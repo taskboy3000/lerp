@@ -8,34 +8,38 @@ use Capture::Tiny ':all';
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-my $plerdall = "$FindBin::Bin/../bin/plerdall";
+our $gPLERDALL_BIN = "$FindBin::Bin/../bin/plerdall";
+our $gINIT_DIR;
+our $gCONFIG_FILE;
 
-my $init_dir = Path::Class::Dir->new( "$FindBin::Bin/init" );
-$init_dir->rmtree;
-$init_dir->mkpath;
+Main();
+exit;
 
-chdir $init_dir or die "Can't chdir to $init_dir: $!";
-
-# Write out a (blank) config file for this test.
-my $config_file_path = Path::Class::File->new(
-    $FindBin::Bin,
-    'test.conf',
-);
-$config_file_path->spew( '' );
-
-# Run init at the default location.
-{
+#--------
+# Tests
+#--------
+sub TestRunAtDefaultLocation {
     run_init();
     check_wrapper( 'plerd' );
 }
 
-# Run init at a specified location.
-{
+sub TestRunAtSpecifiedLocation {
     run_init( 'foobar' );
     check_wrapper( 'foobar' );
 }
 
-done_testing;
+
+#----------
+# Helpers
+sub Main {
+    setup();
+
+    TestRunAtDefaultLocation();
+    TestRunAtSpecifiedLocation();
+
+    teardown();
+    done_testing();
+}
 
 sub run_init {
     my ($init_target) = @_;
@@ -50,9 +54,9 @@ sub run_init {
         system(
             $^X,
             '-I', "$FindBin::Bin/../lib/",
-            $plerdall,
+            $gPLERDALL_BIN,
             $init_arg,
-            "--config=$config_file_path",
+            "--config=$gCONFIG_FILE",
         );
     }
 }
@@ -62,7 +66,7 @@ sub run_init {
 sub check_wrapper {
     my ( $subdir ) = @_;
     my $wrapper = Path::Class::File->new(
-        $init_dir, $subdir, 'templates', 'wrapper.tt'
+        $gINIT_DIR, $subdir, 'templates', 'wrapper.tt'
     );
 
     ok (-e $wrapper, "Wrapper template exists under '$subdir'.");
@@ -73,3 +77,22 @@ sub check_wrapper {
         "Wrapper content looks okay.",
     );
 }
+
+sub setup {
+    $gINIT_DIR = Path::Class::Dir->new( "$FindBin::Bin/init" );
+    $gINIT_DIR->rmtree;
+    $gINIT_DIR->mkpath;
+    chdir $gINIT_DIR or die "Can't chdir to $gINIT_DIR: $!";
+
+    $gCONFIG_FILE = Path::Class::File->new(
+        $FindBin::Bin,
+        'test.conf',
+    );
+    $gCONFIG_FILE->spew( '' );
+
+}
+
+sub teardown {
+
+}
+

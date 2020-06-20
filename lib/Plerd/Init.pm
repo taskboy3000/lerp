@@ -6,7 +6,6 @@ use strict;
 use Path::Class::Dir;
 use LWP;
 use Plerd;
-use Try::Tiny;
 
 my %file_content;
 
@@ -64,7 +63,7 @@ sub populate_directory ( $$ ) {
 
     my %file_content = file_content( $dir );
 
-    try {
+    eval {
         foreach ( qw( docroot source templates log run db conf ) ) {
             my $subdir = Path::Class::Dir->new( $dir, $_ );
             mkdir $subdir or die "Can't create subdir $subdir: $!";
@@ -82,10 +81,9 @@ sub populate_directory ( $$ ) {
         );
 
         $config->spew( iomode=>'>:encoding(utf8)', $file_content{ config } );
-
-    }
-    catch {
-        push @$messages, $_;
+        1;
+    } or do {
+        push @$messages, $@;
         push @$messages, "I am cowardly declining to clean up $dir. You might "
                          . "need to empty or remove it yourself before trying "
                          . "this command again.";

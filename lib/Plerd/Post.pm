@@ -1,241 +1,60 @@
 package Plerd::Post;
 
-use Moose;
+use Data::GUID;
 use DateTime;
 use DateTime::Format::W3CDTF;
+use HTML::SocialMeta;
+use HTML::Strip;
+use JSON;
+use Moo;
+use Path::Class::File;
 use Text::MultiMarkdown qw( markdown );
 use URI;
-use HTML::Strip;
-use Data::GUID;
-use HTML::SocialMeta;
-use Try::Tiny;
-use JSON;
-use Path::Class::File;
 
 use Plerd::SmartyPants;
-use Web::Mention;
 
-use Readonly;
-Readonly my $WPM => 200; # The words-per-minute reading speed to assume
-Readonly my $WEBMENTIONS_STORE_FILENAME => 'webmentions.json';
+our $gWPM = 200; # The words-per-minute reading speed to assume
 
-has 'plerd' => (
-    is => 'ro',
-    required => 1,
-    isa => 'Plerd',
-    weak_ref => 1,
-);
+has 'attributes' => (is => 'rw', default => sub { {} });
+has 'body' => (is => 'rw');
+has 'date' => (is => 'rw', handles => [qw(month month_name day year ymd hms)], trigger => \&_build_utc_date);
+has 'description' => (is => 'rw', default => '',);
+has 'guid' => (is => 'rw');
+sub _build_guid {
+    my $self = shift;
 
-has 'source_file' => (
-    is => 'ro',
-    isa => 'Path::Class::File',
-    required => 1,
-    trigger => \&_process_source_file,
-);
+    return Data::GUID->new;
+}
 
-has 'publication_file' => (
-    is => 'ro',
-    isa => 'Path::Class::File',
-    lazy_build => 1,
-);
+has 'image' => (is => 'rw', default => undef);
+has 'image_alt' => (is => 'rw', default => undef);
+has 'json' => (is => 'ro', default => sub { JSON->new->convert_blessed });
+has 'newer_post' => (is => 'ro', lazy => 1, builder => '_build_newer_post');
+sub _build_newer_post {
+    my $self = shift;
 
-has 'title' => (
-    is => 'rw',
-    isa => 'Str',
-);
+    my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
 
-has 'body' => (
-    is => 'rw',
-    isa => 'Str',
-);
+    my $newer_post;
+    if ( $index - 1 >= 0 ) {
+        $newer_post = $self->plerd->posts->[ $index - 1 ];
+    }
 
-has 'stripped_body' => (
-    is => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
-);
+    return $newer_post;
+}
+has 'older_post' => (is => 'ro', lazy => 1, builder => '_build_older_post');
+sub _build_older_post {
+    my $self = shift;
 
-has 'stripped_title' => (
-    is => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
-);
+    my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
 
-has 'attributes' => (
-    is => 'rw',
-    isa => 'HashRef',
-);
+    my $older_post = $self->plerd->posts->[ $index + 1 ];
 
-has 'tag_objects' => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    default => sub {[]}
-);
+    return $older_post;
+}
 
-has 'image' => (
-    is => 'rw',
-    isa => 'Maybe[URI]',
-    default => undef,
-);
-
-has 'image_alt' => (
-    is => 'rw',
-    isa => 'Maybe[Str]',
-    default => undef,
-);
-
-has 'description' => (
-    is => 'rw',
-    isa => 'Str',
-    default => '',
-);
-
-has 'date' => (
-    is => 'rw',
-    isa => 'DateTime',
-    handles => [ qw(
-        month
-        month_name
-        day
-        year
-        ymd
-        hms
-    ) ],
-    trigger => \&_build_utc_date,
-);
-
-has 'utc_date' => (
-    is => 'rw',
-    isa => 'DateTime',
-    lazy_build => 1,
-);
-
-has 'published_filename' => (
-    is => 'rw',
-    isa => 'Str',
-    lazy_build => 1,
-);
-
-has 'uri' => (
-    is => 'ro',
-    isa => 'URI',
-    lazy_build => 1,
-);
-
-has 'guid' => (
-    is => 'rw',
-    isa => 'Data::GUID',
-);
-
-has 'updated_timestamp' => (
-    is => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
-);
-
-has 'published_timestamp' => (
-    is => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
-);
-
-has 'newer_post' => (
-    is => 'ro',
-    isa => 'Maybe[Plerd::Post]',
-    lazy_build => 1,
-);
-
-has 'older_post' => (
-    is => 'ro',
-    isa => 'Maybe[Plerd::Post]',
-    lazy_build => 1,
-);
-
-has 'reading_time' => (
-    is => 'ro',
-    isa => 'Num',
-    lazy_build => 1,
-);
-
-has 'socialmeta' => (
-    is => 'ro',
-    isa => 'Maybe[HTML::SocialMeta]',
-    lazy_build => 1,
-);
-
-has 'social_meta_tags' => (
-    is => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
-);
-
-has 'socialmeta_mode' => (
-    is => 'rw',
-    isa => 'Str',
-    default => 'summary',
-);
-
-has 'webmentions_by_source' => (
-    is => 'ro',
-    isa => 'HashRef',
-    lazy_build => 1,
-);
-
-has 'likes' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    lazy_build => 1,
-    traits => ['Array'],
-    handles => {
-        like_count => 'count',
-    },
-);
-
-has 'reposts' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    lazy_build => 1,
-    traits => ['Array'],
-    handles => {
-        repost_count => 'count',
-    },
-);
-
-has 'replies' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    traits => ['Array'],
-    lazy_build => 1,
-    handles => {
-        reply_count => 'count',
-    },
-);
-
-has 'quotations' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    traits => ['Array'],
-    lazy_build => 1,
-    handles => {
-        quotation_count => 'count',
-    },
-);
-
-has 'mentions' => (
-    is => 'ro',
-    isa => 'ArrayRef[Web::Mention]',
-    traits => ['Array'],
-    lazy_build => 1,
-    handles => {
-        mention_count => 'count',
-    },);
-
-has 'json' => (
-    is => 'ro',
-    isa => 'JSON',
-    default => sub { JSON->new->convert_blessed },
-);
-
+has 'plerd' => (is => 'ro', required => 1, weak_ref => 1);
+has 'publication_file' => (is => 'ro',lazy => 1, builder => '_build_publication_file');
 sub _build_publication_file {
     my $self = shift;
 
@@ -245,6 +64,7 @@ sub _build_publication_file {
     );
 }
 
+has 'published_filename' => (is => 'rw', lazy => 1, builder => '_build_published_filename');
 sub _build_published_filename {
     my $self = shift;
 
@@ -269,59 +89,7 @@ sub _build_published_filename {
 
     return $filename;
 }
-
-sub _build_uri {
-    my $self = shift;
-
-    my $base_uri = $self->plerd->base_uri;
-    if ($base_uri =~ /[^\/]$/) {
-        $base_uri .= '/';
-    }
-    return URI->new_abs(
-        $self->published_filename,
-        $base_uri,
-    );
-}
-
-sub _build_updated_timestamp {
-    my $self = shift;
-
-    my $mtime = $self->source_file->stat->mtime;
-
-    my $formatter = DateTime::Format::W3CDTF->new;
-    my $timestamp = $formatter->format_datetime(
-        DateTime->from_epoch(
-            epoch     => $mtime,
-            time_zone => 'local',
-        ),
-    );
-
-    return $timestamp;
-}
-
-sub _build_newer_post {
-    my $self = shift;
-
-    my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
-
-    my $newer_post;
-    if ( $index - 1 >= 0 ) {
-        $newer_post = $self->plerd->posts->[ $index - 1 ];
-    }
-
-    return $newer_post;
-}
-
-sub _build_older_post {
-    my $self = shift;
-
-    my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
-
-    my $older_post = $self->plerd->posts->[ $index + 1 ];
-
-    return $older_post;
-}
-
+has 'published_timestamp' => (is => 'ro', lazy => 1, builder => '_build_published_timestamp');
 sub _build_published_timestamp {
     my $self = shift;
 
@@ -331,43 +99,49 @@ sub _build_published_timestamp {
     return $timestamp;
 }
 
-sub _build_guid {
-    my $self = shift;
-
-    return Data::GUID->new;
-}
-
+has 'reading_time' => (is => 'ro', lazy => 1, builder => '_build_reading_time');
 sub _build_reading_time {
     my $self = shift;
 
     my @words = $self->stripped_body =~ /(\w+)\W*/g;
 
-    return int ( scalar(@words) / $WPM ) + 1;
+    return int ( scalar(@words) / $gWPM ) + 1;
 }
 
-sub _build_stripped_body {
+has 'social_meta_tags' => (is => 'ro', lazy => 1, builder => '_build_social_meta_tags');
+sub _build_social_meta_tags {
     my $self = shift;
 
-    return $self->_strip_html( $self->body );
+    my $tags = '';
+
+    my %targets = (
+        twitter => 'twitter_id',
+        opengraph => 'facebook_id',
+    );
+
+    if ( $self->socialmeta ) {
+        for my $target ( keys %targets ) {
+            my $id_method = $targets{ $target };
+            if ( $self->plerd->$id_method ) {
+                eval {
+                    $tags .=
+                        $self->socialmeta->$target->create(
+                            $self->socialmeta_mode
+                        );
+                    1;
+                } or do {
+                    warn "Couldn't create $target meta tags for "
+                         . $self->source_file->basename
+                         . ": $@\n";
+                };
+            }
+        }
+    }
+
+    return $tags;
 }
 
-sub _build_stripped_title {
-    my $self = shift;
-
-    return $self->_strip_html( $self->title );
-}
-
-sub _strip_html {
-    my ($self, $raw_text) = @_;
-
-    my $stripped = HTML::Strip->new->parse( $raw_text );
-
-    # Clean up apparently orphaned punctuation
-    $stripped =~ s{ ([;.,\?\!])}{$1}g;
-
-    return $stripped;
-}
-
+has 'socialmeta' => (is => 'ro', lazy => 1, builder => '_build_socialmeta');
 sub _build_socialmeta {
     my $self = shift;
 
@@ -392,49 +166,123 @@ sub _build_socialmeta {
 
     my $socialmeta;
 
-    try {
+    eval {
         $socialmeta = HTML::SocialMeta->new( %args );
-    }
-    catch {
+        1
+    } or do {
         warn "Couldn't build an HTML::SocialMeta object for post "
              . $self->source_file->basename
-             . ": $_\n";
+             . ": $@\n";
     };
 
     return $socialmeta;
 }
 
-sub _build_social_meta_tags {
+has 'socialmeta_mode' => (is => 'rw', default => sub {'summary'});
+
+has 'source_file' => (is => 'ro', required => 1, trigger => \&_process_source_file,); # @fixme
+has 'stripped_body' => (is => 'ro', lazy => 1, builder => '_build_stripped_body');
+sub _build_stripped_body {
     my $self = shift;
 
-    my $tags = '';
+    return $self->_strip_html( $self->body );
+}
 
-    my %targets = (
-        twitter => 'twitter_id',
-        opengraph => 'facebook_id',
+has 'stripped_title' => (is => 'ro', lazy => 1, builder => '_build_stripped_title');
+sub _build_stripped_title {
+    my $self = shift;
+
+    return $self->_strip_html( $self->title );
+}
+
+has 'tag_objects' => (is => 'rw', lazy => 1, builder => '_build_tag_objects');
+sub  _build_tag_objects { [] }
+ 
+has 'title' => (is => 'rw');
+has 'updated_timestamp' => (is => 'ro', lazy => 1, builder => '_build_updated_timestamp');
+sub _build_updated_timestamp {
+    my $self = shift;
+
+    my $mtime = $self->source_file->stat->mtime;
+
+    my $formatter = DateTime::Format::W3CDTF->new;
+    my $timestamp = $formatter->format_datetime(
+        DateTime->from_epoch(
+            epoch     => $mtime,
+            time_zone => 'local',
+        ),
     );
 
-    if ( $self->socialmeta ) {
-        for my $target ( keys %targets ) {
-            my $id_method = $targets{ $target };
-            if ( $self->plerd->$id_method ) {
-                try {
-                    $tags .=
-                        $self->socialmeta->$target->create(
-                            $self->socialmeta_mode
-                        );
-                }
-                catch {
-                    warn "Couldn't create $target meta tags for "
-                         . $self->source_file->basename
-                         . ": $_\n";
-                };
-            }
-        }
+    return $timestamp;
+}
+has 'uri' => (is => 'ro', lazy => 1, builder => '_build_uri');
+sub _build_uri {
+    my $self = shift;
+
+    my $base_uri = $self->plerd->base_uri;
+    if ($base_uri =~ /[^\/]$/) {
+        $base_uri .= '/';
     }
+    return URI->new_abs(
+        $self->published_filename,
+        $base_uri,
+    );
+}
+has 'utc_date' => (is => 'rw', lazy => 1, builder => '_build_utc_date');
+sub _build_utc_date {
+    my $self = shift;
 
-    return $tags;
+    my $dt = $self->date->clone;
+    $dt->set_time_zone( 'UTC' );
+    return $dt;
+}
 
+#-------------------
+# "Public" methods
+#-------------------
+sub publish {
+    my $self = shift;
+
+    # Make <title>-ready text free of possible Markdown-generated HTML tags.
+    my $stripped_title = $self->title;
+    $stripped_title =~ s{</?(em|strong)>}{}g;
+
+    my $html_fh = $self->publication_file->openw;
+    my $template_fh = $self->plerd->post_template_file->openr;
+    foreach( $html_fh, $template_fh ) {
+	$_->binmode(':utf8');
+    }
+    $self->plerd->template->process(
+        $template_fh,
+        {
+            plerd => $self->plerd,
+            posts => [ $self ],
+            title => $stripped_title,
+            context_post => $self,
+        },
+	    $html_fh,
+    ) || $self->plerd->_throw_template_exception( $self->plerd->post_template_file );
+
+}
+
+sub tags {
+    my $self = shift;
+
+    return [ map { $_->name } @{ $self->tag_objects } ];
+}
+
+#-------------------
+# "Private" methods
+#-------------------
+sub _strip_html {
+    my ($self, $raw_text) = @_;
+
+    my $stripped = HTML::Strip->new->parse( $raw_text );
+
+    # Clean up apparently orphaned punctuation
+    $stripped =~ s{ ([;.,\?\!])}{$1}g;
+
+    return $stripped;
 }
 
 # This next internal method does a bunch of stuff.
@@ -612,118 +460,6 @@ sub _process_source_file {
     }
 }
 
-sub publish {
-    my $self = shift;
-
-    # Make <title>-ready text free of possible Markdown-generated HTML tags.
-    my $stripped_title = $self->title;
-    $stripped_title =~ s{</?(em|strong)>}{}g;
-
-    my $html_fh = $self->publication_file->openw;
-    my $template_fh = $self->plerd->post_template_file->openr;
-    foreach( $html_fh, $template_fh ) {
-	$_->binmode(':utf8');
-    }
-    $self->plerd->template->process(
-        $template_fh,
-        {
-            plerd => $self->plerd,
-            posts => [ $self ],
-            title => $stripped_title,
-            context_post => $self,
-        },
-	    $html_fh,
-    ) || $self->plerd->_throw_template_exception( $self->plerd->post_template_file );
-
-}
-
-sub send_webmentions {
-    my $self = shift;
-
-    my @wms = Web::Mention->new_from_html(
-        source => $self->uri,
-        html => $self->body,
-    );
-
-    my %report = (
-        attempts => 0,
-        delivered => 0,
-        sent => 0,
-    );
-    foreach ( @wms ) {
-        $report{attempts}++;
-        if ( $_->send ) {
-            $report{delivered}++;
-        }
-        if ( $_->endpoint ) {
-            $report{sent}++;
-        }
-    }
-
-    return (\%report);
-}
-
-sub add_webmention {
-    my $self = shift;
-    my ( $webmention ) = @_;
-
-    $self->webmentions_by_source->{ $webmention->source } = $webmention;
-    $self->serialize_webmentions;
-}
-
-sub update_webmention {
-    return add_webmention( @_ );
-}
-
-sub delete_webmention {
-    my $self = shift;
-    my ( $webmention ) = @_;
-
-    delete $self->webmentions_by_source->{ $webmention->source };
-    $self->serialize_webmentions;
-}
-
-sub serialize_webmentions {
-    my $self = shift;
-
-    $self->_store( $WEBMENTIONS_STORE_FILENAME, $self->webmentions_by_source );
-}
-
-sub ordered_webmentions {
-    my $self = shift;
-
-    return sort
-        {$a->time_published <=> $b->time_published }
-        values( %{ $self->webmentions_by_source } )
-    ;
-}
-
-sub webmention_count {
-    my $self = shift;
-
-    return scalar keys %{ $self->webmentions_by_source };
-}
-
-sub _build_webmentions_by_source {
-    my $self = shift;
-
-    my $webmentions_ref =
-        $self->_retrieve(
-            $WEBMENTIONS_STORE_FILENAME,
-        )
-        || {}
-    ;
-
-    for my $source_url ( keys( %{ $webmentions_ref } ) ) {
-        my $webmention = Web::Mention->FROM_JSON(
-            $webmentions_ref->{ $source_url }
-        );
-        $webmentions_ref->{ $source_url } = $webmention;
-    }
-
-    return $webmentions_ref;
-}
-
 sub _store {
     my $self = shift;
     my ($filename, $data_ref) = @_;
@@ -762,248 +498,4 @@ sub _retrieve {
     }
 }
 
-sub _build_utc_date {
-    my $self = shift;
-
-    my $dt = $self->date->clone;
-    $dt->set_time_zone( 'UTC' );
-    return $dt;
-}
-
-sub _build_likes {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'like' );
-}
-
-sub _build_mentions {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'mention' );
-}
-
-sub _build_replies {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'reply' );
-}
-
-sub _build_quotations {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'quotation' );
-}
-
-sub _build_reposts {
-    my $self = shift;
-
-    return $self->_grep_webmentions( 'repost' );
-}
-
-sub _grep_webmentions {
-    my ( $self, $webmention_type ) = @_;
-    return [
-        grep { $_->type eq $webmention_type } $self->ordered_webmentions
-    ];
-}
-
-sub tags {
-    my $self = shift;
-
-    return [ map { $_->name } @{ $self->tag_objects } ];
-}
-
 1;
-
-=head1 NAME
-
-Plerd::Post - A Plerd blog post
-
-=head1 DESCRIPTION
-
-An object of the class Plerd::Post represents a single post to a
-Plerd-based blog, with Markdown source and HTML output.
-
-=head1 CLASS METHODS
-
-=over
-
-=item new( \%config )
-
-Object constructor. The single config hashref I<must> include the
-following keys:
-
-=over
-
-=item plerd
-
-The parent Plerd object.
-
-=item source_file
-
-A Path::Class::File object representing this post's Markdown source
-file.
-
-=back
-
-=back
-
-=head1 OBJECT ATTRIBUTES
-
-=head2 Read-only attributes
-
-=over
-
-=item newer_post
-
-A Plerd::Post object representing the next-newer post to the blog.
-
-Is the current object represents the newest post in the blog, then this
-method returns undef.
-
-=item older_post
-
-A Plerd::Post object representing the next-older post to the blog.
-
-Is the current object represents the oldest post in the blog, then this
-method returns undef.
-
-=item published_filename
-
-The local filename (without parent directory path) of the HTML file that
-this post will generate upon publication.
-
-=item published_timestamp
-
-This post's date, in W3C format, set to midnight in the local timezone.
-
-=item reading_time
-
-An estimated reading-time for this post, measured in whole minutes, and
-based on an assumed (and fairly conservative) reading pace of 200 words
-per minute.
-
-=item updated_timestamp
-
-The modification time of this this post's source file, in W3C format,
-set to the local timezone.
-
-=item uri
-
-The L<URI> of the of the HTML file that this post will generate upon
-publication.
-
-=item utc_date
-
-Returns the value of C<date> (see below), with the time zone set to UTC.
-
-=back
-
-=head2 Read-write attributes
-
-=over
-
-=item attributes
-
-A hashref of all the attributes defined in the source document's
-metadata section, whether or not Plerd takes any special meaning from
-them.
-
-For example, if a source document defines both C<title> and
-C<favorite_color> key-value pairs in its metadata, both keys and values
-will appear in this hashref, even though Plerd pays no mind to the
-latter key.
-
-=item body
-
-String representing the post's body text.
-
-=item date
-
-L<DateTime> object representing this post's presented publication date.
-
-Plerd usually sets this for you, based on the post's metadata, and sets
-the time zone to local. If you'd like the object in UTC time instead,
-use the C<utc_date> attribute.
-
-=item description
-
-String representing a short, descriptive summary of this post. This
-value affects the metadata attached to this post, for use by social
-media and such.
-
-If you don't set this value yourself by the time Plerd needs it, then it
-will set it to the first paragraph of the post's body text (with all
-markup removed).
-
-=item image
-
-(Optional) L<URI> object referencing an illustrative image for this
-post.
-
-Setting this value affects the metadata attached to this post, for use
-by social media and such.
-
-=item image_alt
-
-(Optional) A text description of the image referenced by the C<image>
-atribute.
-
-Setting this value affects the metadata attached to this post, for use
-by social media and such.
-
-=item title
-
-String representing this post's title.
-
-=item tags
-
-An array reference to the list of tags (as plain-text strings)
-associated with this post as set in the source file using the 'tags:'
-header.
-
-=item tag_objects
-
-An array reference to the list of tags (as L<Plerd::Tag> objects)
-associated with this post as set in the source file using the 'tags:'
-header.
-
-=back
-
-=head1 OBJECT METHODS
-
-=head2 publish
-
- $post->publish
-
-Publishes the post.
-
-=head2 send_webmentions
-
- $report = $post->send_webmentions
-
-Attempts to send a webmention for every hyperlink contained in the post.
-
-The return value is a hashref with the following keys:
-
-=over
-
-=item attempts
-
-The number of webmentions this post attempted to send.
-
-=item sent
-
-The number of webmentions actually sent (due to webmention-endpoint URLs
-advertised by the links' targets).
-
-=item delivered
-
-The number of webmentions whose delivery was acknowledged by the
-receiving endpoint.
-
-=back
-
-=head1 AUTHOR
-
-Jason McIntosh <jmac@jmac.org>

@@ -4,11 +4,10 @@ package Plerd::Util;
 
 use warnings;
 use strict;
-use Try::Tiny;
-use File::HomeDir;
-use YAML qw( LoadFile );
+
 use Cwd;
 use Path::Class::File;
+use YAML qw( LoadFile );
 
 # read_config_file: Pass in a param representing a config file location, which
 #                   can be undef if we don't have one. Apply fallbacks if
@@ -17,25 +16,27 @@ use Path::Class::File;
 sub read_config_file {
     my ( $config_file ) = @_;
 
-    unless ( defined $config_file ) {
+    if (! defined $config_file ) {
         # As fallback config locations, try ./plerd.conf, conf/plerd.conf,
         # ~/.plerd, then (for historical reasons) $bin/../conf/plerd.conf.
         # Then give up.
         my $local_file = Path::Class::File->new( getcwd, 'plerd.conf' );
         my $nearby_file = Path::Class::File->new( getcwd, 'conf', 'plerd.conf' );
-        my $dotfile = Path::Class::File->new( File::HomeDir->my_home, '.plerd' );
-        foreach (
+        my $dotfile = Path::Class::File->new( "$ENV{HOME}/.plerd" );
+
+        for my $file (
             $local_file,
             $nearby_file,
             $dotfile,
             "$FindBin::Bin/../conf/plerd.conf",
         ) {
-            if ( -r $_ ) {
-                $config_file = $_;
+            if ( -r $file) {
+                $config_file = $file;
                 last;
             }
         }
-        unless ( defined $config_file ) {
+
+        if (! defined $config_file ) {
             die "Can't start $0: I can't find a Plerd config file in "
                 . "$local_file, $nearby_file, $dotfile, or in "
                 . "$FindBin::Bin/../conf/plerd.conf, and "
@@ -44,34 +45,16 @@ sub read_config_file {
     }
 
     my $config_ref;
-    try {
+    eval {
         $config_ref = LoadFile( $config_file );
-    }
-    catch {
+        1;
+    } or do {
         if ( -r $config_file ) {
             die "Can't start $0: Can't read config file at $config_file: $_\n";
-        }
-        else {
+        } else {
             die "Can't start $0: No readable config file found at $config_file.\n";
         }
     };
 }
 
 1;
-
-=head1 NAME
-
-Plerd::Util
-
-=head1 DESCRIPTION
-
-This class provides some utility functions common to Plerd's
-command-line programs. It has no public API.
-
-=head1 SEE ALSO
-
-L<Plerd>
-
-=head1 AUTHOR
-
-Jason McIntosh <jmac@jmac.org>

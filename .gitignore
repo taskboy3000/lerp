@@ -10,3 +10,7 @@ log
 conf
 Plerd-*
 /MYMETA.*
+local
+Makefile
+Makefile.old
+blib
