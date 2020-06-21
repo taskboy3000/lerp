@@ -54,7 +54,7 @@ sub _build_older_post {
 }
 
 has 'plerd' => (is => 'ro', required => 1, weak_ref => 1);
-has 'publication_file' => (is => 'ro',lazy => 1, builder => '_build_publication_file');
+has 'publication_file' => (is => 'ro',lazy => 1, predicate => 1, builder => '_build_publication_file');
 sub _build_publication_file {
     my $self = shift;
 
@@ -62,6 +62,17 @@ sub _build_publication_file {
         $self->plerd->publication_directory,
         $self->published_filename,
     );
+}
+
+has 'publication_file_mtime' => (is => 'ro', lazy => 1, builder => '_builder_publication_file');
+sub _build_publication_file_mtime {
+    my ($self) = @_;
+    if (-e $self->publication_file->stringify) {
+        my @stat = $self->publication_file->stat;
+        return $stat[9];
+    }
+
+    return;
 }
 
 has 'published_filename' => (is => 'rw', lazy => 1, builder => '_build_published_filename');
@@ -181,6 +192,17 @@ sub _build_socialmeta {
 has 'socialmeta_mode' => (is => 'rw', default => sub {'summary'});
 
 has 'source_file' => (is => 'ro', required => 1, trigger => \&_process_source_file,); # @fixme
+
+has 'source_file_mtime' => (is => 'ro', lazy => 1, builder => '_build_source_file_mtime');
+sub _build_source_file_mtime {
+    my ($self) = @_;
+    if (-e $self->source_file->stringify) {
+        my @stat = $self->source_file->stat;
+        return $stat[9];
+    }
+    return;
+}
+
 has 'stripped_body' => (is => 'ro', lazy => 1, builder => '_build_stripped_body');
 sub _build_stripped_body {
     my $self = shift;
@@ -215,6 +237,7 @@ sub _build_updated_timestamp {
 
     return $timestamp;
 }
+
 has 'uri' => (is => 'ro', lazy => 1, builder => '_build_uri');
 sub _build_uri {
     my $self = shift;
@@ -228,6 +251,7 @@ sub _build_uri {
         $base_uri,
     );
 }
+
 has 'utc_date' => (is => 'rw', lazy => 1, builder => '_build_utc_date');
 sub _build_utc_date {
     my $self = shift;
@@ -249,9 +273,10 @@ sub publish {
 
     my $html_fh = $self->publication_file->openw;
     my $template_fh = $self->plerd->post_template_file->openr;
-    foreach( $html_fh, $template_fh ) {
-	$_->binmode(':utf8');
+    for ( $html_fh, $template_fh ) {
+	    $_->binmode(':utf8');
     }
+
     $self->plerd->template->process(
         $template_fh,
         {
@@ -263,12 +288,21 @@ sub publish {
 	    $html_fh,
     ) || $self->plerd->_throw_template_exception( $self->plerd->post_template_file );
 
+    $self->publication_file_mtime;
+    $self->update_tag_db;
 }
 
 sub tags {
     my $self = shift;
 
     return [ map { $_->name } @{ $self->tag_objects } ];
+}
+
+sub update_tag_db {
+    my $self = shift;
+    my $tags = $self->tags;
+
+    @$tags 
 }
 
 #-------------------

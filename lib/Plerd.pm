@@ -144,20 +144,6 @@ sub _build_post_template_file {
     );
 }
 
-#has 'posts' => (is => 'ro', lazy => 1, clearer => 1, builder => "_build_posts"); 
-#sub _build_posts {
-#    my $self = shift;
-#    my @posts;
-#
-#    @posts = sort { $b->date <=> $a->date }
-#                map { Plerd::Post->new( plerd => $self, source_file => $_ ) }
-#                @${ $self->get_source_files }
-#    ;
-#
-#    return \@posts;
-#}
-#
-
 has 'publication_directory' => (is => 'ro', lazy => 1, builder => "_build_publication_directory");
 sub _build_publication_directory {
     my $self = shift;
@@ -257,6 +243,7 @@ sub _build_tags_index_uri {
     );
 }
 
+# @todo: should this be sqlite?
 has 'tags_map' => (is => 'ro', lazy => 1, builder => '_build_tags_map');
 sub _build_tags_map { {} };
 
@@ -406,15 +393,44 @@ sub sort_posts {
     return [ sort { $b->date <=> $a->date } @$posts ]; 
 }
 
-# @todo: This should really just publish new posts and update tags
 sub publish {
-    my $self = shift;
+    my ($self, $post) = @_;
  
-    return $self->publish_all;
+    $self->clear_recent_posts;
+ 
+    $self->clear_post_index_hash;
+    $self->clear_post_url_index_hash;
+
+    $self->tags_map( {} );
+    $self->tag_case_conflicts( {} );
+
+    if (!defined $post) {
+        die("assert");
+    }
+
+    $post->publish;
+    $self->report_tag_case_conflicts();
+
+    # update the other publishing artefacts
+    # @fixme: recompute recent posts
+    $self->publish_rss;
+    $self->publish_jsonfeed;
+
+    $self->publish_tag_indexes;
+    $self->publish_archive_page;
+    $self->publish_recent_page;
 }
 
+# This republishes all content
 sub publish_all {
     my $self = shift;
+
+    # Reset an previous state
+    $self->clear_recent_posts;
+    $self->clear_post_index_hash;
+    $self->clear_post_url_index_hash;
+    $self->tags_map( {} );
+    $self->tag_case_conflicts( {} );
 
     for my $post ( @{ $self->posts } ) {
         $post->publish;
@@ -430,7 +446,6 @@ sub publish_all {
     $self->publish_jsonfeed;
 
     $self->clear_recent_posts;
-    $self->clear_posts;
     $self->clear_post_index_hash;
     $self->clear_post_url_index_hash;
 
@@ -504,6 +519,11 @@ sub publish_recent_page {
     symlink $self->recent_file, $index_file;
 }
 
+sub update_recent_page {
+    die;
+}
+
+
 sub publish_rss {
     my $self = shift;
 
@@ -529,32 +549,6 @@ sub post_with_url {
     }
 }
 
-# @todo: Why is this method marked private?
-sub _publish_feed {
-    my $self = shift;
-    my ( $feed_type ) = @_;
-
-    my $template_file_method = "${feed_type}_template_file";
-    my $file_method          = "${feed_type}_file";
-
-    return unless -e $self->$template_file_method;
-
-    my $formatter = $self->datetime_formatter;
-    my $timestamp =
-        $formatter->format_datetime( DateTime->now( time_zone => 'local' ) )
-    ;
-
-    $self->template->process(
-        $self->$template_file_method->open('<:encoding(utf8)'),
-        {
-            plerd => $self,
-            posts => $self->recent_posts,
-            timestamp => $timestamp,
-        },
-        $self->$file_method->open('>:encoding(utf8)'),
-    ) || $self->_throw_template_exception( $self->$template_file_method );
-}
-
 sub publish_archive_page {
     my $self = shift;
 
@@ -571,45 +565,6 @@ sub publish_archive_page {
 
 }
 
-### Helper methods
-# Given a Path::Class::File or Path::Class::Dir make the directory
-sub _make_path {
-    my ($self, $path) = @_;
-
-    if (!$path) {
-        die("assert - no path given to _make_path");
-    }
-
-    if (ref $path eq 'Path::Class::File') {
-        if (-e $path->parent->stringify) {
-            return $path->parent;
-        }
-
-        return $self->_make_path($path->parent);
-    } elsif (ref $path eq 'Path::Class::Dir') {
-        if ( -e $path->stringify) {
-            return $path;
-        }
-        $path->mkpath(0, 0755);
-        return $path;
-    } elsif (!ref $path) {
-        # assume someone passed in a path as a string
-        return $self->_make_path(Path::Class::Dir->new($path));
-    }
-
-    die("assert - unhandled object " . $path);    
-}
-
-sub _throw_template_exception {
-    my $self = shift;
-    my ( $template_file ) = @_;
-
-    my $error = $self->template->error;
-
-    die "Publication interrupted due to an error encountered while processing "
-        . "template file $template_file: $error\n";
-}
-
 
 #### Tag-related builders & methods
 # This is dynamically computed and not a good fit for a Moo property
@@ -618,21 +573,6 @@ sub has_tags {
     my $tags_map = $self->tags_map;
 
     return scalar(keys(%$tags_map)) ? 1 : 0;
-}
-
-# Return either the tags/index.html file
-# or a tags/TAGNAME.html file if given a tag
-sub _make_tags_publication_file {
-    my ($self, $tag) = @_;
-    $tag //= 'index';
-
-    my $tags_dir = $self->_make_path($self->publication_directory,
-                                     $self->_build_tags_publication_directory);
-
-    my $file = Path::Class::File->new($tags_dir,
-                                      "$tag.html");
-
-    return $file;
 }
 
 sub tag_named {
@@ -689,6 +629,87 @@ sub report_tag_case_conflicts {
              . "sadnesses and regrets. Please normalize these tags!\n";
 
     warn $warning;
+}
+
+#-------------------
+# 'Private' Methods
+#-------------------
+sub _publish_feed {
+    my $self = shift;
+    my ( $feed_type ) = @_;
+
+    my $template_file_method = "${feed_type}_template_file";
+    my $file_method          = "${feed_type}_file";
+
+    return unless -e $self->$template_file_method;
+
+    my $formatter = $self->datetime_formatter;
+    my $timestamp =
+        $formatter->format_datetime( DateTime->now( time_zone => 'local' ) )
+    ;
+
+    $self->template->process(
+        $self->$template_file_method->open('<:encoding(utf8)'),
+        {
+            plerd => $self,
+            posts => $self->recent_posts,
+            timestamp => $timestamp,
+        },
+        $self->$file_method->open('>:encoding(utf8)'),
+    ) || $self->_throw_template_exception( $self->$template_file_method );
+}
+
+sub _make_path {
+    my ($self, $path) = @_;
+
+    if (!$path) {
+        die("assert - no path given to _make_path");
+    }
+
+    if (ref $path eq 'Path::Class::File') {
+        if (-e $path->parent->stringify) {
+            return $path->parent;
+        }
+
+        return $self->_make_path($path->parent);
+    } elsif (ref $path eq 'Path::Class::Dir') {
+        if ( -e $path->stringify) {
+            return $path;
+        }
+        $path->mkpath(0, 0755);
+        return $path;
+    } elsif (!ref $path) {
+        # assume someone passed in a path as a string
+        return $self->_make_path(Path::Class::Dir->new($path));
+    }
+
+    die("assert - unhandled object " . $path);    
+}
+
+sub _throw_template_exception {
+    my $self = shift;
+    my ( $template_file ) = @_;
+
+    my $error = $self->template->error;
+
+    die "Publication interrupted due to an error encountered while processing "
+        . "template file $template_file: $error\n";
+}
+
+
+# Return either the tags/index.html file
+# or a tags/TAGNAME.html file if given a tag
+sub _make_tags_publication_file {
+    my ($self, $tag) = @_;
+    $tag //= 'index';
+
+    my $tags_dir = $self->_make_path($self->publication_directory,
+                                     $self->_build_tags_publication_directory);
+
+    my $file = Path::Class::File->new($tags_dir,
+                                      "$tag.html");
+
+    return $file;
 }
 
 1;
