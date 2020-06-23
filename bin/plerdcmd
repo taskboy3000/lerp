@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use FindBin;
+BEGIN {
+    if (!exists $ENV{PLERD_HOME}) {
+        $ENV{PLERD_HOME}="$FindBin::Bin/..";
+    }   
+}
+use lib "$ENV{PLERD_HOME}/lib";
+
+use Cwd;
+use Getopt::Long;
+use Path::Class::Dir;
+use Plerd;
+use Plerd::Config;
+
+Main();
+exit(0);
+
+#--------------
+# Subroutines
+#--------------
+sub Main {
+    my %opts;
+    GetOptions(
+        'init' => \$opts{initialize},
+        'publish=s' => \$opts{publish},
+        'publish-all' => \$opts{publish_all},
+        'c|onfig=s' => \$opts{config},
+        'd|base-dir=s' => \$opts{base_dir},
+        'v|verbose' => \$opts{verbose},
+        'version'   => \$opts{version},
+        'h|help' => \$opts{usage},
+    );
+
+    if ($opts{help}) {
+        usage();
+    } elsif ($opts{version}){
+        version();
+    } elsif ($opts{initialize}) {
+        initialize($opts{config}, $opts{base_dir}, $opts{verbose});
+    } elsif ($opts{publish}) {
+        publish($opts{publish}, $opts{config}, $opts{verbose});
+    } elsif ($opts{publish_all}) {
+        publish_all($opts{config}, $opts{verbose});
+    } else {
+        usage();
+    }
+
+    return;
+}
+
+sub usage {
+    print <<"EOT";
+$0 - manage plerd sites
+
+USAGE:
+
+    $0 [OPTIONS] [COMMAND]
+
+COMMAND:
+
+--init                   Create a new plerd site
+--publish [SOURCE_FILE]  Publish the source given by SOURCE_FILE
+--publish-all            Republish all known source files
+
+OPTIONS:
+
+--c|config [FILE]        Name of plerd configuration file to use
+--base-dir [DIR]         Directory into which plerd artifacts are copied
+--verbose                Enable verbose messages
+--version                Print plerd version number
+--help                   This screen
+
+EOT
+}
+
+sub version {
+    printf("Plerd version %s\n", $Plerd::VERSION);
+}
+
+sub initialize {
+    my ($conf_file, $base_dir, $verbose) = @_;
+
+    my $config;
+    if (defined $conf_file && -e $conf_file) {
+        $config = Plerd::Config->new(config_file => $conf_file);
+        $config->unserialize;
+    } else {
+        my %params;
+        if (defined $base_dir) {
+            $params{path} = $base_dir;
+        }
+        if (defined $conf_file) {
+            $params{config_file} = $conf_file;
+        }
+        $config = Plerd::Config->new(%params);
+    }
+
+    if ($verbose) {
+        printf("Using conf: %s\n", $config->config_file);
+    }
+
+    my @messages = $config->initialize;
+    if ($verbose) {
+        for my $line (@messages) {
+            printf("%s\n", $line);
+        }
+    }
+}
+
+sub publish {
+    my ($source_file, $conf_file, $verbose) = @_;
+    die("assert");
+}
+
+sub publish_all {
+    my ($conf_file, $verbose) = @_;
+    die("assert");
+}

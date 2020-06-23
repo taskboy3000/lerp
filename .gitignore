@@ -14,3 +14,6 @@ local
 Makefile
 Makefile.old
 blib
+plerd.code-workspace
+*.old
+

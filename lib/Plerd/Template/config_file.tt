@@ -1,0 +1,73 @@
+# This is a configuration file for a single Plerd-based blog!
+#
+# Update the values below to best suit your blogging needs. After that,
+# you can then either copy (or symlink) this file to .plerd in your home
+# directory for use as a system-wide default, or you can specify this
+# file when running the `plerd` or `plerdwatcher` programs through their
+# --config command-line option. (See these programs' respective man
+# pages for more details.)
+
+#####################
+# Required setup
+#####################
+# Values for these fields are all required for Plerd to work properly.
+
+# base_uri: The URI base that this blog will use when generating various
+#           self-pointing links. Generally, this should be the same as your
+#           blog's "front page" URL.
+base_uri:     [% config.base_uri %]
+
+# path: The path on your filesystem where Plerd will find this blog's
+# source, docroot, and other important sub-directories. (If you don't
+# want to keep all these under a single master directory, see
+# "Split-location setup", below.)
+path:         [% config.path %]
+
+# title: This blog's title.
+title:        [% config.title %]
+
+# author_name: The name of this blog's author.
+author_name:  [% config.author_name %]
+
+# author_email: The email address of this blog's author.
+author_email: [% config.author_email %]
+
+######################
+# Social-media setup
+######################
+# Fill in these values in order to activate Twitter Card support for your
+# Plerd-based blog.
+
+# twitter_id: The Twitter username to associate with this blog.
+#             If you define this, then Plerd will try to generate Twitter Card
+#             metatags on each post's webpage.
+#             (Don't include the leading '\@', please.)
+twitter_id: [% config.has_twitter_id ? config.twitter_id : "" %]
+
+# image: Your blog's "logo", used as a fallback image for posts that do not
+#        define an image themselves.
+#        Optional, but if you don't define this, then posts without their
+#        own image attributes won't get any social-media metatags.
+#
+#        e.g. http://blog.example.com/images/blog_logo.png
+image: [% config.has_image ? config.image : "" %]
+
+# image_alt: A text description of your image, equivalent to the "alt" attribute
+#            in HTML <img> tags, and useful for visually impaired visitors to
+#            your blog.
+#            Optional, but if you define an image, you should define this too.
+image_alt: [% config.image_alt %]
+
+######################
+# Split-location setup
+######################
+# If you don't want to keep all of Plerd's required directories under a single
+# master directory (configured withe the "path" directive, as seen above), then
+# you can define the directories with these separate directives instead:
+#
+source_path:       [% config.source_directory %]
+publication_path:  [% config.publication_directory %]
+template_path:     [% config.template_directory %]
+database_path:     [% config.database_directory %]
+run_path:          [% config.run_directory %]
+log_path:          [% config.log_directory %]
