@@ -1,16 +1,15 @@
 use warnings;
 use strict;
-use Test::More;
-use Path::Class::Dir;
-use Path::Class::File;
-use Capture::Tiny ':all';
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-our $gPLERDALL_BIN = "$FindBin::Bin/../bin/plerdall";
-our $gINIT_DIR;
-our $gCONFIG_FILE;
+use Path::Class::Dir;
+use Test::More;
+
+use Plerd::Config;
+
+our $gBaseDir = Path::Class::Dir->new("$FindBin::Bin/init_tests");
 
 Main();
 exit;
@@ -18,22 +17,77 @@ exit;
 #--------
 # Tests
 #--------
+sub TestEmptyConfig {
+    diag("Testing default config");
+    my $Cfg = Plerd::Config->new;
+
+    # properties => default values
+    my %baselines = (
+        author_email => 's.handwich@localhost',
+        author_name => 'Sam Handwich',
+        base_uri => 'http://localhost/',
+        image_alt => '[image]',
+        title => 'Another Plerd Blog',
+        config_file => "$ENV{HOME}/.plerd.conf"
+    );
+
+    for my $property (keys %baselines) {
+        ok($Cfg->$property eq $baselines{$property},
+            "Property '$property' has expected default");
+    }
+
+    ok(!$Cfg->has_image, "image is not set (via predicate)");
+}
+
+sub TestConfigWithPubDir {
+    diag("Testing config with publication_directory");
+
+    my $pubDir = "/var/lib/html";
+    my $Cfg = Plerd::Config->new(publication_directory => $pubDir);
+
+    # properties => default values
+    my %baselines = (
+        "publication_directory" => $pubDir,
+    );
+
+    for my $property (keys %baselines) {
+        ok($Cfg->$property eq $baselines{$property},
+            "Property '$property' has expected default");
+    }
+}
+
+
 sub TestRunAtDefaultLocation {
-    run_init();
-    check_wrapper( 'plerd' );
+    my $config = Plerd::Config->new(config_file => "./new-site.conf");
+    $config->initialize();
+    ok(-d "new-site", "Default site directory 'new-site' exists");
+    ok(-e "./new-site.conf", "Site config was created");   
+
+    my $reread_config = Plerd::Config->new(config_file => "./new-site.conf");
+    ok($reread_config->unserialize, "Unserialized new config");
+    for my $property (qw(
+                path publication_directory source_directory
+                database_directory template_directory run_directory log_directory
+    )) {
+        ok($config->$property eq $reread_config->$property, "Property $property is the same");
+        # diag($config->$property . " => " . $reread_config->$property);
+    }
 }
 
 sub TestRunAtSpecifiedLocation {
-    run_init( 'foobar' );
-    check_wrapper( 'foobar' );
+    my $config = Plerd::Config->new(config_file => "./new-site2.conf", path => "./new-site2");
+    $config->initialize();
+    ok(-d "new-site2", "Default site directory 'new-site2' exists");
+    ok(-e "./new-site2.conf", "Site config was created");   
 }
-
 
 #----------
 # Helpers
 sub Main {
     setup();
 
+    TestEmptyConfig();
+    TestConfigWithPubDir(); 
     TestRunAtDefaultLocation();
     TestRunAtSpecifiedLocation();
 
@@ -41,58 +95,17 @@ sub Main {
     done_testing();
 }
 
-sub run_init {
-    my ($init_target) = @_;
-
-    my $init_arg = '--init';
-    if ( defined $init_target ) {
-        $init_arg .= "=$init_target";
-    }
-
-    # Capture these, even though we don't do anything with them (yet)
-    my ($stdout, $stderr, $exit) = capture {
-        system(
-            $^X,
-            '-I', "$FindBin::Bin/../lib/",
-            $gPLERDALL_BIN,
-            $init_arg,
-            "--config=$gCONFIG_FILE",
-        );
-    }
-}
-
-# check_wrapper: Just check for the existence of templates/wrapper.tt,
-#                and make sure it seems to have expected content.
-sub check_wrapper {
-    my ( $subdir ) = @_;
-    my $wrapper = Path::Class::File->new(
-        $gINIT_DIR, $subdir, 'templates', 'wrapper.tt'
-    );
-
-    ok (-e $wrapper, "Wrapper template exists under '$subdir'.");
-    my $wrapper_content = $wrapper->slurp;
-    like(
-        $wrapper_content,
-        qr{<h1>Hello</h1>},
-        "Wrapper content looks okay.",
-    );
-}
-
 sub setup {
-    $gINIT_DIR = Path::Class::Dir->new( "$FindBin::Bin/init" );
-    $gINIT_DIR->rmtree;
-    $gINIT_DIR->mkpath;
-    chdir $gINIT_DIR or die "Can't chdir to $gINIT_DIR: $!";
+    if (-d $gBaseDir) {
+        $gBaseDir->rmtree;
+    }
 
-    $gCONFIG_FILE = Path::Class::File->new(
-        $FindBin::Bin,
-        'test.conf',
-    );
-    $gCONFIG_FILE->spew( '' );
-
+    $gBaseDir->mkpath;
+    chdir $gBaseDir || die("assert");
 }
 
 sub teardown {
-
+    chdir "..";
+    $gBaseDir->rmtree;
 }
 

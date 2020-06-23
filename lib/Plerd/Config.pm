@@ -13,17 +13,22 @@ use Template;
 use URI;
 use YAML qw( LoadFile );
 
+BEGIN {
+    if (! exists $ENV{PLERD_HOME}) {
+        die("Please set the PLERD_HOME environment variable");
+    }
+}
 #------------
 # Attributes
 #------------
-has author_email => (is => 'ro', lazy => 1, builder => '_build_author_email');
+has author_email => (is => 'rw', lazy => 1, builder => '_build_author_email');
 sub _build_author_email { 's.handwich@localhost' }
 
-has author_name => (is => 'ro', lazy => 1, builder => '_build_author_name');
+has author_name => (is => 'rw', lazy => 1, builder => '_build_author_name');
 sub _build_author_name { 'Sam Handwich' }
 
 has base_uri => (
-    is => 'ro',
+    is => 'rw',
     default => sub { 'http://localhost/' },
     coerce => \&_coerce_uri,
 );
@@ -66,18 +71,14 @@ has 'database_directory' => (
 sub _build_database_directory {
     my $self = shift;
     my $dir = Path::Class::Dir->new($self->path, "db");
-    if (! -d $dir) {
-        $dir->mkpath;
-    }
-    return $dir;
 }
 
 has 'datetime_formatter' => (is => 'ro', default => sub { DateTime::Format::W3CDTF->new });
 
-has 'image' => (is => 'ro', predicate => 1);
-has 'image_alt' => (is => 'ro', default => sub { "[image]" });
+has 'image' => (is => 'rw', predicate => 1, coerce => \&_coerce_image);
+has 'image_alt' => (is => 'rw', default => sub { "[image]" });
 
-has facebook_id => (is => 'ro', predicate => 1);
+has facebook_id => (is => 'rw', predicate => 1);
 
 has log_directory => (
     is => 'ro', 
@@ -91,7 +92,7 @@ sub _build_log_directory {
 }
 
 has path => (
-    is => 'ro', 
+    is => 'rw', 
     lazy => 1,
     builder => '_build_path',
     coerce => \&_coerce_directory
@@ -124,7 +125,7 @@ sub _build_run_directory {
 }
 
 has 'source_directory' => (
-    is => 'ro',
+    is => 'rw',
     lazy => 1,
     builder => '_build_source_directory',
     coerce => \&_coerce_directory
@@ -136,7 +137,7 @@ sub _build_source_directory {
 }
 
 has 'tags_publication_directory' => (
-    is => 'ro',
+    is => 'rw',
     lazy => 1,
     builder => '_build_tags_publication_directory',
     coerce => \&_coerce_directory    
@@ -147,7 +148,7 @@ sub _build_tags_publication_directory {
 }
 
 has 'template_directory' => (
-    is => 'ro',
+    is => 'rw',
     lazy => 1,
     builder => '_build_template_directory',
     coerce => \&_coerce_directory    
@@ -157,8 +158,8 @@ sub _build_template_directory {
     return Path::Class::Dir->new($self->path, "templates");
 }
 
-has 'title' => (is => 'ro', default => sub { "Another Plerd Blog" });
-has twitter_id => (is => 'ro', predicate => 1);
+has 'title' => (is => 'rw', default => sub { "Another Plerd Blog" });
+has twitter_id => (is => 'rw', predicate => 1);
 
 #------------
 # Coersions
@@ -166,7 +167,7 @@ has twitter_id => (is => 'ro', predicate => 1);
 sub _coerce_directory {
     my ($path) = @_;
     if (ref $path eq 'Path::Class::Dir') {
-        return $path;
+        return $path->absolute;
     }
 
     return Path::Class::Dir->new($path)->absolute;    
@@ -189,7 +190,13 @@ sub _coerce_uri {
     return URI->new($href);
 }
 
-
+sub _coerce_image {
+    my ($img) = @_;
+    if (ref $img eq 'URI') {
+        return $img;
+    }
+    return URI->new( $img );
+}
 #----------------
 # Public methods
 #----------------
@@ -257,6 +264,7 @@ sub unserialize {
             $self->$property( $config_ref->{$property} );
         }
     }
+    return 1;
 }
 
 sub serialize {

@@ -1,6 +1,13 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use FindBin;
+
+BEGIN {
+    if (!exists $ENV{PLERD_HOME}) {
+        $ENV{PLERD_HOME} = "$FindBin::Bin/..";
+    }
+}
 
 Main();
 exit;
