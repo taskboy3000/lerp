@@ -6,7 +6,7 @@ use Path::Class::Dir;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Plerd::Tag;
+use Plerd::Model::Tag;
 
 our $gDB_DIR;
 our $gSRC_DIR;
@@ -26,13 +26,13 @@ sub TestNameLogic {
     );
 
     for my $tag (keys %baselines) {
-        my $t = Plerd::Tag->new(name => $tag);
+        my $t = Plerd::Model::Tag->new(name => $tag);
         ok($t->name eq $baselines{$tag}, "Canonicalized '$tag' to '" . $t->name . "'");
     } 
 }
 
 sub TestTagsDBCreate {
-    my $Tags = Plerd::Tag->new(db_directory => $gDB_DIR);
+    my $Tags = Plerd::Model::Tag->new(db_directory => $gDB_DIR);
 
     # source_file_basename => [tag1, tag2, etc..]
     my %baselines = ('01.md' => ['foo', 'bar bar'],
@@ -51,7 +51,7 @@ sub TestTagsDBCreate {
 }
 
 sub TestTagsDBListSources {
-    my $Tags = Plerd::Tag->new(db_directory => $gDB_DIR);
+    my $Tags = Plerd::Model::Tag->new(db_directory => $gDB_DIR);
 
     my %baselines = (
         'foo' => [ '01.md', '03.md' ],
@@ -61,7 +61,7 @@ sub TestTagsDBListSources {
     );
 
     while (my ($tag, $expected) = each %baselines) {
-        $tag = Plerd::Tag->new(name => $tag);
+        $tag = Plerd::Model::Tag->new(name => $tag);
         my $sources = $Tags->get_sources_by_tag($tag);
         ok(defined $sources, "Got " . @$sources . " for tag '" . $tag->name . "'");
         ok(@$expected == @$sources, "  Got the expected number of sources returned");
@@ -81,7 +81,7 @@ sub TestTagsDBListSources {
 }
 
 sub TestTagsDBRemove {
-    my $Tags = Plerd::Tag->new(db_directory => $gDB_DIR);
+    my $Tags = Plerd::Model::Tag->new(db_directory => $gDB_DIR);
 
     # source_file_basename => [tag1, tag2, etc..]
     my %baselines = (

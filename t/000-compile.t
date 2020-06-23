@@ -17,7 +17,10 @@ exit;
 # Tests
 #-------
 sub TestCompileModules {
-    my @classFiles = sort glob("$::gLIBDIR/*.pm"), glob("$::gLIBDIR/*/*.pm");
+    my @classFiles = sort glob("$::gLIBDIR/*.pm"), 
+    glob("$::gLIBDIR/*/*.pm"),
+    glob("$::gLIBDIR/*/*/*.pm");
+
     for my $classFile (@classFiles) {
         my @cmd = ($^X, "-I$::gLIBDIR", "-wc", $classFile, "2>/dev/null");
         # diag(join(" ", @cmd)); 
@@ -63,7 +66,7 @@ sub TestCompileExecuteables {
 sub Main {
 
     TestCompileModules();
-    TestCompileExecuteables();
+    # TestCompileExecuteables();
 
     done_testing();
 }

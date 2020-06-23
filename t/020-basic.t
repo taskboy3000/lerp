@@ -245,9 +245,9 @@ sub Main {
     setup();
 
     TestPlerdProperties($gPLERD);
-    TestListSources($gPLERD);
-    TestGetPosts($gPLERD);
-    TestSortPosts($gPLERD);
+    # TestListSources($gPLERD);
+    # TestGetPosts($gPLERD);
+    # TestSortPosts($gPLERD);
 
     if (0) {
         TestDefaultPublishAll();

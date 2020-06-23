@@ -10,8 +10,9 @@ use Moo;
 use Template;
 use URI;
 
-use Plerd::Post;
-use Plerd::Tag;
+use Plerd::Config;
+use Plerd::Model::Post;
+use Plerd::Model::Tag;
 
 #-------------------------
 # Attributes and Builders
@@ -40,9 +41,22 @@ sub _build_archive_template_file {
     );
 }
 
+# @moved
 has 'author_email' => (is => 'ro', required => 1);
+# @moved
 has 'author_name' => (is => 'ro', required => 1);
+# @moved
 has 'base_uri' => (is => 'ro', required => 1);
+has 'config' => (is => 'ro', lazy => 1, builder => "_build_config");
+sub _build_config {
+    my ($self);
+
+    # todo: add in params
+    my $config = Plerd::Config->new;
+    return $config;
+}
+
+# @moved
 has 'database_directory' => (is => 'ro', lazy => 1, builder => '_build_database_directory');
 sub _build_database_directory {
     my $self = shift;
@@ -74,8 +88,11 @@ sub _build_directory {
     }
 }
 
+# @moved
 has 'image' => (is => 'ro', predicate => 1);
+# @moved
 has 'image_alt' => (is => 'ro', default => sub { "[image]" });
+
 has 'index_of_post_with_guid' => (is => 'ro', lazy => 1, clearer => 1, builder => "_build_index_of_post_guid");
 sub _build_index_of_post_with_guid {
     my $self = shift;
@@ -124,6 +141,7 @@ sub _build_jsonfeed_template_file {
     );
 }
 
+# @moved
 has 'path' => (is => 'ro');
 has 'post_parsing_errors' => (is => 'ro', lazy => 1, builder => '_build_post_parsing_errors');
 sub _build_post_parsing_errors {
@@ -144,6 +162,7 @@ sub _build_post_template_file {
     );
 }
 
+# @moved
 has 'publication_directory' => (is => 'ro', lazy => 1, builder => "_build_publication_directory");
 sub _build_publication_directory {
     my $self = shift;
@@ -216,6 +235,7 @@ sub _build_rss_template_file {
     );
 }
 
+# @moved
 has 'source_directory' => (is => 'ro', lazy => 1, builder => '_build_source_directory');
 sub _build_source_directory {
     my $self = shift;
@@ -247,6 +267,7 @@ sub _build_tags_index_uri {
 has 'tags_map' => (is => 'ro', lazy => 1, builder => '_build_tags_map');
 sub _build_tags_map { {} };
 
+# @moved
 has 'tags_publication_directory' => (is => 'ro', lazy => 1, builder => '_build_tags_publication_directory');
 sub _build_tags_publication_directory {
     my $self = shift;
@@ -368,7 +389,7 @@ sub get_posts {
     for my $sourceFile (@{ $self->get_source_files }) {
         my $post;
         eval {
-            $post = Plerd::Post->new(plerd => $self, source_file => $sourceFile);
+            $post = Plerd::Model::Post->new(plerd => $self, source_file => $sourceFile);
             1;
         } or do {
             push @{$self->post_parsing_errors}, [ $sourceFile => $@ ];
@@ -584,7 +605,7 @@ sub tag_named {
     if ( $tag ) {
         $tag->ponder_new_name( $tag_name );
     } else {
-        $tag = Plerd::Tag->new(
+        $tag = Plerd::Model::Tag->new(
             name => $tag_name,
             plerd => $self,
         );

@@ -1,3 +1,5 @@
+# All this class knows about is how to map tags to source files
+#
 # When a source file has tags:
 #   add a touch file to the tag DB dirs:
 #   $PLERD_ROOT/db/tags/
@@ -11,7 +13,7 @@
 #   and to generate tag files from this list.
 #
 #   STARTING NOW, tags are normalized to lower-case.  Sorry, but it's true.  Also, no spaces.
-package Plerd::Tag;
+package Plerd::Model::Tag;
 use strict;
 use warnings;
 
@@ -19,20 +21,47 @@ use File::Basename;
 use Moo;
 use URI;
 
+use Plerd::Config;
+
 #-------------------------
 # Attributes and Builders
 #-------------------------
-has 'db_directory' => (is => 'ro'); # Path::Class::Dir
+has config => ('is' => 'ro', lazy => 1, builder => '_build_config');
+sub _build_config {
+    Plerd::Config->new();    
+}
+
+has 'db_directory' => (
+    is => 'ro', 
+    lazy => 1, 
+    builder => '_build_db_directory',
+    coerce => \&Plerd::Config::_coerce_directory
+);
+sub _build_db_directory {
+    my $self = shift;
+    Path::Class::Dir->new(
+        $self->config->database_directory,
+        "tags_db"
+    );
+}
 
 has 'name' => (
     is => 'rw',
     coerce => \&_canonicalize_tag
 );
 
-has 'posts' => (
+has 'source_file' => (
     is => 'ro',
-    default => sub { [] },
+    predicate => 1,
+    coerce => \&_coerce_source_file,
 );
+sub _coerce_source_file {
+    my ($file) = @_;
+    if (ref $file eq 'Path::Class::File') {
+        return $file;
+    } 
+    return Path::Class::File->new($file);
+}
 
 has 'uri' => (
     is => 'ro',
@@ -45,6 +74,25 @@ sub _build_uri {
         'tags/' . $self->name . '.html',
         $self->plerd->base_uri,
     );
+}
+
+#-----------
+# Coersions
+#-----------
+sub _canonicalize_tag {
+    my ($tag) = @_;
+
+    chomp($tag);
+
+    # no html
+    if ($tag =~ /[<>]/) {
+        $tag =~ s{(</?[^>]+>)}{}g;
+    }
+
+    # no spaces
+    $tag =~ s/\s+/_/g;
+
+    return $tag;
 }
 
 #------------------
@@ -84,12 +132,15 @@ sub get_tag_entry_file_for_source {
 sub add_source_to_db {
     my ($self, $tag, $source_file) = @_;
 
+    $tag //= $self->tag;
+    $source_file //= $self->source_file;
+    
     return if !$tag || !$source_file;
     die("assert - no db") if !$self->db_directory;
 
     # Pass in a string and I will make a new tag object which normalizes the name
     if (!ref $tag) {
-        $tag = Plerd::Tag->new(name => $tag, db_directory => $self->db_directory);
+        $tag = Plerd::Model::Tag->new(name => $tag, db_directory => $self->db_directory);
     }
 
     my $entry = $self->get_tag_entry_file_for_source($tag, $source_file, 1);    
@@ -107,7 +158,7 @@ sub tag_has_source {
 
     # Pass in a string and I will make a new tag object which normalizes the name
     if (!ref $tag) {
-        $tag = Plerd::Tag->new(name => $tag, db_directory => $self->db_directory);
+        $tag = Plerd::Model::Tag->new(name => $tag, db_directory => $self->db_directory);
     }
 
     my $tagDir = $self->get_dir_for_tag($tag);
@@ -126,7 +177,7 @@ sub remove_source_from_db {
 
     # Pass in a string and I will make a new tag object which normalizes the name
     if (!ref $tag) {
-        $tag = Plerd::Tag->new(name => $tag, db_directory => $self->db_directory);
+        $tag = Plerd::Model::Tag->new(name => $tag, db_directory => $self->db_directory);
     }
 
     my $entry = $self->get_tag_entry_file_for_source($tag, $source_file);    
@@ -184,44 +235,9 @@ sub remove_tag_from_db {
     return 1;
 }
 
-# @todo: remove me
-sub add_post {
-    my ($self, $post) = @_;
-
-    my $added = 0;
-    if ( @{$self->posts} ) {
-        for (my $index = 0; $index <= @{$self->posts} - 1; $index++ ) {
-            if ( $self->posts->[$index]->date < $post->date ) {
-                splice @{$self->posts}, $index, 0, $post;
-                $added = 1;
-                last;
-            }
-        }
-    }
-
-    unless ($added) {
-        push @{$self->posts}, $post;
-    }
-}
-
-
 #-------------------
 # "Private" Methods
 #-------------------
-sub _canonicalize_tag {
-    my ($tag) = @_;
 
-    chomp($tag);
-
-    # no html
-    if ($tag =~ /[<>]/) {
-        $tag =~ s{(</?[^>]+>)}{}g;
-    }
-
-    # no spaces
-    $tag =~ s/\s+/_/g;
-
-    return $tag;
-}
 1;
 

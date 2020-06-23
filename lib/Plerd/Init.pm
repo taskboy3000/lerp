@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use Path::Class::Dir;
 use LWP;
-use Plerd;
+# use Plerd;
 
 my %file_content;
 

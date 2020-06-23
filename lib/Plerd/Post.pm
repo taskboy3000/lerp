@@ -13,6 +13,7 @@ use Text::MultiMarkdown qw( markdown );
 use URI;
 
 use Plerd::Config;
+use Plerd::Model::Tag;
 use Plerd::SmartyPants;
 
 our $gWPM = 200; # The words-per-minute reading speed to assume
