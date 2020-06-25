@@ -393,16 +393,18 @@ has 'source_file' => (
 has 'source_file_loaded' => (is => 'rw', default => sub { 0 });
 has 'source_file_mtime' => (
     is => 'ro', 
-    lazy => 1, 
+    lazy => 1,
+    clearer => 1, 
     builder => '_build_source_file_mtime'
 );
 sub _build_source_file_mtime {
     my ($self) = @_;
     if (-e $self->source_file->stringify) {
-        my @stat = $self->source_file->stat;
-        return $stat[9];
-    }
-    return;
+        my $stat = $self->source_file->stat();
+        return $stat->mtime;
+    } 
+
+    die("assert - source file cannot be found: " . $self->source_file);
 }
 
 has 'stripped_body' => (

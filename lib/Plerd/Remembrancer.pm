@@ -82,13 +82,8 @@ sub load {
 # Directory walk through DB dir, return keys as an array suitable for load();
 sub keys {
     my ($self) = @_;
-die("assert");
-    # $entry->parent - $self->database_directory ?
-    # key1/key2 ?
-    my @keys;
 
     my @files = _dir_walk($self->database_directory);
-
 
     return [ map { $self->_entry_to_key($_) } @files ];
 }
@@ -140,9 +135,11 @@ sub _dir_walk {
     my @found;
     while (my $thing = $dir->next) {
         # No dot files allowed
-        next if substr($thing, 0, 1) eq '.';
+        if (substr($thing->basename, 0, 1) eq '.') {
+            next;
+        }
 
-        if (-d $thing) {
+        if ($thing->is_dir) {
             push @found, $thing if $opt_subdirs_only;
             push @found, _dir_walk($thing, $opt_subdirs_only);
         } else {

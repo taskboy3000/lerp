@@ -74,8 +74,6 @@ sub TestPayloadKeyStore {
     if ($@) {
         diag($@);
     }
-
-
 }
 
 sub TestKeyExistence {
@@ -100,6 +98,15 @@ sub TestKeyExistence {
     }
 
     ok(!$R->exists(["foo", "bar"]), "Non-existing key does not exist");
+}
+
+sub TestKeys {
+    my ($R) = @_;
+    my $list = $R->keys();
+    ok(@$list, "Got keys list");
+    for my $entry (@$list) {
+        diag("  " . join("/", @$entry));
+    }
 }
 
 sub TestPayloadRetrieval {
@@ -177,6 +184,7 @@ sub Main {
     TestNonExistingKeyFetch($Remembrancer);
     TestPayloadKeyStore($Remembrancer);
     TestKeyExistence($Remembrancer);
+    TestKeys($Remembrancer);
     TestPayloadRetrieval($Remembrancer);
     TestKeyRemoval($Remembrancer);
 

@@ -7,6 +7,7 @@ use Template;
 
 use Plerd::Config;
 use Plerd::Model::Post;
+use Plerd::Remembrancer;
 
 our $VERSION="1.0";
 
@@ -38,11 +39,33 @@ sub _build_publisher {
     return Template->new(%params);   
 }
 
+has post_memory => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_post_memory',
+);
+sub _build_post_memory {
+    my ($self) = @_;
+    my $post_db_dir = Path::Class::Dir->new($self->config->database_directory, 'posts');
+    return Plerd::Remembrancer->new(database_directory => $post_db_dir);
+}
+
 has source_dir_handle => (
     is => 'rw',
     clearer => 1,
-    predicate => 1
+    predicate => 1,
 );
+
+has tag_memory => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_tag_memory',
+);
+sub _build_tag_memory {
+    my ($self) = @_;
+    my $post_db_dir = Path::Class::Dir->new($self->config->database_directory, 'tags');
+    return Plerd::Remembrancer->new(database_directory => $post_db_dir);
+}
 
 #-----------------
 # Public Methods
@@ -52,6 +75,17 @@ sub publish_post {
 
     if (!$post->has_source_file) {
         die("assert - post has no source file");
+    }
+
+    # Does this post need to be regenerated?
+    my $post_key = $post->publication_file->basename;
+
+    if (my $memory = $self->tag_memory->load($post_key)) { 
+        if ($memory->{mtime} >= $post->source_file_mtime) {
+            # the cache is newer than the source.
+            # decline to proceed.
+            return;
+        }
     }
 
     if (!$post->source_file_loaded) {
@@ -68,6 +102,12 @@ sub publish_post {
     } else {
         die("assert - Publishing failed for " . $post->source_file);
     }
+
+    # Update post 
+    $self->tag_memory->save($post->publication_file->basename, {
+        mtime => $post->source_file_mtime,
+        original_filename => $post->source_file->absolute->stringify,
+    });
 
     return 1;
 }
@@ -116,12 +156,11 @@ sub publish_all {
 sub next_source_file {
     my ($self) = @_;
 
-    if (!$self->has_source_dir_handle) {
+    if (!$self->has_source_dir_handle()) {
         $self->source_dir_handle($self->config->source_directory->open);
     }
 
-    my $file;
-    while ($file = $self->source_dir_handle->read) {
+    while (my $file = $self->source_dir_handle()->read) {
         $file = $self->config->source_directory->file($file)->absolute;
         next if -d $file;
         if ($file->stringify =~ /\.(?:md|markdown)$/) {

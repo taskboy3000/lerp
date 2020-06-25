@@ -60,8 +60,14 @@ sub TestPublishingOnePost {
         source_file => $source_file
     );
     diag("Src: " . $source_file);
-    ok($plerd->publish_post($post), "Publish post without tags");
+    ok($plerd->publish_post($post), "Published post without tags");
     ok(-s $post->publication_file, "Published file exists and is non-empty: " . $post->publication_file->basename);
+    ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file");
+    sleep(2);
+    $source_file->touch;
+    $post->clear_source_file_mtime;
+    ok($plerd->publish_post($post), "Plerd republished an updated source file");
+
     ok($config->path->rmtree, "Removed test site");
 }
 
