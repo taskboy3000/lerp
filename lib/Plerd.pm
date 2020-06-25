@@ -6,7 +6,7 @@ use Moo;
 use Template;
 
 use Plerd::Config;
-use Plerd::Post;
+use Plerd::Model::Post;
 
 our $VERSION="1.0";
 
@@ -15,7 +15,6 @@ has 'config' => (
     lazy => 1, 
     builder => '_build_config'
 );
-
 sub _build_config {
     Plerd::Config->new;    
 }
@@ -39,8 +38,11 @@ sub _build_publisher {
     return Template->new(%params);   
 }
 
-# @todo: verify clearer
-has source_dir_handle => (is => 'rw', clearer => 1, predicate => 1);
+has source_dir_handle => (
+    is => 'rw',
+    clearer => 1,
+    predicate => 1
+);
 
 #-----------------
 # Public Methods
@@ -48,17 +50,26 @@ has source_dir_handle => (is => 'rw', clearer => 1, predicate => 1);
 sub publish_post {
     my ($self, $post) = @_;
 
-    my $tmpl = Path::Class::File->new($self->config->template_directory, "post.tt");
-
-    $self->_publish($tmpl, { post => $post });
-
-    if ($post->has_tags) {
-        for my $tag (@{ $post->tags }) {
-            $self->publish_tag($tag);
-        }
+    if (!$post->has_source_file) {
+        die("assert - post has no source file");
     }
 
-    die("assert");
+    if (!$post->source_file_loaded) {
+        $post->load_source;
+    }
+
+    my $tmpl = Path::Class::File->new($self->config->template_directory, "post.tt");
+    if ($self->_publish($tmpl, $post->publication_file, { post => $post }) ) {
+        if (@{ $post->tags }) {
+            for my $tag (@{ $post->tags }) {
+                $self->publish_tag($tag);
+            }
+        }
+    } else {
+        die("assert - Publishing failed for " . $post->source_file);
+    }
+
+    return 1;
 }
 
 sub publish_tag {
@@ -90,10 +101,8 @@ sub publish_all {
     my ($self) = @_;
 
     while (my $source_file = $self->next_source_file) {
-        my $post = $Plerd::Post->new(
-            config => $self->config,
-            source_file => $source_file
-        );
+        my $post = $Plerd::Model::Post->new(config => $self->config);
+        $post->source_file($source_file);
         $self->publish_post($post);
     }
 
@@ -113,10 +122,11 @@ sub next_source_file {
 
     my $file;
     while ($file = $self->source_dir_handle->read) {
+        $file = $self->config->source_directory->file($file)->absolute;
         next if -d $file;
-        next if $file =~ /\.(md|markdown)$/;
-
-        return $file;
+        if ($file->stringify =~ /\.(?:md|markdown)$/) {
+            return $file;
+        }
     }
 
     # Failed to find a source file
@@ -128,13 +138,15 @@ sub next_source_file {
 # Private methods
 #-----------------
 sub _publish {
-    my ($self, $template, $target_file, $vars) = @_;
+    my ($self, $template_file, $target_file, $vars) = @_;
 
-    my $out;
+    my $tmpl_fh = $template_file->open('<:encoding(utf8)');
+    my $trg_fh = $target_file->open('>:encoding(utf8)');
+
     unless ($self->publisher->process(
-                        $template->stringify,
+                        $tmpl_fh,
                         $vars,
-                        \$out,
+                        $trg_fh,
                     ) 
     ) {
         die(sprintf("assert[processing %s] %s",
@@ -143,8 +155,6 @@ sub _publish {
                    )
         );
     }
-
-    $target_file->spew(iomode=>'>:encoding(utf8)', $out);
 
     return 1;
 }

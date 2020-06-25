@@ -13,6 +13,7 @@ use Text::MultiMarkdown qw( markdown );
 use URI;
 
 use Plerd::Config;
+use Plerd::Model::Tag;
 use Plerd::SmartyPants;
 
 our $gWPM = 200; # The words-per-minute reading speed to assume
@@ -200,6 +201,7 @@ sub _build_publication_file {
     );
 }
 
+# @todo: I am not clear that this is needed
 has 'publication_file_mtime' => (
     is => 'ro',
     lazy => 1,
@@ -385,10 +387,10 @@ sub _build_socialmeta_mode {
 }
 
 has 'source_file' => (
-    is => 'ro',
-    required => 1,
+    is => 'rw',
+    predicate => 1,
 ); 
-
+has 'source_file_loaded' => (is => 'rw', default => sub { 0 });
 has 'source_file_mtime' => (
     is => 'ro', 
     lazy => 1, 
@@ -423,25 +425,24 @@ sub _build_stripped_title {
     return $self->_strip_html( $self->title );
 }
 
-has 'tags' => (is => 'ro', lazy => 1, builder => '_build_tags');
+has 'tags' => (is => 'rw', lazy => 1, builder => '_build_tags', coerce => \&_coerce_tags);
 sub _build_tags {
     my ($self) = @_;
-    my @tags;
-    if ($self->attributes->{tags}) {
-        my @tag_names = split /\s*,\s*/, $self->attributes->{ tags };
-        for my $tag (@tag_names) {
-            push @tags, Plerd::Model::Tag->new(
-                                name => $tag,
-                                config => $self->config,
-                                source_file => $self->source_file,
-                                );
-        }
-        # @todo: when this post is published, 
-        # call for (@{$post->tags}) { $_->add_source_to_db }
-    }
-    return @tags;
+    return $self->attributes->{tags};
 }
- 
+sub _coerce_tags {
+    my ($value) = @_;
+    my @tags;
+    if ($value) {
+        my @tmp = split /\s*,\s*/, $value;
+        for (@tmp) {
+            push @tags, Plerd::Model::Tag->new(name => $_);
+        }
+    }
+
+    return \@tags;
+}
+
 has 'title' => (
     is => 'rw', 
     predicate => 1, 
@@ -511,7 +512,11 @@ sub _build_utc_date {
 # "Public" methods
 #-------------------
 sub load_source {
-    my ($self) = @_;
+    my ($self, $source_file) = @_;
+
+    if (defined $source_file) {
+        $self->source_file($source_file);
+    }
 
     if (!-e $self->source_file) {
         die("Cannot find source file: " . $self->source_file);
@@ -548,7 +553,7 @@ sub load_source {
     close $fh;
     $self->raw_body($body); # @thinkie: raw_title?
     $self->body($body); # this converts MD to HTML
-
+    $self->source_file_loaded(1);
     return 1;
 }
 

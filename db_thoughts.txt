@@ -1,0 +1,22 @@
+What if there is a pass where new source files are processed for metadata?
+
+The data source has the list of source files listed into publication order.
+
+
+schemes:
+
+Posts                                           Tags
+pubdate_file1 -> path/to/source_file1           tag1/pubdate_file1 -> path/to/source_file1
+pubdate_file2 -> path/to/source_file2           tag1/pubdate_file2
+                                                tag2/pubdate_file1
+
+Fast sort time with ls or glob, need to open files to get sourcename
+Can use mtime on db_entry to determine update
+
+When a post is removed, it needs to be deleted from Posts and tags.
+This may force the regeneration of:
+  - recent_files
+  - archives list
+  - tags index
+  - tag specific index
+  - publication list

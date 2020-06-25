@@ -58,6 +58,7 @@ sub _build_config_tt {
     my %params = (
         INCLUDE_PATH => $self->config_template_dir,
         ABSOLUTE => 1,
+        RELATIVE => 1,
     );
     Template->new(%params);    
 }

@@ -12,7 +12,6 @@ use Test::More;
 Main();
 exit;
 
-
 #-------
 # Tests
 #-------
@@ -40,7 +39,6 @@ sub TestCompileModules {
     }
 }
 
-
 sub TestCompileExecuteables {
     my @binFiles = sort glob("$::gBINDIR/*");
 
@@ -66,7 +64,7 @@ sub TestCompileExecuteables {
 sub Main {
 
     TestCompileModules();
-    # TestCompileExecuteables();
+    TestCompileExecuteables();
 
     done_testing();
 }
