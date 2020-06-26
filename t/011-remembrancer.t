@@ -97,9 +97,12 @@ sub TestKeyExistence {
         my ($description, $data) = @$pair;
         my ($key) = @$data;
         ok($R->exists($key), $description);
+        my $updated_at = $R->updated_at($key);
+        ok($updated_at, "Key was updated: " . localtime($updated_at));
     }
 
     ok(!$R->exists(["foo", "bar"]), "Non-existing key does not exist");
+    ok(!defined $R->updated_at(["foo", "bar"]), "Non-existing key does not have an updated timestamp");
 }
 
 sub TestKeys {

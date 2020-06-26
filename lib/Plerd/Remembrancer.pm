@@ -62,6 +62,17 @@ sub exists {
     return -e $entry;
 }
 
+sub updated_at {
+    my ($self, $key) = @_;
+    my $entry = $self->_key_to_entry($key);
+    if (-e $entry) { 
+        my $stat = $entry->stat();
+        return $stat->mtime;
+    }
+
+    return;
+}
+
 sub load {
     my ($self, $key) = @_;
     my $entry = $self->_key_to_entry($key);

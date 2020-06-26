@@ -20,7 +20,7 @@ sub Main {
     for my $file (@ARGV) {
         if (-e $file) {
             my @cmd = ($^X, $file);
-            print "Running: $file\n";
+            say "#### Running: $file";
 
             system(@cmd);
             my $exit_code = $? >> 8;
@@ -34,6 +34,8 @@ sub Main {
                     sprintf("Died with signal: %d", ($? & 127))
                 );
             }
+            
+            say "#"x75;
         }
     }
 
