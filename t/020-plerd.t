@@ -63,11 +63,28 @@ sub TestPublishingOnePost {
     ok($plerd->publish_post($post), "Published post without tags");
     ok(-s $post->publication_file, "Published file exists and is non-empty: " . $post->publication_file->basename);
     ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file");
-    sleep(2);
     $source_file->touch;
     $post->clear_source_file_mtime;
     ok($plerd->publish_post($post), "Plerd republished an updated source file");
 
+    diag("Creating a post with tags");
+    my $source_file2 = Path::Class::File->new(
+        $config->source_directory,
+        'two_tags.md'
+    );
+
+    my $post2 = Plerd::Model::Post->new(
+        config => $config, 
+        source_file => $source_file2
+    );
+    diag("Src: " . $source_file2);
+    ok($plerd->publish_post($post2), "Published post with tags");
+    ok(-s $post2->publication_file, "Published file exists and is non-empty: " . $post2->publication_file->basename);
+
+    my $tm = $plerd->tag_memory;
+    for my $tag (@{$post2->tags}) {
+        ok($tm->exists($tag->name), 'Tag ' . $tag->name . ' exists');
+    }
     ok($config->path->rmtree, "Removed test site");
 }
 

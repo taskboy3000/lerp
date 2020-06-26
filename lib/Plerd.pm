@@ -46,8 +46,8 @@ has post_memory => (
 );
 sub _build_post_memory {
     my ($self) = @_;
-    my $post_db_dir = Path::Class::Dir->new($self->config->database_directory, 'posts');
-    return Plerd::Remembrancer->new(database_directory => $post_db_dir);
+    my $db_dir = Path::Class::Dir->new($self->config->database_directory, 'posts');
+    return Plerd::Remembrancer->new(database_directory => $db_dir);
 }
 
 has source_dir_handle => (
@@ -63,8 +63,8 @@ has tag_memory => (
 );
 sub _build_tag_memory {
     my ($self) = @_;
-    my $post_db_dir = Path::Class::Dir->new($self->config->database_directory, 'tags');
-    return Plerd::Remembrancer->new(database_directory => $post_db_dir);
+    my $db_dir = Path::Class::Dir->new($self->config->database_directory, 'tags');
+    return Plerd::Remembrancer->new(database_directory => $db_dir);
 }
 
 #-----------------
@@ -80,7 +80,7 @@ sub publish_post {
     # Does this post need to be regenerated?
     my $post_key = $post->publication_file->basename;
 
-    if (my $memory = $self->tag_memory->load($post_key)) { 
+    if (my $memory = $self->post_memory->load($post_key)) { 
         if ($memory->{mtime} >= $post->source_file_mtime) {
             # the cache is newer than the source.
             # decline to proceed.
@@ -94,19 +94,37 @@ sub publish_post {
 
     my $tmpl = Path::Class::File->new($self->config->template_directory, "post.tt");
     if ($self->_publish($tmpl, $post->publication_file, { post => $post }) ) {
-        if (@{ $post->tags }) {
             for my $tag (@{ $post->tags }) {
-                $self->publish_tag($tag);
+                my $tm = $self->tag_memory;
+                my $memory = $tm->load($tag->name);
+            
+                if ($memory) {
+                    if (!exists $memory->{$post->source_file->stringify}) {
+                        $memory->{$post->source_file->stringify} = {
+                            uri => $post->uri->as_string,
+                            title => $post->title,
+                        };
+                    }
+                } else {
+                    $memory = {
+                        $post->source_file->stringify => {
+                                    uri => $post->uri->as_string,
+                                    title => $post->title,
+                        }
+                    };
+                }
+
+                $tm->save($tag->name => $memory);
             }
-        }
     } else {
         die("assert - Publishing failed for " . $post->source_file);
     }
 
-    # Update post 
-    $self->tag_memory->save($post->publication_file->basename, {
+    # Remember publishing this post 
+    $self->post_memory->save($post->publication_file->basename, {
         mtime => $post->source_file_mtime,
         original_filename => $post->source_file->absolute->stringify,
+        tags => $post->tags
     });
 
     return 1;
