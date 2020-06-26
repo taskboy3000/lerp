@@ -6,7 +6,7 @@
 
     <ul>
     [% FOREACH tag = tags.keys.sort %]
-        <li><a href="[% plerd.tag_uri(tag) %]">[% tag %]</a> ([% tags.\$tag.size %])</li>
+        <li><a href="[% plerd.tag_uri(tag) %]">[% tag %]</a> ([% tags.$tag.size %])</li>
     [% END %]
     </ul>
 </section>
@@ -15,7 +15,7 @@
     [% FOREACH tag = tags.keys %]
       <h1>Tag: [% tag %]</h1>
       <ul>
-        [% FOREACH post = tags.\$tag %]
+        [% FOREACH post = tags.$tag %]
             <li><a href="[% post.uri %]">[% post.title %]</a></li>
         [% END %]
       </ul>

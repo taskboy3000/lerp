@@ -250,8 +250,9 @@ sub initialize {
         }
     }
 
-    # add default templates
-    for my $template (qw[archive feed jsonfeed post tags wrapper]) {
+    # add default templates 
+    # @fixme: pick up all *tt in the directory and move them
+    for my $template (qw[archive feed jsonfeed post tags wrapper front_page]) {
         my $basename = $template . ".tt";
         my $src_file = Path::Class::File->new($self->config_template_dir, $basename);
         if (-e $src_file) {

@@ -61,7 +61,7 @@ sub TestPublishingOnePost {
         source_file => $source_file
     );
     diag("Src: " . $source_file);
-    $DB::single=1;
+ 
     ok($plerd->publish_post($post), "Published post without tags");
     ok(-s $post->publication_file, "Published file exists and is non-empty: " . $post->publication_file->basename);
     ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file");
@@ -87,6 +87,7 @@ sub TestPublishingOnePost {
     for my $tag (@{$post2->tags}) {
         ok($tm->exists($tag->name), 'Tag ' . $tag->name . ' exists');
     }
+    
     ok($config->path->rmtree, "Removed test site");
 }
 
@@ -156,6 +157,58 @@ sub TestTagMemory {
         }
     }
 
+
+    ok($plerd->publish_tags_index, "Publishing tags index");
+    ok(-e $plerd->tags_index->publication_file, "Appears to have created a tags index file");
+    ok(!$plerd->publish_tags_index, "Declined to publish unchanged tags index");
+
+    sleep(2);
+
+    my $new_tag = Plerd::Model::Tag->new(name => 'bar');
+    $TIdx->update_tag_for_post($new_tag => $post2);
+
+    ok($plerd->publish_tags_index, "Republished changed tags index");
+ 
+    $plerd->config->path->rmtree;
+}
+
+sub TestArchiveRSSRecentPages {
+    diag("Testing Archive, RSS, JSON Feed, and Recent pages");
+    my $plerd = Plerd->new;
+    my $config = $plerd->config;
+    $config->path("$FindBin::Bin/init/new-site");
+    $config->source_directory("$FindBin::Bin/source_model");
+
+    ok($config->initialize, "Creating test site for publication");
+    my %sought = (
+        "good-source-file.md" => 1,
+        "extra-headers.md" => 1,
+        "1999-01-02-unicode.md" => 1,
+        "formatted-title.md" => 1,
+    );
+
+    while (my $source_file = $plerd->next_source_file) {
+        if (exists $sought{ $source_file->basename} ) {
+            my $post = Plerd::Model::Post->new(
+                    config => $plerd->config, 
+                    source_file => $source_file
+            );
+            ok($plerd->publish_post($post), "Published " . $post->publication_file->basename);
+        }
+    }
+    
+    ok($plerd->publish_rss_feed, "Published atom feed". $plerd->rss_feed->publication_file->basename);
+    ok(-e $plerd->rss_feed->publication_file, "Atom feed appears to have been created");
+
+    ok($plerd->publish_json_feed, "Published json feed: " . $plerd->json_feed->publication_file->basename);
+    ok(-e $plerd->json_feed->publication_file, "Atom feed appears to have been created");
+
+    ok($plerd->publish_archive, "Published archive feed: " . $plerd->archive->publication_file->basename);
+    ok(-e $plerd->archive->publication_file, "Archive page appears to have been created");
+$DB::single=1;
+    ok($plerd->publish_front_page, "Published front page feed: " . $plerd->front_page->publication_file->basename);
+    ok(-e $plerd->front_page->publication_file, "Front page appears to have been created");
+
     $plerd->config->path->rmtree;
 }
 
@@ -169,6 +222,7 @@ sub Main {
     TestSourceListing();
     TestPublishingOnePost();
     TestTagMemory();
+    TestArchiveRSSRecentPages();
 
     teardown();
 
