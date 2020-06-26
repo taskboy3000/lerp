@@ -106,7 +106,7 @@ sub TestKeyExistence {
 
 sub TestKeys {
     my ($R) = @_;
-    $DB::single=1;
+
     my $list = $R->keys();
     ok(@$list == 4, "Got expected list of keys");
     for my $entry (@$list) {

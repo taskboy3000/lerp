@@ -131,7 +131,14 @@ sub publish_post {
 
 sub publish_tag {
     my ($self, $tag) = @_;
-    die("assert");
+}
+
+sub publish_tags_index {
+    my ($self, $tag) = @_;
+
+    # Get the mtime of the published tags index
+    # If any tag memory is newer, regenerate index
+    
 }
 
 sub publish_rss_feed {
