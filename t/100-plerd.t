@@ -8,6 +8,7 @@ use Test::More;
 
 use Plerd;
 use Plerd::Model::Post;
+use Plerd::Model::TagIndex;
 
 Main();
 exit;
@@ -60,6 +61,7 @@ sub TestPublishingOnePost {
         source_file => $source_file
     );
     diag("Src: " . $source_file);
+    $DB::single=1;
     ok($plerd->publish_post($post), "Published post without tags");
     ok(-s $post->publication_file, "Published file exists and is non-empty: " . $post->publication_file->basename);
     ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file");
@@ -81,11 +83,80 @@ sub TestPublishingOnePost {
     ok($plerd->publish_post($post2), "Published post with tags");
     ok(-s $post2->publication_file, "Published file exists and is non-empty: " . $post2->publication_file->basename);
 
-    my $tm = $plerd->tag_memory;
+    my $tm = $plerd->config->tag_memory;
     for my $tag (@{$post2->tags}) {
         ok($tm->exists($tag->name), 'Tag ' . $tag->name . ' exists');
     }
     ok($config->path->rmtree, "Removed test site");
+}
+
+
+sub TestTagMemory {
+    diag(" Testing tag memory");
+
+    my $plerd = Plerd->new();
+    $plerd->config->path("init/new-site");
+    $plerd->config->initialize();
+
+    my $TIdx = $plerd->tags_index;  
+
+    my $post1 = Plerd::Model::Post->new(
+        config => $plerd->config,
+        source_file => "$FindBin::Bin/source_model/one_tag.md"
+    );
+    $post1->load_source;
+
+    my $post2 = Plerd::Model::Post->new(
+        config => $plerd->config,
+        source_file => "$FindBin::Bin/source_model/two_tags.md"
+    );
+    $post2->load_source;
+
+    for my $tag (@{$post1->tags}) {
+        ok($TIdx->update_tag_for_post($tag, $post1), 
+            "Updating tag " . $tag->name . " for post " . $post1->source_file->basename
+        );
+    }
+
+    for my $tag (@{$post2->tags}) {
+        ok($TIdx->update_tag_for_post($tag, $post2),
+            "Updating tag " . $tag->name . " for post " . $post2->source_file->basename
+        );
+    }
+
+    my $links = $TIdx->get_tag_links;
+    ok (defined $links, "Got tag links structure");
+
+    for my $letter (sort keys %$links) {
+        diag("  $letter");
+        for my $tag (sort keys %{$links->{$letter}}) {
+            diag("    tag: $tag");
+            for my $rec (@{ $links->{$letter}->{$tag} }) {
+                diag("      post: $rec->{title}");
+            }
+        }
+    }
+
+    my $foo_tag;
+    for my $tag (@{ $post2->tags }) {
+        if ($tag->name eq 'foo') {
+            $foo_tag = $tag;
+        }
+    }
+    ok($TIdx->remove_tag_from_post($foo_tag, $post2), "Removing tag 'foo' from post " . $post2->source_file->basename);
+    $links = $TIdx->get_tag_links;
+    
+    for my $letter (sort keys %$links) {
+        diag("  $letter");
+        for my $tag (sort keys %{$links->{$letter}}) {
+            diag("    tag: $tag");
+            for my $rec (@{ $links->{$letter}->{$tag} }) {
+                diag("      post: $rec->{title}");
+            }
+        }
+    }
+
+    $plerd->config->path->rmtree;
 }
 
 #---------
@@ -97,6 +168,7 @@ sub Main {
     TestInvoked();
     TestSourceListing();
     TestPublishingOnePost();
+    TestTagMemory();
 
     teardown();
 

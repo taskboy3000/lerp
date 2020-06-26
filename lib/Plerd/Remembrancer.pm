@@ -47,7 +47,7 @@ sub save {
         }   
     }
 
-    if (ref $payload eq ref {}) {
+    if (ref $payload) {
         $entry->spew(iomode => '>:encoding(UTF-8)', Dump($payload));
     } else {
         $entry->touch;
@@ -143,6 +143,9 @@ sub remove {
     return 1;
 }
 
+#----------------------
+# Private keys
+#-----------------------
 sub _key_to_entry {
     my ($self, $key) = @_;
 

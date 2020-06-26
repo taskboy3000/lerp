@@ -6,10 +6,10 @@ use Path::Class::Dir;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+use Plerd::Config;
 use Plerd::Model::Tag;
 
-our $gDB_DIR;
-our $gSRC_DIR;
+our $gCFG;
 
 Main();
 exit;
@@ -26,11 +26,13 @@ sub TestNameLogic {
     );
 
     for my $tag (keys %baselines) {
-        my $t = Plerd::Model::Tag->new(name => $tag);
+        my $t = Plerd::Model::Tag->new(name => $tag, config => $gCFG);
         ok($t->name eq $baselines{$tag}, "Canonicalized '$tag' to '" . $t->name . "'");
         diag("Tag URI: " . $t->uri);
     } 
 }
+
+
 
 #--------------
 # Helpers
@@ -40,24 +42,16 @@ sub Main {
 
     TestNameLogic();
 
-
     teardown();
 
     done_testing();
 }
 
 sub setup {
-    $gDB_DIR = Path::Class::Dir->new($FindBin::Bin, "tag_db");
-    if (-d $gDB_DIR) {
-        $gDB_DIR->rmtree();
-    }
-    $gDB_DIR->mkpath(undef, 0755);
-
-    # Purely fictional directory, none of the tags opts need these files to actually exist
-    $gSRC_DIR = Path::Class::Dir->new($FindBin::Bin, "tag_source_dir");
-
+    $gCFG = Plerd::Config->new(path => "init/new-site");
+    $gCFG->initialize;
 }
 
 sub teardown {
-    $gDB_DIR->rmtree();
+    $gCFG->path->rmtree;
 }

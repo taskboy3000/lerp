@@ -261,7 +261,7 @@ sub _build_published_timestamp {
     return $timestamp;
 }
 
-has ordered_attribute_names => (
+has 'ordered_attribute_names' => (
     is =>'ro', 
     lazy => 1, 
     builder => '_build_ordered_attribute_names'
@@ -386,7 +386,9 @@ sub _build_socialmeta_mode {
 has 'source_file' => (
     is => 'rw',
     predicate => 1,
-); 
+    coerce => \&_coerce_file
+);
+
 has 'source_file_loaded' => (is => 'rw', default => sub { 0 });
 has 'source_file_mtime' => (
     is => 'ro', 
@@ -440,6 +442,16 @@ sub _coerce_tags {
     }
 
     return \@tags;
+}
+
+has 'template_file' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_template_file'
+);
+sub _build_template_file {
+    my ($self) = @_;
+    Path::Class::File->new($self->config->template_directory, "post.tt");
 }
 
 has 'title' => (
@@ -587,6 +599,16 @@ sub can_publish {
 sub _apply_markdown {
     my ($string) = @_;
     return Plerd::SmartyPants::process( markdown( $string || '' ) );
+}
+
+sub _coerce_file {
+    my ($thing) = @_;
+
+    if (ref $thing eq 'Path::Class::File') {
+        return $thing;
+    }
+
+    return Path::Class::File->new($thing);
 }
 
 sub _coerce_title {

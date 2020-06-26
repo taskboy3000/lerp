@@ -17,6 +17,10 @@ BEGIN {
         die("Please set the PLERD_HOME environment variable");
     }
 }
+
+use lib "$ENV{PLERD_HOME}/lib";
+use Plerd::Remembrancer;
+
 #------------
 # Attributes
 #------------
@@ -102,6 +106,18 @@ sub _build_path {
     return Path::Class::Dir->new("./new-site");
 }
 
+has post_memory => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_post_memory',
+);
+sub _build_post_memory {
+    my ($self) = @_;
+    my $db_dir = Path::Class::Dir->new($self->database_directory, 'posts');
+    return Plerd::Remembrancer->new(database_directory => $db_dir);
+}
+
+
 has 'publication_directory' => (
     is => 'ro',
     lazy => 1,
@@ -134,6 +150,17 @@ sub _build_source_directory {
     my $self = shift;
     return Path::Class::Dir->new($self->path, "source");
 
+}
+
+has tag_memory => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_tag_memory',
+);
+sub _build_tag_memory {
+    my ($self) = @_;
+    my $db_dir = Path::Class::Dir->new($self->database_directory, 'tags');
+    return Plerd::Remembrancer->new(database_directory => $db_dir);
 }
 
 has 'tags_publication_directory' => (

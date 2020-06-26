@@ -1,7 +1,6 @@
 package Plerd::Model::Tag;
 use Modern::Perl '2018';
 
-use File::Basename;
 use Moo;
 use URI;
 

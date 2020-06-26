@@ -6,6 +6,7 @@ use Template;
 
 use Plerd::Config;
 use Plerd::Model::Post;
+use Plerd::Model::TagIndex;
 use Plerd::Remembrancer;
 
 our $VERSION="1.0";
@@ -38,33 +39,23 @@ sub _build_publisher {
     return Template->new(%params);   
 }
 
-has post_memory => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_post_memory',
-);
-sub _build_post_memory {
-    my ($self) = @_;
-    my $db_dir = Path::Class::Dir->new($self->config->database_directory, 'posts');
-    return Plerd::Remembrancer->new(database_directory => $db_dir);
-}
-
 has source_dir_handle => (
     is => 'rw',
     clearer => 1,
     predicate => 1,
 );
 
-has tag_memory => (
+has 'tags_index' => (
     is => 'ro',
-    lazy => 1,
-    builder => '_build_tag_memory',
+    clearer => 1,
+    predicate => 1,
+    builder => '_build_tags_index',
 );
-sub _build_tag_memory {
+sub _build_tags_index {
     my ($self) = @_;
-    my $db_dir = Path::Class::Dir->new($self->config->database_directory, 'tags');
-    return Plerd::Remembrancer->new(database_directory => $db_dir);
+    Plerd::Model::TagIndex->new(config => $self->config);
 }
+
 
 #-----------------
 # Public Methods
@@ -79,7 +70,7 @@ sub publish_post {
     # Does this post need to be regenerated?
     my $post_key = $post->publication_file->basename;
 
-    if (my $memory = $self->post_memory->load($post_key)) { 
+    if (my $memory = $self->config->post_memory->load($post_key)) { 
         if ($memory->{mtime} >= $post->source_file_mtime) {
             # the cache is newer than the source.
             # decline to proceed.
@@ -91,40 +82,28 @@ sub publish_post {
         $post->load_source;
     }
 
-    my $tmpl = Path::Class::File->new($self->config->template_directory, "post.tt");
-    if ($self->_publish($tmpl, $post->publication_file, { post => $post }) ) {
-            for my $tag (@{ $post->tags }) {
-                my $tm = $self->tag_memory;
-                my $memory = $tm->load($tag->name);
-            
-                if ($memory) {
-                    if (!exists $memory->{$post->source_file->stringify}) {
-                        $memory->{$post->source_file->stringify} = {
-                            uri => $post->uri->as_string,
-                            title => $post->title,
-                        };
-                    }
-                } else {
-                    $memory = {
-                        $post->source_file->stringify => {
-                                    uri => $post->uri->as_string,
-                                    title => $post->title,
-                        }
-                    };
-                }
-
-                $tm->save($tag->name => $memory);
-            }
+    if ($self->_publish(
+            $post->template_file, 
+            $post->publication_file, 
+            { post => $post }) 
+    ) {
+        # @todo: fix orphan tag problem when a post is updated with tags removed
+        for my $tag (@{ $post->tags }) {
+            $self->tags_index->update_tag_for_post( $tag, $post );
+        }
     } else {
         die("assert - Publishing failed for " . $post->source_file);
     }
 
     # Remember publishing this post 
-    $self->post_memory->save($post->publication_file->basename, {
-        mtime => $post->source_file_mtime,
-        original_filename => $post->source_file->absolute->stringify,
-        tags => $post->tags
-    });
+    $self->config->post_memory->save(
+        $post->publication_file->basename, 
+        {
+            mtime => $post->source_file_mtime,
+            original_filename => $post->source_file->absolute->stringify,
+            tags => $post->tags
+        }
+    );
 
     return 1;
 }
@@ -137,8 +116,22 @@ sub publish_tags_index {
     my ($self, $tag) = @_;
 
     # Get the mtime of the published tags index
+    my $tags_index = $self->tags_index;
+    if (!$tags_index->out_of_date) {
+        return; # no updates needed
+    }
+
     # If any tag memory is newer, regenerate index
-    
+    my $tag_links = $tags_index->get_tag_links;
+    if (!$self->_publish(
+            $tags_index->template_file, 
+            $tags_index->publication_file, 
+            { tag_links => $tag_links }) 
+    ) {
+        die("assert - Publishing failed for tag index");
+    }
+
+    return 1;
 }
 
 sub publish_rss_feed {
@@ -165,7 +158,7 @@ sub publish_all {
     my ($self) = @_;
 
     while (my $source_file = $self->next_source_file) {
-        my $post = $Plerd::Model::Post->new(config => $self->config);
+        my $post = Plerd::Model::Post->new(config => $self->config);
         $post->source_file($source_file);
         $self->publish_post($post);
     }
