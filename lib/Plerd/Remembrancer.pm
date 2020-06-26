@@ -89,14 +89,49 @@ sub load {
     return;
 }
 
-# Directory walk through DB dir, return keys as an array suitable for load();
+# Alpha sorted keys;
 sub keys {
     my ($self) = @_;
 
-    my @files = _dir_walk($self->database_directory);
+    my $filter = sub {
+        my ($files) = @_;
+
+        return sort { $a->stringify cmp $b->stringify } @$files;
+    };
+
+    my @files = _dir_walk($self->database_directory, $filter);
 
     return [ map { $self->_entry_to_key($_) } @files ];
 }
+
+# Reverse chrono keys
+sub earliest_keys {
+    my ($self) = @_;
+
+    my $filter = sub {
+        my ($files) = @_;
+
+        return sort { $a->stat->mtime <=> $b->stat->mtime } @$files;
+    };
+    my @files = _dir_walk($self->database_directory, $filter);
+
+    return [ map { $self->_entry_to_key($_) } @files ];
+}
+
+# Chrono keys
+sub latest_keys {
+    my ($self) = @_;
+
+    my $filter = sub {
+        my ($files) = @_;
+
+        return sort { $b->stat->mtime <=> $a->stat->mtime } @$files;
+    };
+    my @files = _dir_walk($self->database_directory, $filter);
+
+    return [ map { $self->_entry_to_key($_) } @files ];
+}
+
 
 sub remove {
     my ($self, $keys) = @_;
@@ -140,8 +175,8 @@ sub _entry_to_key {
 
 # not a method
 sub _dir_walk {
-    my ($dir, $opt_subdirs_only) = @_;
-
+    my ($dir, $filter_coderef) = @_;
+ 
     my @found;
     while (my $thing = $dir->next) {
         # No dot files allowed
@@ -150,14 +185,17 @@ sub _dir_walk {
         }
 
         if ($thing->is_dir) {
-            push @found, $thing if $opt_subdirs_only;
-            push @found, _dir_walk($thing, $opt_subdirs_only);
+            push @found, _dir_walk($thing); # pass along filter? 
         } else {
-            push @found, $thing if !$opt_subdirs_only;
+            push @found, $thing;
         }
     }
 
-    return sort { $a->stringify cmp $b->stringify } @found;     
+    if (defined $filter_coderef) {
+        return $filter_coderef->(\@found);        
+    }
+
+    return @found;
 }
 
 1;

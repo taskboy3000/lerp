@@ -1,7 +1,5 @@
 use Modern::Perl '2018';
 
-use warnings;
-use strict;
 use FindBin;
 BEGIN {
     $::gLIBDIR="$FindBin::Bin/../lib";
@@ -69,6 +67,7 @@ sub TestPayloadKeyStore {
 
         my $rc = eval { $R->save($key, $payload) };
         ok($rc, "  $description");
+        sleep(1); # introduce variations in mtimes
     }
 
     my $rc = eval { $R->save(["foo", "bar"]) };
@@ -107,11 +106,27 @@ sub TestKeyExistence {
 
 sub TestKeys {
     my ($R) = @_;
+    $DB::single=1;
     my $list = $R->keys();
-    ok(@$list, "Got keys list");
+    ok(@$list == 4, "Got expected list of keys");
     for my $entry (@$list) {
         diag("  " . join("/", @$entry));
     }
+
+    my $earliest = $R->earliest_keys;
+    ok(@$earliest, "Got earliest keys");
+    for my $entry (@$earliest) {
+        diag("  " . join("/", @$entry));
+    }
+    my $latest = $R->latest_keys;
+    ok(@$latest, "Got latest keys");
+    for my $entry (@$latest) {
+        diag("  " . join("/", @$entry));
+    }
+
+    ok(join(",",@{$earliest->[0]}) ne join(",", @{$latest->[0]}), 
+        "Ealiest list appears to be different from latest list"
+    );
 }
 
 sub TestPayloadRetrieval {
