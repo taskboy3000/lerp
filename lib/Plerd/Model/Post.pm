@@ -1,4 +1,5 @@
 package Plerd::Model::Post;
+use Modern::Perl '2018';
 
 use Data::GUID;
 use DateTime;
@@ -6,7 +7,7 @@ use DateTime::Format::W3CDTF;
 use File::Basename;
 use HTML::SocialMeta;
 use HTML::Strip;
-use JSON;
+
 use Moo;
 use Path::Class::File;
 use Text::MultiMarkdown qw( markdown );
@@ -155,10 +156,6 @@ sub _build_image_alt {
     $self->config->image_alt;
 }
 
-has 'json' => (
-    is => 'ro', 
-    default => sub {  }
-);
 
 =pod
 FIXME -- This is going to be handled by javascript
@@ -571,7 +568,7 @@ sub serialize_source {
     }
     $new_content .= "\n" . $self->raw_body . "\n";
     $self->source_file->spew( iomode=>'>:encoding(utf8)', $new_content );
-    $self->_store($self->attributes)    
+       
 }
 
 sub can_publish {
@@ -582,44 +579,6 @@ sub can_publish {
     }
 
     return;
-}
-
-# @remove to plerd controller
-=pod
-sub publish {
-    my $self = shift;
-
-    # Make <title>-ready text free of possible Markdown-generated HTML tags.
-    my $stripped_title = $self->title;
-    $stripped_title =~ s{</?(em|strong)>}{}g;
-
-    my $html_fh = $self->publication_file->openw;
-    my $template_fh = $self->plerd->post_template_file->openr;
-    for ( $html_fh, $template_fh ) {
-	    $_->binmode(':utf8');
-    }
-
-    $self->plerd->template->process(
-        $template_fh,
-        {
-            plerd => $self->plerd,
-            posts => [ $self ],
-            title => $stripped_title,
-            context_post => $self,
-        },
-	    $html_fh,
-    ) || $self->plerd->_throw_template_exception( $self->plerd->post_template_file );
-
-    $self->publication_file_mtime;
-    $self->update_tag_db;
-}
-=cut
-
-sub update_tag_db {
-    my $self = shift;
-    my $tags = $self->tags;
-
-    @$tags 
 }
 
 #-------------------
@@ -651,52 +610,5 @@ sub _strip_html {
     return $stripped;
 }
 
-sub _store {
-    my $self = shift;
-    my ($data_ref) = @_;
-
-    my $post_dir =  Path::Class::Dir->new(
-        $self->config->database_directory,
-        "posts"
-    );
-
-    unless ( -e $post_dir ) {
-        $post_dir->mkpath;
-    }
-
-    my $file = Path::Class::File->new(
-        $post_dir,
-        $self->guid,
-    );
-    my $json = JSON->new->convert_blessed->utf8->canonical->pretty;
-    $file->spew( $json->encode( $data_ref ) );
-    return 1;
-}
-
-sub _retrieve {
-    my $self = shift;
-
-    my $file = Path::Class::File->new(
-        $self->config->database_directory,
-        "posts",
-        $self->guid
-    );
-
-    if ( -e $file ) {
-        my $json = JSON->new->convert_blessed->utf8;
-        my $data;
-        eval {
-            my $in = $file->slurp;
-            $data = $json->decode( $in );
-            1;
-        } or do {
-            warn("Could not retrieve stored data: " . $@);
-            return;
-        };
-        return $data;
-    }
-
-    return;
-}
 
 1;

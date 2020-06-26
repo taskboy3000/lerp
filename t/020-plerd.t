@@ -1,5 +1,5 @@
-use strict;
-use warnings;
+use Modern::Perl '2018';
+
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 

@@ -1,7 +1,5 @@
 package Plerd::SmartyPants;
-use strict;
-use warnings;
-use utf8;
+use Modern::Perl '2018';
 
 # Configurable variables:
 my $smartypants_attr = "1";

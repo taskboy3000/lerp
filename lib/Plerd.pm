@@ -1,6 +1,5 @@
 package Plerd;
-use strict;
-use warnings;
+use Modern::Perl '2018';
 
 use Moo;
 use Template;

@@ -1,5 +1,5 @@
-use warnings;
-use strict;
+use Modern::Perl '2018';
+
 use FindBin;
 BEGIN {
     $::gLIBDIR="$FindBin::Bin/../lib";

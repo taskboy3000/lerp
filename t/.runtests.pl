@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-use strict;
-use warnings;
+use Modern::Perl '2018';
+
 use FindBin;
 
 BEGIN {

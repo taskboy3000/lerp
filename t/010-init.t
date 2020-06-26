@@ -1,3 +1,5 @@
+use Modern::Perl '2018';
+
 use warnings;
 use strict;
 

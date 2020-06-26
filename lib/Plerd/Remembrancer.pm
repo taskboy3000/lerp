@@ -5,8 +5,7 @@
 # empty values are allowable.
 #
 package Plerd::Remembrancer;
-use strict;
-use warnings;
+use Modern::Perl '2018';
 
 use Path::Class::Dir;
 use Path::Class::File;

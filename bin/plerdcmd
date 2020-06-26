@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use warnings;
-use strict;
+use Modern::Perl '2018';
 
 use FindBin;
 BEGIN {
@@ -18,7 +16,7 @@ use Plerd;
 use Plerd::Config;
 
 Main();
-exit(0);
+exit;
 
 #--------------
 # Subroutines

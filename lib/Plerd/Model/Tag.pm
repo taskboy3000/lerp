@@ -1,21 +1,5 @@
-# All this class knows about is how to map tags to source files
-#
-# When a source file has tags:
-#   add a touch file to the tag DB dirs:
-#   $PLERD_ROOT/db/tags/
-#                       tag1/
-#                            source_file_basename1.tag
-#                       tag2/
-#                            source_file_basename2.tag
-#                            source_file_basename3.tag
-#
-#   These files have no content, but make it easy to add, remove posts from tags
-#   and to generate tag files from this list.
-#
-#   STARTING NOW, tags are normalized to lower-case.  Sorry, but it's true.  Also, no spaces.
 package Plerd::Model::Tag;
-use strict;
-use warnings;
+use Modern::Perl '2018';
 
 use File::Basename;
 use Moo;
