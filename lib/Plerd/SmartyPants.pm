@@ -1,3 +1,7 @@
+# All important logic in this file is the work of Jason McIntosh
+# and the contributors to Plerd.
+#
+# See: https://github.com/jmacdotorg/plerd
 package Plerd::SmartyPants;
 use Modern::Perl '2018';
 
