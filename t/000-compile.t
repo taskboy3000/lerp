@@ -43,7 +43,7 @@ sub TestCompileExecuteables {
     my @binFiles = sort glob("$::gBINDIR/*");
 
     for my $binFile (@binFiles) {
-        my @cmd = ($^X, "-I$::gLIBDIR", "-wc", $binFile, ) ; # "2>/dev/null");
+        my @cmd = ($^X, "-I$::gLIBDIR", "-wc", $binFile, "2>/dev/null");
         
         system(join(" ", @cmd));
 
