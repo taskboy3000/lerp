@@ -25,14 +25,18 @@ exit;
 sub Main {
     my %opts;
     GetOptions(
+        # commands
         'init' => \$opts{initialize},
         'publish=s' => \$opts{publish},
         'publish-all' => \$opts{publish_all},
+
+        # options
         'c|onfig=s' => \$opts{config},
         'd|base-dir=s' => \$opts{base_dir},
+        'force'        => \$opts{force},
+        'h|help' => \$opts{usage},
         'v|verbose' => \$opts{verbose},
         'version'   => \$opts{version},
-        'h|help' => \$opts{usage},
     );
 
     if ($opts{help}) {
@@ -41,10 +45,8 @@ sub Main {
         version();
     } elsif ($opts{initialize}) {
         initialize($opts{config}, $opts{base_dir}, $opts{verbose});
-    } elsif ($opts{publish}) {
-        publish($opts{publish}, $opts{config}, $opts{verbose});
     } elsif ($opts{publish_all}) {
-        publish_all($opts{config}, $opts{verbose});
+        publish_all($opts{config}, $opts{verbose}, $opts{force});
     } else {
         usage();
     }
@@ -63,13 +65,13 @@ USAGE:
 COMMAND:
 
 --init                   Create a new plerd site
---publish [SOURCE_FILE]  Publish the source given by SOURCE_FILE
 --publish-all            Republish all known source files
 
 OPTIONS:
 
 --c|config [FILE]        Name of plerd configuration file to use
 --base-dir [DIR]         Directory into which plerd artifacts are copied
+--force                  Force the publication of files, even if source has not changed
 --verbose                Enable verbose messages
 --version                Print plerd version number
 --help                   This screen
@@ -111,12 +113,22 @@ sub initialize {
     }
 }
 
-sub publish {
-    my ($source_file, $conf_file, $verbose) = @_;
-    die("assert");
-}
-
 sub publish_all {
-    my ($conf_file, $verbose) = @_;
-    die("assert");
+    my ($conf_file, $verbose, $force) = @_;
+
+    my $config;
+    if (defined $conf_file) {
+        $config = Plerd::Config->new(config_file => $conf_file);
+    } else {
+        $config = Plerd::Config->new;
+    }
+
+    if (!-e $config->config_file) {
+        die("Cannot find plerd config file: " . $config->config_file);
+    }
+
+    $config->unserialize;
+
+    my $plerd = Plerd->new(config => $config);
+    $plerd->publish_all(verbose => $verbose, force => $force);
 }
