@@ -122,20 +122,31 @@ sub _build_tags_index {
 # Public Methods
 #-----------------
 sub publish_post {
-    my ($self, $post) = @_;
+    my ($self, $post) = (shift, shift);
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
 
     if (!$post->has_source_file) {
         die("assert - post has no source file");
     }
 
     # Does this post need to be regenerated?
+    my $post_memory = $self->config->post_memory;
     my $post_key = $post->publication_file->basename;
 
-    if (my $memory = $self->config->post_memory->load($post_key)) { 
-        if ($memory->{mtime} >= $post->source_file_mtime) {
-            # the cache is newer than the source.
-            # decline to proceed.
-            return;
+    if (!$opts{force}) {
+        if (my $memory = $post_memory->load($post_key)) { 
+            if ($memory->{mtime} >= $post->source_file_mtime) {
+                # the cache is newer than the source.
+                # decline to proceed.
+                if ($opts{verbose}) {
+                    say "Declining to reprocess unchanged " . $post->source_file->basename;
+                }
+                return;
+            }
         }
     }
 
@@ -148,6 +159,10 @@ sub publish_post {
             $post->publication_file, 
             { post => $post }) 
     ) {
+        if ($opts{verbose}) {
+            say "Published " . $post->publication_file->basename;            
+        }
+
         # @todo: fix orphan tag problem when a post is updated with tags removed
         for my $tag (@{ $post->tags }) {
             $self->tags_index->update_tag_for_post( $tag, $post );
@@ -157,7 +172,7 @@ sub publish_post {
     }
 
     # Remember publishing this post 
-    $self->config->post_memory->save(
+    $post_memory->save(
         $post->publication_file->basename, 
         {
             mtime => $post->source_file_mtime,
@@ -171,11 +186,16 @@ sub publish_post {
 
 
 sub publish_tags_index {
-    my ($self, $tag) = @_;
+    my ($self, $tag) = (shift, shift);
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
 
     # Get the mtime of the published tags index
     my $tags_index = $self->tags_index;
-    if (!$tags_index->out_of_date) {
+    if (!$opts{force} && !$tags_index->out_of_date) {
         return; # no updates needed
     }
 
@@ -186,6 +206,9 @@ sub publish_tags_index {
             $tags_index->publication_file, 
             { tag_links => $tag_links }) 
     ) {
+        if ($opts{verbose}) {
+            say "Published " . $tags_index->publication_file->basename;            
+        }
         return 1;
     }
 
@@ -193,12 +216,18 @@ sub publish_tags_index {
 }
 
 sub publish_rss_feed {
-    my ($self) = @_;
-    my $rss_feed = $self->rss_feed;
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+    my $feed = $self->rss_feed;
     my $post_memory = $self->config->post_memory;
 
     # @fixme - need to regen?
     my @posts;
+
     # @todo: allow customization from config
     my $max_posts = 3;
     my $latest_keys = $post_memory->latest_keys;
@@ -221,22 +250,32 @@ sub publish_rss_feed {
     # pass to the template like 
     # [% feed.json %]
     if ($self->_publish(
-        $rss_feed->template_file,
-        $rss_feed->publication_file,
+        $feed->template_file,
+        $feed->publication_file,
         { posts => \@posts }
     )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;            
+        }
+
         return 1;
     }
     die("assert - Publishing failed for rss_feed");
 }
 
 sub publish_json_feed {
-    my ($self) = @_;
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
     my $feed = $self->json_feed;
     my $post_memory = $self->config->post_memory;
-    # @fixme - need to regen?
 
+    # @fixme - need to regen?
     my @posts;
+
     # @todo: allow customization from config
     my $max_posts = 3;
     my $latest_keys = $post_memory->latest_keys;
@@ -260,6 +299,9 @@ sub publish_json_feed {
         $feed->publication_file,
         { posts => \@posts }
     )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;            
+        }
         return 1;
     }
     die("assert - Publishing failed for JSON feed");
@@ -267,7 +309,12 @@ sub publish_json_feed {
 
 # This is the main blog page
 sub publish_front_page {
-    my ($self) = @_;
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
     my $feed = $self->front_page;
 
     # @todo: allow customization from config
@@ -296,6 +343,9 @@ sub publish_front_page {
         $feed->publication_file,
         { posts => \@posts }
     )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;            
+        }
         return 1;
     }
     die("assert - Publishing failed for archive page");
@@ -303,7 +353,12 @@ sub publish_front_page {
 }
 
 sub publish_archive {
-    my ($self) = @_;
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
    
     my $feed = $self->archive;
 
@@ -328,27 +383,57 @@ sub publish_archive {
         $feed->publication_file,
         { posts => \@posts }
     )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;            
+        }
         return 1;
     }
     die("assert - Publishing failed for archive page");
 }
 
 sub publish_all {
-    my ($self) = @_;
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
 
+    my $post_memory = $self->post_memory;
+    my ($latest_post) = @{ $post_memory->latest_keys };
+
+    my @source_files;
     while (my $source_file = $self->next_source_file) {
-        my $post = Plerd::Model::Post->new(config => $self->config);
-        $post->source_file($source_file);
-        $self->publish_post($post);
+        if (!$opts{force}) {
+            my $src_mtime = $source_file->stat->mtime;
+            if ($src_mtime < $latest_post) {
+                if ($opts{verbose}) {
+                    say "Declining to reprocess old source: " . $source_file->basename;
+                }
+                next;
+            }
+        }
+        push @source_files, $source_file;
     }
 
-    $self->publish_front_page;
-    $self->publish_archive_page;
-    $self->publish_rss_feed;
-    $self->publish_json_feed;
+    if (!@source_files) {
+        return;
+    }
+
+    for my $source_file (@source_files) {
+        my $post = Plerd::Model::Post->new(config => $self->config, source_file => $source_file);
+        $self->publish_post($post, %opts);
+    }
+
+    $self->publish_front_page(%opts);
+    $self->publish_archive_page(%opts);
+    $self->publish_rss_feed(%opts);
+    $self->publish_json_feed(%opts);
+
+    return 1;
 }
 
-# @todo: verify this iterate pattern
+
 sub next_source_file {
     my ($self) = @_;
 

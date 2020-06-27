@@ -205,7 +205,7 @@ sub TestArchiveRSSRecentPages {
 
     ok($plerd->publish_archive, "Published archive feed: " . $plerd->archive->publication_file->basename);
     ok(-e $plerd->archive->publication_file, "Archive page appears to have been created");
-$DB::single=1;
+
     ok($plerd->publish_front_page, "Published front page feed: " . $plerd->front_page->publication_file->basename);
     ok(-e $plerd->front_page->publication_file, "Front page appears to have been created");
 

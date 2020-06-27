@@ -15,6 +15,7 @@ use Path::Class::Dir;
 use Plerd;
 use Plerd::Config;
 
+# @todo: add locking
 Main();
 exit;
 
