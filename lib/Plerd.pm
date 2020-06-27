@@ -154,6 +154,17 @@ sub publish_post {
         $post->load_source;
     }
 
+    if (!$post->can_publish) {
+        if ($opts{verbose}) {
+            say "Post cannot be published without both a title and body."
+        }
+        return;
+    }
+
+    if ($post->attributes_have_changed) {
+        $post->serialize_source
+    }
+
     if ($self->_publish(
             $post->template_file, 
             $post->publication_file, 
@@ -230,9 +241,8 @@ sub publish_rss_feed {
 
     # @todo: allow customization from config
     my $max_posts = 3;
-    my $latest_keys = $post_memory->latest_keys;
-
-    for my $key (@{ $latest_keys }) {
+    my @latest_keys = reverse @{ $post_memory->keys };
+    for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
         }
@@ -278,9 +288,9 @@ sub publish_json_feed {
 
     # @todo: allow customization from config
     my $max_posts = 3;
-    my $latest_keys = $post_memory->latest_keys;
+    my @latest_keys = reverse @{ $post_memory->keys };
 
-    for my $key (@{ $latest_keys }) {
+    for my $key (@latest_keys) {
         if ($max_posts-- < 0){
             last;
         }
@@ -323,8 +333,8 @@ sub publish_front_page {
 
     my $post_memory = $self->config->post_memory;
     my @posts;
-    my $latest_keys = $post_memory->latest_keys;
-    for my $key (@{ $latest_keys }) {
+    my @latest_keys = reverse @{ $post_memory->keys };
+    for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
         }
@@ -352,7 +362,7 @@ sub publish_front_page {
 
 }
 
-sub publish_archive {
+sub publish_archive_page {
     my ($self) = shift;
     my (%opts) = (
         'force' => 0,
@@ -366,8 +376,9 @@ sub publish_archive {
 
     my $post_memory = $self->config->post_memory;
     my @posts;
-    my $latest_keys = $post_memory->latest_keys;
-    for my $key (@{ $latest_keys }) {
+
+    my @latest_keys = reverse @{ $post_memory->keys };
+    for my $key ( @latest_keys ) {
 
         my $rec = $post_memory->load($key);
         my $post = Plerd::Model::Post->new(
@@ -399,14 +410,18 @@ sub publish_all {
         @_
     );
 
-    my $post_memory = $self->post_memory;
+    my $post_memory = $self->config->post_memory;
     my ($latest_post) = @{ $post_memory->latest_keys };
+    my $latest_post_mtime;
+    if (defined $latest_post) {
+        $latest_post_mtime = $post_memory->load($latest_post)->{mtime};
+    }   
 
     my @source_files;
     while (my $source_file = $self->next_source_file) {
-        if (!$opts{force}) {
+        if (defined $latest_post && !$opts{force}) {
             my $src_mtime = $source_file->stat->mtime;
-            if ($src_mtime < $latest_post) {
+            if ($src_mtime <= $latest_post_mtime) {
                 if ($opts{verbose}) {
                     say "Declining to reprocess old source: " . $source_file->basename;
                 }
@@ -415,14 +430,18 @@ sub publish_all {
         }
         push @source_files, $source_file;
     }
-
     if (!@source_files) {
         return;
     }
 
     for my $source_file (@source_files) {
         my $post = Plerd::Model::Post->new(config => $self->config, source_file => $source_file);
-        $self->publish_post($post, %opts);
+        eval {
+            $self->publish_post($post, %opts);
+            1;
+        } or do {
+            say $@;
+        };
     }
 
     $self->publish_front_page(%opts);
@@ -469,7 +488,7 @@ sub _publish {
                         $trg_fh,
                     ) 
     ) {
-        die(sprintf("assert[processing %s] %s",
+        die(sprintf("assert[processing %s] %s\n",
                         $target_file,
                         $self->publisher->error()
                    )

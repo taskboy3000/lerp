@@ -180,6 +180,10 @@ sub _entry_to_key {
 sub _dir_walk {
     my ($dir, $filter_coderef) = @_;
  
+    if (!-d $dir) {
+        return;
+    }
+
     my @found;
     while (my $thing = $dir->next) {
         # No dot files allowed

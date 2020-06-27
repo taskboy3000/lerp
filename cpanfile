@@ -12,5 +12,6 @@ requires 'Path::Class';
 requires 'Template';
 requires 'Test::More';
 requires 'Text::MultiMarkdown';
+requires 'Text::Unidecode';
 requires 'URI';
 requires 'YAML';

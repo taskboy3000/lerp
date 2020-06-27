@@ -7,10 +7,10 @@ use DateTime::Format::W3CDTF;
 use File::Basename;
 use HTML::SocialMeta;
 use HTML::Strip;
-
 use Moo;
 use Path::Class::File;
 use Text::MultiMarkdown qw( markdown );
+use Text::Unidecode;
 use URI;
 
 use Plerd::Config;
@@ -64,7 +64,7 @@ sub _build_date {
             1;
         } or do {
             die 'Error processing ' . $self->source_file . ': '
-                . 'The "time" attribute is not in W3C format.';
+                . "The 'time' attribute is not in W3C format.\n";
         };
     } elsif ( $filename_year ) {
         # The post specifies its day in the filename, but we still don't have a
@@ -192,6 +192,11 @@ has 'publication_file' => (
 );
 sub _build_publication_file {
     my $self = shift;
+
+    if (!$self->source_file_loaded) {
+        $self->load_source;
+    }
+
     Path::Class::File->new(
         $self->config->publication_directory,
         $self->published_filename,
@@ -222,9 +227,14 @@ has 'published_filename' => (
 sub _build_published_filename {
     my $self = shift;
 
+    if (!$self->source_file_loaded) {
+        $self->load_source;
+    }
+
     if ($self->attributes->{published_filename}) {
         return $self->attributes->{published_filename};
     }
+
     $self->attributes_have_changed(1);
     my $filename = $self->source_file->basename;
 
@@ -244,6 +254,7 @@ sub _build_published_filename {
         $filename .= '.html';
     }
 
+    $filename = unidecode($filename);
     return $filename;
 }
 
@@ -254,6 +265,12 @@ has 'published_timestamp' => (
 );
 sub _build_published_timestamp {
     my $self = shift;
+
+    # Cannot compute the published filename without
+    # consuming source
+    if (!$self->source_file_loaded) {
+        $self->load_source;
+    }
 
     my $formatter = DateTime::Format::W3CDTF->new;
     my $timestamp = $formatter->format_datetime( $self->date );
@@ -388,8 +405,8 @@ has 'source_file' => (
     predicate => 1,
     coerce => \&_coerce_file
 );
-
 has 'source_file_loaded' => (is => 'rw', default => sub { 0 });
+
 has 'source_file_mtime' => (
     is => 'ro', 
     lazy => 1,
@@ -579,8 +596,7 @@ sub serialize_source {
         }
     }
     $new_content .= "\n" . $self->raw_body . "\n";
-    $self->source_file->spew( iomode=>'>:encoding(utf8)', $new_content );
-       
+    $self->source_file->spew( iomode=>'>:encoding(utf8)', $new_content );   
 }
 
 sub can_publish {

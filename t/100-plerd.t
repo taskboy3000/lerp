@@ -3,6 +3,8 @@ use Modern::Perl '2018';
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+use File::Copy;
+use Path::Class::Dir;
 use Path::Class::File;
 use Test::More;
 
@@ -24,6 +26,9 @@ sub TestInvoked {
 sub TestSourceListing {
     my $plerd = Plerd->new;
     my $config = $plerd->config;
+
+    # @ok: not publishing the sources, so no rewrite of source can happen
+    # and there is no persisted plerd site.
     $config->source_directory("$FindBin::Bin/source_model");
 
     my $first_fetch = $plerd->next_source_file;
@@ -46,9 +51,10 @@ sub TestPublishingOnePost {
     my $plerd = Plerd->new;
     my $config = $plerd->config;
     $config->path("$FindBin::Bin/init/new-site");
-    $config->source_directory("$FindBin::Bin/source_model");
-
     ok($config->initialize, "Creating test site for publication");
+    for my $file (glob("$FindBin::Bin/source_model/*")) {
+        copy $file, $config->source_directory;
+    }
 
     # A post without tags
     my $source_file = Path::Class::File->new(
@@ -65,9 +71,10 @@ sub TestPublishingOnePost {
     ok($plerd->publish_post($post), "Published post without tags");
     ok(-s $post->publication_file, "Published file exists and is non-empty: " . $post->publication_file->basename);
     ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file");
+    sleep(3);
     $source_file->touch;
     $post->clear_source_file_mtime;
-    ok($plerd->publish_post($post), "Plerd republished an updated source file");
+    ok($plerd->publish_post($post, verbose => 1), "Plerd republished an updated source file");
 
     diag("Creating a post with tags");
     my $source_file2 = Path::Class::File->new(
@@ -88,6 +95,20 @@ sub TestPublishingOnePost {
         ok($tm->exists($tag->name), 'Tag ' . $tag->name . ' exists');
     }
     
+    my $post3 = Plerd::Model::Post->new(
+        config => $config,
+        source_file => Path::Class::File->new($config->source_directory, 'bad-date.md')
+    );
+    my $rc = 0;
+    eval {
+        $rc = $plerd->publish_post($post3);
+        1;
+    } or do {
+        diag("Attempting to publish: " . $post3->source_file->basename);
+        diag($@);
+    };
+
+    ok(!$rc, "Declined to publish source with bad date");
     ok($config->path->rmtree, "Removed test site");
 }
 
@@ -98,18 +119,27 @@ sub TestTagMemory {
     my $plerd = Plerd->new();
     $plerd->config->path("init/new-site");
     $plerd->config->initialize();
+    for my $file (glob("$FindBin::Bin/source_model/*")) {
+        copy $file, $plerd->config->source_directory;
+    }
 
     my $TIdx = $plerd->tags_index;  
 
     my $post1 = Plerd::Model::Post->new(
         config => $plerd->config,
-        source_file => "$FindBin::Bin/source_model/one_tag.md"
+        source_file => Path::Class::File->new(
+            $plerd->config->source_directory,
+            'one_tag.md'
+        )
     );
     $post1->load_source;
 
     my $post2 = Plerd::Model::Post->new(
         config => $plerd->config,
-        source_file => "$FindBin::Bin/source_model/two_tags.md"
+        source_file => Path::Class::File->new(
+            $plerd->config->source_directory,
+            'two_tags.md'
+        )
     );
     $post2->load_source;
 
@@ -162,7 +192,7 @@ sub TestTagMemory {
     ok(-e $plerd->tags_index->publication_file, "Appears to have created a tags index file");
     ok(!$plerd->publish_tags_index, "Declined to publish unchanged tags index");
 
-    sleep(2);
+    sleep(3);
 
     my $new_tag = Plerd::Model::Tag->new(name => 'bar');
     $TIdx->update_tag_for_post($new_tag => $post2);
@@ -177,9 +207,11 @@ sub TestArchiveRSSRecentPages {
     my $plerd = Plerd->new;
     my $config = $plerd->config;
     $config->path("$FindBin::Bin/init/new-site");
-    $config->source_directory("$FindBin::Bin/source_model");
 
     ok($config->initialize, "Creating test site for publication");
+    for my $file (glob("$FindBin::Bin/source_model/*")) {
+        copy $file, $config->source_directory;
+    }
     my %sought = (
         "good-source-file.md" => 1,
         "extra-headers.md" => 1,
@@ -203,11 +235,37 @@ sub TestArchiveRSSRecentPages {
     ok($plerd->publish_json_feed, "Published json feed: " . $plerd->json_feed->publication_file->basename);
     ok(-e $plerd->json_feed->publication_file, "Atom feed appears to have been created");
 
-    ok($plerd->publish_archive, "Published archive feed: " . $plerd->archive->publication_file->basename);
+    ok($plerd->publish_archive_page, "Published archive feed: " . $plerd->archive->publication_file->basename);
     ok(-e $plerd->archive->publication_file, "Archive page appears to have been created");
 
     ok($plerd->publish_front_page, "Published front page feed: " . $plerd->front_page->publication_file->basename);
     ok(-e $plerd->front_page->publication_file, "Front page appears to have been created");
+
+    $plerd->config->path->rmtree;
+}
+
+# This is an integration test
+sub TestPublishAll {
+    diag("Testing Publish all");
+    my $plerd = Plerd->new;
+    my $config = $plerd->config;
+    $config->path("$FindBin::Bin/init/new-site");
+
+    ok($config->initialize, "Creating default test site");
+    for my $file (glob("$FindBin::Bin/source_model/*")) {
+        copy $file, $config->source_directory;
+    }
+
+    ok($plerd->publish_all(verbose => 1), "Published entire source");
+    sleep(3);
+
+    ok(!$plerd->publish_all(verbose => 1), "Declined to republish unchanged sources");
+    sleep(2);
+    # update a couple of files
+    for my $update ('good-date.md', 'TODAY-dated-today.md', 'extra-headers.md') {
+        Path::Class::File->new($config->source_directory, $update)->touch;    
+    }
+    ok($plerd->publish_all(verbose => 1), "Published partial source");
 
     $plerd->config->path->rmtree;
 }
@@ -223,6 +281,7 @@ sub Main {
     TestPublishingOnePost();
     TestTagMemory();
     TestArchiveRSSRecentPages();
+    TestPublishAll();
 
     teardown();
 
@@ -230,7 +289,7 @@ sub Main {
 }
 
 sub setup {
-
+    Path::Class::Dir->new("$FindBin::Bin", "init", "new-site")->rmtree;
 }
 
 sub teardown {

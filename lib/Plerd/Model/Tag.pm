@@ -62,6 +62,9 @@ sub _canonicalize_tag {
     # no spaces
     $tag =~ s/\s+/_/g;
 
+    # remove octothorpes
+    $tag =~ s/#//g;
+
     return lc($tag);
 }
 

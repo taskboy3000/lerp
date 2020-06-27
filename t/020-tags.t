@@ -23,6 +23,7 @@ sub TestNameLogic {
         'Dog' => 'dog',
         'Foo BaR' => 'foo_bar',
         'An <em>important</em> LESSON' => 'an_important_lesson',
+        '#octothorpe' => 'octothorpe',
     );
 
     for my $tag (keys %baselines) {
