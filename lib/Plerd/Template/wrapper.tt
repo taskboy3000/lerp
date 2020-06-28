@@ -2,33 +2,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>[% title %]</title>
+    <title>[% config.title %]</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="atom.xml" rel="alternate" title="Atom feed" type="application/atom+xml">
-    <link href="feed.json" rel="alternate" title="JSON feed" type="application/json">
+    <link href="[% rssFeed.uri %]" rel="alternate" title="Atom feed" type="application/atom+xml">
+    <link href="[% jsonFeed.uri %]" rel="alternate" title="JSON feed" type="application/json">
 
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
-    [% IF context_post %]
-        [% context_post.social_meta_tags %]
-    [% END %]
-    <style>
-        .page-header h1 :link, .page-header h1 :visited {
-            color: black;
-        }
-        .sidebar h1 {
-            font-size: 1.5em;
-        }
-        img.author-link {
-            width: 20px;
-        }
-        .sidebar section {
-            margin-top: 2em;
-        }
-        img {
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="[% siteCSS.uri %]">
 </head>
 <body>
     <div class="navbar navbar-default" role="navigation">
@@ -89,5 +70,6 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="[% siteJS.uri %]"></script>
     </body>
 </html>

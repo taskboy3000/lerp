@@ -312,8 +312,10 @@ sub TestDefaultSiteAgainstBaseline {
         ok(-e $got_file, "Found published target: " . $got_file->basename);
         my $got = -s $got_file;
         my $expected = -s $baseline;
-        my $delta = abs($got - $expected);
-        ok($delta < 10, "  [diff: $delta] context within tolerance of baseline: " . $baseline->basename);
+        my $delta = $got - $expected;
+        # negative numbers means $got is missing expected strings
+        # positive means $got produced more output than expected
+        ok(abs($delta) < 10, "  [diff: $delta] context within tolerance of baseline: " . $baseline->basename);
     }
 
     $plerd->config->path->rmtree;

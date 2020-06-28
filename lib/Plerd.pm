@@ -14,6 +14,8 @@ use Plerd::Model::FrontPage;
 use Plerd::Model::JSONFeed;
 use Plerd::Model::Post;
 use Plerd::Model::RSSFeed;
+use Plerd::Model::SiteCSS;
+use Plerd::Model::SiteJavaScript;
 use Plerd::Model::TagIndex;
 use Plerd::Remembrancer;
 
@@ -56,6 +58,7 @@ sub _build_front_page {
 has 'json_feed' => (
     is => 'ro',
     clearer => 1,
+    lazy => 1,
     predicate => 1,
     builder => '_build_json_feed',
 );
@@ -75,8 +78,14 @@ sub _build_publisher {
         INCLUDE_PATH => $self->config->template_directory,
         ABSOLUTE => 1,
         PRE_DEFINE => {
+            archive => $self->archive,
             config => $self->config,
+            jsonFeed => $self->json_feed,
             plerd_version => $VERSION,
+            rssFeed => $self->rss_feed,
+            siteCSS => $self->site_css,
+            siteJS => $self->site_js,
+            tagsIndex => $self->tags_index,
         }
     );
     my $json = JSON->new->utf8;
@@ -94,6 +103,7 @@ sub _build_publisher {
 has 'rss_feed' => (
     is => 'ro',
     clearer => 1,
+    lazy => 1,
     predicate => 1,
     builder => '_build_rss_feed',
 );
@@ -102,15 +112,38 @@ sub _build_rss_feed {
     Plerd::Model::RSSFeed->new(config => $self->config);
 }
 
+has 'site_css' => (
+    is => 'ro', 
+    lazy => 1, 
+    builder => '_build_site_css'
+);
+sub _build_site_css {
+    my ($self) = @_;
+    Plerd::Model::SiteCSS->new(config => $self->config);
+}
+
+has 'site_js' => (
+    is => 'ro', 
+    lazy => 1, 
+    builder => '_build_site_js'
+);
+sub _build_site_js {
+    my ($self) = @_;
+    Plerd::Model::SiteJavaScript->new(config => $self->config);
+}
+
 has source_dir_handle => (
     is => 'rw',
+    lazy => 1,
     clearer => 1,
     predicate => 1,
 );
 
+
 has 'tags_index' => (
     is => 'ro',
     clearer => 1,
+    lazy => 1,
     predicate => 1,
     builder => '_build_tags_index',
 );
