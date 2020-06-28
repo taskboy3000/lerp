@@ -1,13 +1,6 @@
 t/testblog
 t/test.conf
 t/init
-run
-db
-source
-docroot
-templates
-log
-conf
 Plerd-*
 /MYMETA.*
 local

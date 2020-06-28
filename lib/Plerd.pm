@@ -430,6 +430,7 @@ sub publish_all {
         }
         push @source_files, $source_file;
     }
+
     if (!@source_files) {
         return;
     }

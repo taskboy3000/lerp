@@ -257,6 +257,7 @@ sub TestPublishAll {
     }
 
     ok($plerd->publish_all(verbose => 1), "Published entire source");
+
     sleep(3);
 
     ok(!$plerd->publish_all(verbose => 1), "Declined to republish unchanged sources");
@@ -266,6 +267,47 @@ sub TestPublishAll {
         Path::Class::File->new($config->source_directory, $update)->touch;    
     }
     ok($plerd->publish_all(verbose => 1), "Published partial source");
+
+    $plerd->config->path->rmtree;
+}
+
+sub TestDefaultSiteAgainstBaseline {
+    diag("Testing default site against baselines");
+    my $plerd = Plerd->new;
+    my $config = $plerd->config;
+    $config->path("$FindBin::Bin/init/new-site");
+
+    ok($config->initialize, "Creating default test site");
+    for my $file (glob("$FindBin::Bin/source_model/*")) {
+        copy $file, $config->source_directory;
+    }
+
+    ok($plerd->publish_all(verbose => 1), "Published entire source");
+    my $pub_dir = $plerd->config->publication_directory;
+    my @pub_files = $pub_dir->children;
+
+    my $baseline_dir = Path::Class::Dir->new("$FindBin::Bin/baselines/new-site/docroot");
+    my $title_pattern = q[^\d{4}-\d{2}-\d{2}-];
+
+    while (my $baseline = $baseline_dir->next) {
+        next if -d $baseline;
+        (my $baseline_base = $baseline->basename) =~ s/$title_pattern//o;
+
+        my $got_file;        
+        for my $candidate (@pub_files) {
+            (my $can_base = $candidate->basename) =~ s/$title_pattern//o;
+            if ($can_base eq $baseline_base) {
+                $got_file = $candidate;
+                last;
+            }
+        }
+
+        ok(-e $got_file, "Found published target: " . $got_file->basename);
+        my $got = -s $got_file;
+        my $expected = -s $baseline;
+        my $delta = abs($got - $expected);
+        ok($delta < 10, "  [diff: $delta] context within tolerance of baseline: " . $baseline->basename);
+    }
 
     $plerd->config->path->rmtree;
 }
@@ -282,6 +324,7 @@ sub Main {
     TestTagMemory();
     TestArchiveRSSRecentPages();
     TestPublishAll();
+    TestDefaultSiteAgainstBaseline();
 
     teardown();
 

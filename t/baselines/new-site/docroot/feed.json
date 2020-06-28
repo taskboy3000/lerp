@@ -1,0 +1,58 @@
+{
+  "version": "https://jsonfeed.org/version/1",
+  "title": "",
+  "home_page_url": "",
+  "feed_url": "/feed.json",
+  "user_comment": "This feed allows you to read the posts from this site in any feed reader that supports the JSON Feed format. To add this feed to your reader, copy the following URL — /feed.json — and add it your reader.",
+  "author": {
+    "name": ""
+  },
+  "items": [
+
+
+    
+    {
+      "id": "http://localhost/2020-06-28-two-tags.html",
+      "url": "http://localhost/2020-06-28-two-tags.html",
+      "title": "Two tags",
+      "content_html": "<p>This is a perfectly good and typical source file.</p>
+",
+      "date_published": "2020-06-28T09:04:06-04:00",
+      "date_modified": "2020-06-28T09:04:06-04:00"
+    },
+
+    
+    {
+      "id": "http://localhost/2020-06-28-one-tag.html",
+      "url": "http://localhost/2020-06-28-one-tag.html",
+      "title": "One tag",
+      "content_html": "<p>This is a perfectly good and typical source file.</p>
+",
+      "date_published": "2020-06-28T09:04:05-04:00",
+      "date_modified": "2020-06-28T09:04:05-04:00"
+    },
+
+    
+    {
+      "id": "http://localhost/2020-06-28-no-title.html",
+      "url": "http://localhost/2020-06-28-no-title.html",
+      "title": "no-title",
+      "content_html": "<p>Uh oh, this file doesnât have a title!</p>
+",
+      "date_published": "2020-06-28T09:04:05-04:00",
+      "date_modified": "2020-06-28T09:04:05-04:00"
+    },
+
+    
+    {
+      "id": "http://localhost/2020-06-28-metatags.html",
+      "url": "http://localhost/2020-06-28-metatags.html",
+      "title": "Metatags",
+      "content_html": "<p>This file sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
+",
+      "date_published": "2020-06-28T09:04:06-04:00",
+      "date_modified": "2020-06-28T09:04:06-04:00"
+    }
+
+  ]
+}
