@@ -1,5 +1,8 @@
 # This (more or less) bag of properties
 # can be passed around to objects that need to understand the app configuration
+#
+# Joe Johnston <jjohn@taskboy.com>
+#
 package Plerd::Config;
 use Modern::Perl '2018';
 
@@ -37,7 +40,7 @@ has base_uri => (
 );
 
 has config_file => (
-    is => 'ro',
+    is => 'rw',
     lazy => 1,
     builder => '_build_config_file',
     coerce => \&_coerce_file,

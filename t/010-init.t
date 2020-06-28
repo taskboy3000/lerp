@@ -60,12 +60,12 @@ sub TestConfigWithPubDir {
 
 
 sub TestRunAtDefaultLocation {
-    my $config = Plerd::Config->new(config_file => "./new-site.conf");
+    my $config = Plerd::Config->new(config_file => "$FindBin::Bin/init/new-site.conf");
     $config->initialize();
-    ok(-d "new-site", "Default site directory 'new-site' exists");
-    ok(-e "./new-site.conf", "Site config was created");   
+    ok(-d $config->path, "Default site directory exists: " . $config->path);
+    ok(-e $config->config_file, "Site config file was created: " . $config->config_file);   
 
-    my $reread_config = Plerd::Config->new(config_file => "./new-site.conf");
+    my $reread_config = Plerd::Config->new(config_file => "$FindBin::Bin/init/new-site.conf");
     ok($reread_config->unserialize, "Unserialized new config");
     for my $property (qw(
                 path publication_directory source_directory
@@ -74,13 +74,20 @@ sub TestRunAtDefaultLocation {
         ok($config->$property eq $reread_config->$property, "Property $property is the same");
         # diag($config->$property . " => " . $reread_config->$property);
     }
+    $config->config_file->remove;
+    $config->path->rmtree;
 }
 
 sub TestRunAtSpecifiedLocation {
-    my $config = Plerd::Config->new(config_file => "./new-site2.conf", path => "./new-site2");
+    my $config = Plerd::Config->new(
+        config_file => "$FindBin::Bin/init/new-site2.conf",
+        path => "$FindBin::Bin/init/new-site2"
+    );
     $config->initialize();
-    ok(-d "new-site2", "Default site directory 'new-site2' exists");
-    ok(-e "./new-site2.conf", "Site config was created");   
+    ok(-d $config->path, "Default site directory 'new-site2' exists");
+    ok(-e $config->config_file, "Site config was created");
+    $config->config_file->remove;
+    $config->path->rmtree;   
 }
 
 #----------

@@ -51,6 +51,8 @@ sub TestPublishingOnePost {
     my $plerd = Plerd->new;
     my $config = $plerd->config;
     $config->path("$FindBin::Bin/init/new-site");
+    $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
+
     ok($config->initialize, "Creating test site for publication");
     for my $file (glob("$FindBin::Bin/source_model/*")) {
         copy $file, $config->source_directory;
@@ -117,7 +119,9 @@ sub TestTagMemory {
     diag(" Testing tag memory");
 
     my $plerd = Plerd->new();
-    $plerd->config->path("init/new-site");
+    $plerd->config->path("$FindBin::Bin/init/new-site");
+    $plerd->config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
+
     $plerd->config->initialize();
     for my $file (glob("$FindBin::Bin/source_model/*")) {
         copy $file, $plerd->config->source_directory;
@@ -207,6 +211,7 @@ sub TestArchiveRSSRecentPages {
     my $plerd = Plerd->new;
     my $config = $plerd->config;
     $config->path("$FindBin::Bin/init/new-site");
+    $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
 
     ok($config->initialize, "Creating test site for publication");
     for my $file (glob("$FindBin::Bin/source_model/*")) {
@@ -250,6 +255,7 @@ sub TestPublishAll {
     my $plerd = Plerd->new;
     my $config = $plerd->config;
     $config->path("$FindBin::Bin/init/new-site");
+    $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
 
     ok($config->initialize, "Creating default test site");
     for my $file (glob("$FindBin::Bin/source_model/*")) {
@@ -276,6 +282,7 @@ sub TestDefaultSiteAgainstBaseline {
     my $plerd = Plerd->new;
     my $config = $plerd->config;
     $config->path("$FindBin::Bin/init/new-site");
+    $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
 
     ok($config->initialize, "Creating default test site");
     for my $file (glob("$FindBin::Bin/source_model/*")) {

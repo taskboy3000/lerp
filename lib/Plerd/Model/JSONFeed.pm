@@ -1,3 +1,4 @@
+# Joe Johnston <jjohn@taskboy.com>
 package Plerd::Model::JSONFeed;
 use Modern::Perl '2018';
 

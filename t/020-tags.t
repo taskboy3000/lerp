@@ -49,7 +49,7 @@ sub Main {
 }
 
 sub setup {
-    $gCFG = Plerd::Config->new(path => "init/new-site");
+    $gCFG = Plerd::Config->new(path => "$FindBin::Bin/init/new-site");
     $gCFG->initialize;
 }
 

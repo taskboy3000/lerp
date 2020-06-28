@@ -1,3 +1,4 @@
+[%- # Joe Johnston <jjohn@taskboy.com> %]
 [% WRAPPER wrapper.tt title = 'Tags' %]
 
 [%   IF is_tags_index_page %]

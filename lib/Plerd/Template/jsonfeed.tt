@@ -1,3 +1,4 @@
+[%- # Joe Johnston <jjohn@taskboy.com> %]
 {
   "version": "https://jsonfeed.org/version/1",
   "title": "[% plerd.title %]",

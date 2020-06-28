@@ -4,6 +4,8 @@
 # values are the contents of those files.
 # empty values are allowable.
 #
+# Joe Johnston <jjohn@taskboy.com>
+#
 package Plerd::Remembrancer;
 use Modern::Perl '2018';
 

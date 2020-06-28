@@ -1,3 +1,5 @@
+# Joe Johnston <jjohn@taskboy.com>, based on original work by
+# Jason McIntosh <jmac@jmac.org>
 package Plerd::Model::Post;
 use Modern::Perl '2018';
 

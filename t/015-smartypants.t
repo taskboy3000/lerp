@@ -1,5 +1,7 @@
+# This code was written by Jason McIntosh (jmac@jmac.org)
+# It is included here under the MIT License.
+# See https://github.com/jmacdotorg/plerd for more details.
 use Modern::Perl '2018';
-
 use FindBin;
 BEGIN {
     $::gLIBDIR="/Users/jjohn/src/plerd_taskboy3000/t/../lib";
