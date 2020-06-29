@@ -551,7 +551,7 @@ sub _publish {
         $vars->{activeSection} = $section;
     }
 
-    if (exists $vars->{recent_posts}) {
+    if (!exists $vars->{recent_posts}) {
         $vars->{recent_posts} = $self->get_recent_posts;
     }
 

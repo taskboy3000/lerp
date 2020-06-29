@@ -2,12 +2,25 @@
 [% WRAPPER layout.tt section_title = 'Tags' %]
 <h2>All Tags</h2>
 
+<ul class="nav">
+  [%- FOREACH letter = ['A'..'Z'] %]
+  <li class="nav-item">
+    [%- IF tag_links.$letter %]
+    <a class="nav-link" href="#[% letter %]-tag-list">[% letter %]</a>
+    [%- ELSE %]
+    [% letter %]
+    [%- END %]
+  </li>
+  [%- END %]
+</ul>
+
 <ul id="all-tags-list">
-  [% FOREACH letter = tag_links.keys.sort %]
+  [% FOREACH letter = ['A'..'Z'] %]
     <li>
       <h3>[% letter %]</h3>
+      [% IF tag_links.$letter %]
       <ul id="[% letter %]-tag-list">
-      [% FOREACH tag = tag_links.$letter.keys.sort %]
+      [%- FOREACH tag = tag_links.$letter.keys.sort %]
         <h4>[% tag %] ([% tag_links.$letter.$tag.size %])</h4>
         <ul id="tag-[% tag | html %]-list">
         [% FOREACH link = tag_links.$letter.$tag %]
@@ -16,9 +29,12 @@
           </li>
         [% END %]
         </ul>
-      [% END %]
+      [%- END %]
       </ul>
-      </li>
+      [%- ELSE %]
+      <p><em>None</em></p>
+      [%- END %]
+    </li>
   [% END %]
 </ul>
 
