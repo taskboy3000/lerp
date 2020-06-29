@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>[% config.title %]</title>
+    <title>[% config.title %] :: [% section_title %]</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
@@ -42,10 +42,10 @@
         <h1>[% config.title %]</h1>
 
         <div class="row">
-            <main class="col-sm-9">
+            <div class="col-sm-9">
                 [% content %]
-            </main>
-            <aside class="col-sm-3 sidebar">
+            </div>
+            <div class="col-sm-3 sidebar">
                 <h2>Sidebar</h2>
 
                 <section class="about">
@@ -71,8 +71,12 @@
                     [% END %]
                     </ul>
                 </section>
+                <section>
+                    <h3>HTML Validation</h3>
+                    <a href="[% u = w3validator.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
+                </section>
             </div>
-        </aside>
+        </div>
         <footer class="engine_attribution">
             <p>Powered by <a href="config.engine_uri">[% config.engine_name %] / [% config.engine_version %]</a>.</p>
         </footer>

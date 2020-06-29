@@ -1,0 +1,3 @@
+[% WRAPPER 'layout.tt' %]
+    [% INCLUDE '_post.tt' %]
+[% END %]

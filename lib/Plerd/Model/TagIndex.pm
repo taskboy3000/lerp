@@ -53,7 +53,7 @@ has 'uri' => (
 sub _build_uri {
     my ($self) = @_;
     my $base_uri = $self->config->base_uri;
-    return URI->new_abs($self->published_file->basename, $base_uri);
+    return URI->new_abs($self->publication_file->basename, $base_uri);
 }
 #-------------------
 # Public Methods

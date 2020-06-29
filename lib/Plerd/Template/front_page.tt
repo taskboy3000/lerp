@@ -1,4 +1,13 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
-[% WRAPPER layout.tt %]
-NYI
+[% WRAPPER layout.tt section_title = "Latest Articles" %]
+<h1>Lastest Articles</h1>
+
+<ul class="latest-posts">
+[% FOREACH post = posts %]
+    <li>
+        [% INCLUDE "_post.tt" %]
+    </li>
+[% END %]
+</ul>
+
 [% END %]

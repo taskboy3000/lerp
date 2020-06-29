@@ -470,7 +470,7 @@ has 'template_file' => (
 );
 sub _build_template_file {
     my ($self) = @_;
-    Path::Class::File->new($self->config->template_directory, "post.tt");
+    Path::Class::File->new($self->config->template_directory, "single_post.tt");
 }
 
 has 'title' => (

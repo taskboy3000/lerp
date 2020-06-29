@@ -83,6 +83,7 @@ sub _build_publisher {
             siteCSS => $self->site_css,
             siteJS => $self->site_js,
             tagsIndex => $self->tags_index,
+            w3validatorURI => URI->new("https://validator.w3.org/nu/"),
         }
     );
     my $json = JSON->new->utf8;
@@ -200,7 +201,7 @@ sub publish_post {
     if ($self->_publish(
             $post->template_file, 
             $post->publication_file, 
-            { post => $post }) 
+            { post => $post, thisURI => $post->uri }) 
     ) {
         if ($opts{verbose}) {
             say "Published " . $post->publication_file->basename;            
@@ -247,7 +248,7 @@ sub publish_tags_index {
     if ($self->_publish(
             $tags_index->template_file, 
             $tags_index->publication_file, 
-            { tag_links => $tag_links }) 
+            { tag_links => $tag_links, thisURI => $tags_index->uri }) 
     ) {
         if ($opts{verbose}) {
             say "Published " . $tags_index->publication_file->basename;            
@@ -294,7 +295,7 @@ sub publish_rss_feed {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts }
+        { posts => \@posts, thisURI => $feed->uri }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
@@ -339,7 +340,7 @@ sub publish_json_feed {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts }
+        { posts => \@posts, thisURI => $feed->uri }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
@@ -383,7 +384,7 @@ sub publish_front_page {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts }
+        { posts => \@posts, thisURI => $feed->uri }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
@@ -424,7 +425,7 @@ sub publish_archive_page {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts }
+        { posts => \@posts, thisURI => $feed->uri }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
