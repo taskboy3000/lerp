@@ -81,7 +81,12 @@ EOT
 }
 
 sub version {
-    printf("Plerd version %s\n", $Plerd::VERSION);
+    my $cfg = Plerd::Config->new;
+    printf("%s / %s\nCode available at: %s\nThis is free software under the MIT License.\n",
+        $cfg->engine_name,
+        $cfg->engine_version,
+        $cfg->engine_uri
+    );
 }
 
 sub initialize {

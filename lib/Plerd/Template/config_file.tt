@@ -72,3 +72,18 @@ template_path:     [% config.template_directory %]
 database_path:     [% config.database_directory %]
 run_path:          [% config.run_directory %]
 log_path:          [% config.log_directory %]
+
+# Custom navigation items can be added to the top-level 
+# nav bar by adding a title and URI, as is shown below:
+#
+# custom_nav_items:
+#       - title: Now
+#         uri: http://blog.com/now.html
+#       - title: About
+#         uri: http://blog.com/about.html
+# 
+custom_nav_items:
+[%- FOREACH custom_nav_item = config.custom_nav_items %]
+    - title: [%- custom_nav_item.title %]
+      uri: [%- custom_nav_item.uri %]
+[%- END %]

@@ -11,7 +11,7 @@ use Test::More;
 
 use Plerd::Config;
 
-our $gBaseDir = Path::Class::Dir->new("$FindBin::Bin/init_tests");
+our $gBaseDir = Path::Class::Dir->new("$FindBin::Bin/init");
 
 Main();
 exit;
@@ -74,6 +74,7 @@ sub TestRunAtDefaultLocation {
         ok($config->$property eq $reread_config->$property, "Property $property is the same");
         # diag($config->$property . " => " . $reread_config->$property);
     }
+    ok(defined $config->custom_nav_items, 'Custom nav items present');
     $config->config_file->remove;
     $config->path->rmtree;
 }
@@ -90,6 +91,35 @@ sub TestRunAtSpecifiedLocation {
     $config->path->rmtree;   
 }
 
+sub TestCustomNavItems {
+    my $config = Plerd::Config->new(
+        config_file => "$FindBin::Bin/init/new-site3.conf",
+        path => "$FindBin::Bin/init/new-site3",
+        custom_nav_items => [
+            {
+                title => "Now", uri => "/now.html",
+            },
+            {
+                title => "About", uri => "http://localhost/about.html"
+            }
+        ]
+    );
+
+    $config->initialize();
+    ok(-d $config->path, "Default site directory 'new-site3' exists");
+    ok(-e $config->config_file, "Site config was created");
+
+    my $reread_config = Plerd::Config->new(config_file => "$FindBin::Bin/init/new-site3.conf");
+    ok($reread_config->unserialize, "Unserialized new config");
+    ok(@{ $reread_config->custom_nav_items } == 2, "Got 2 custom nav items");
+    for my $nav_item (@{ $reread_config->custom_nav_items }) {
+        diag("$nav_item->{title} => $nav_item->{uri}");
+    }
+
+    $config->config_file->remove;
+    $config->path->rmtree;   
+}
+
 #----------
 # Helpers
 sub Main {
@@ -99,22 +129,15 @@ sub Main {
     TestConfigWithPubDir(); 
     TestRunAtDefaultLocation();
     TestRunAtSpecifiedLocation();
+    TestCustomNavItems();
 
     teardown();
     done_testing();
 }
 
 sub setup {
-    if (-d $gBaseDir) {
-        $gBaseDir->rmtree;
-    }
-
-    $gBaseDir->mkpath;
-    chdir $gBaseDir || die("assert");
 }
 
 sub teardown {
-    chdir "..";
-    $gBaseDir->rmtree;
 }
 

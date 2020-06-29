@@ -13,71 +13,77 @@
     <link rel="stylesheet" href="http://localhost/site.css">
 </head>
 <body>
-    <div class="navbar navbar-default" role="navigation">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="recent.html"></a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="archive.html">Archive</a></li>
-                    <li><a href="atom.xml">RSS</a></li>
-                </ul>
-            </div><!--/.navbar-collapse -->
-        </div>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="http://localhost/">Another Plerd Blog</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="container">
-    <div class="row">
-        <div class="col-sm-9">
-            
-
-
-
-
-
-
-
-        </div>
-        <div class="col-sm-3 sidebar">
-            <section>
-                <h1>Hello</h1>
-                <p>
-                    This is a blog by <a href="mailto:"></a>.
-                </p>
-            </section>
-            <section>
-                <h1>Search</h1>
-                <form action="https://duckduckgo.com" method="get">
-                <input name="q" type="text" placeholder="Search this blog" />
-                <input name="sites" type="hidden" value="" />
-                <input type="submit" value="Go" />
-                </form>
-            </section>
-            <section>
-                <h1>Recent Posts</h1>
-                <ul>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item" >
+                    <a class="nav-link" href="">Blog</a>
+                </li>
+                <li class="nav-item" >
+                    <a class="nav-link" href="">Tags</a>
+                </li>
+                <li class="nav-item" >
+                    <a class="nav-link" href="http://localhost/archive.html">Archive</a>
+                </li>
                 
-                </ul>
-            </section>
+            </ul>
         </div>
-    </div>
-     <footer style="font-size:small; font-style:italic" class="container">
-        <hr />
-        <p>Powered by <a href="http://jmac.org/plerd">FIXMEEE!!!</a>.</p>
+    </nav>
+
+    <div class="container-fluid">
+        <h1>Another Plerd Blog</h1>
+
+        <div class="row">
+            <main class="col-sm-9">
+                
+
+
+
+
+
+
+
+            </main>
+            <aside class="col-sm-3 sidebar">
+                <h2>Sidebar</h2>
+
+                <section class="about">
+                    <h3>About this site</h3>
+                    <p>
+                        This is a blog by <a href="mailto:s.handwich@localhost">Sam Handwich</a>.
+                    </p>
+                </section>
+                <section class="search">
+                    <h3>Search</h3>
+                    <form action="https://duckduckgo.com" method="get">
+                    <input name="q" type="text" placeholder="Search this blog" />
+                    <input name="sites" type="hidden" value="http://localhost/" />
+                    <input type="submit" value="Go" />
+                    </form>
+                </section>
+                <!-- @fixme -->
+                <section class="recent_posts">
+                    <h3>Recent Posts</h3>
+                    <ul>
+                    
+                    </ul>
+                </section>
+            </div>
+        </aside>
+        <footer class="engine_attribution">
+            <p>Powered by <a href="config.engine_uri">Taskboy Plerd / 1.0</a>.</p>
         </footer>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="http://localhost/site.js"></script>
-    </body>
+</body>
 </html>
 
 

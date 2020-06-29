@@ -1,48 +1,49 @@
-
-
+[%- # Joe Johnston <jjohn@taskboy.com> %]
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Another Plerd Blog</title>
+    <title>[% config.title %]</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://localhost/atom.xml" rel="alternate" title="Atom feed" type="application/atom+xml">
-    <link href="http://localhost/feed.json" rel="alternate" title="JSON feed" type="application/json">
+    <link href="[% rssFeed.uri %]" rel="alternate" title="Atom feed" type="application/atom+xml">
+    <link href="[% jsonFeed.uri %]" rel="alternate" title="JSON feed" type="application/json">
 
-    <link rel="stylesheet" href="http://localhost/site.css">
+    <link rel="stylesheet" href="[% siteCSS.uri %]">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="http://localhost/">Another Plerd Blog</a>
+        <a class="navbar-brand" href="[% config.base_uri %]">[% config.title %]</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item" >
-                    <a class="nav-link" href="">Blog</a>
+                <li class="nav-item" [% activeSection == "blog" ? "active" : "" %]>
+                    <a class="nav-link" href="[% frontPage.uri %]">Blog</a>
                 </li>
-                <li class="nav-item" >
-                    <a class="nav-link" href="">Tags</a>
+                <li class="nav-item" [% activeSection == "tags" ? "active" : "" %]>
+                    <a class="nav-link" href="[% tagIndex.uri %]">Tags</a>
                 </li>
-                <li class="nav-item" >
-                    <a class="nav-link" href="http://localhost/archive.html">Archive</a>
+                <li class="nav-item" [% activeSection == "archive" ? "active" : "" %]>
+                    <a class="nav-link" href="[% archive.uri %]">Archive</a>
                 </li>
-                
+                [% FOREACH customNavItem = config.custom_nav_items %]
+                <li class="nav-item" [% activeSection == customNavItem.title ? "active" : "" %]>
+                    <a class="nav-link" href="[% customNavItem.uri %]">[% customNavItem.title %]</a>
+                </li>
+                [% END %]
             </ul>
         </div>
     </nav>
 
     <div class="container-fluid">
-        <h1>Another Plerd Blog</h1>
+        <h1>[% config.title %]</h1>
 
         <div class="row">
             <main class="col-sm-9">
-                
-NYI
-
+                [% content %]
             </main>
             <aside class="col-sm-3 sidebar">
                 <h2>Sidebar</h2>
@@ -50,14 +51,14 @@ NYI
                 <section class="about">
                     <h3>About this site</h3>
                     <p>
-                        This is a blog by <a href="mailto:s.handwich@localhost">Sam Handwich</a>.
+                        This is a blog by <a href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
                     </p>
                 </section>
                 <section class="search">
                     <h3>Search</h3>
                     <form action="https://duckduckgo.com" method="get">
                     <input name="q" type="text" placeholder="Search this blog" />
-                    <input name="sites" type="hidden" value="http://localhost/" />
+                    <input name="sites" type="hidden" value="[% config.base_uri %]" />
                     <input type="submit" value="Go" />
                     </form>
                 </section>
@@ -65,18 +66,20 @@ NYI
                 <section class="recent_posts">
                     <h3>Recent Posts</h3>
                     <ul>
-                    
+                    [% FOR post IN recent_posts %]
+                        <li><a href="[% post.uri %]">[% post.title %]</a></li>
+                    [% END %]
                     </ul>
                 </section>
             </div>
         </aside>
         <footer class="engine_attribution">
-            <p>Powered by <a href="config.engine_uri">Taskboy Plerd / 1.0</a>.</p>
+            <p>Powered by <a href="config.engine_uri">[% config.engine_name %] / [% config.engine_version %]</a>.</p>
         </footer>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript" src="http://localhost/site.js"></script>
+    <script type="text/javascript" src="[% siteJS.uri %]"></script>
 </body>
 </html>

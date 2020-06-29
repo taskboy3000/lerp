@@ -1,5 +1,5 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
-[% WRAPPER wrapper.tt title = plerd.title _ ': Archives ' %]
+[% WRAPPER layout.tt title = config.title _ ':: Archives ' %]
 
 <div class="page-header">
 <h1>Archive</h1>

@@ -552,7 +552,7 @@ sub load_source {
         die("Cannot find source file: " . $self->source_file);
     }
 
-    my $fh = $self->source_file->open('<:encoding(utf8)');
+    my $fh = $self->source_file->open('<:encoding(UTF-8)');
     my @ordered_attribute_names = qw( title time published_filename guid tags );
     my $line;
     while ( $line = <$fh> ) {
@@ -598,7 +598,7 @@ sub serialize_source {
         }
     }
     $new_content .= "\n" . $self->raw_body . "\n";
-    $self->source_file->spew( iomode=>'>:encoding(utf8)', $new_content );   
+    $self->source_file->spew( iomode=>'>:encoding(UTF-8)', $new_content );   
 }
 
 sub can_publish {

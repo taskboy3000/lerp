@@ -53,6 +53,7 @@ sub TestPublishingOnePost {
     $config->path("$FindBin::Bin/init/new-site");
     $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
 
+ $DB::single=1;
     ok($config->initialize, "Creating test site for publication");
     for my $file (glob("$FindBin::Bin/source_model/*")) {
         copy $file, $config->source_directory;
@@ -69,7 +70,6 @@ sub TestPublishingOnePost {
         source_file => $source_file
     );
     diag("Src: " . $source_file);
- 
     ok($plerd->publish_post($post), "Published post without tags");
     ok(-s $post->publication_file, "Published file exists and is non-empty: " . $post->publication_file->basename);
     ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file");

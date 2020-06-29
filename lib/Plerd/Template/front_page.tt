@@ -1,4 +1,4 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
-[% WRAPPER wrapper.tt %]
+[% WRAPPER layout.tt %]
 NYI
 [% END %]

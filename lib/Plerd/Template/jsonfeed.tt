@@ -1,13 +1,13 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
 {
   "version": "https://jsonfeed.org/version/1",
-  "title": "[% plerd.title %]",
-  "home_page_url": "[% plerd.base_uri %]",
-  "feed_url": "[% plerd.base_uri %]/feed.json",
-  "user_comment": "This feed allows you to read the posts from this site in any feed reader that supports the JSON Feed format. To add this feed to your reader, copy the following URL — [% plerd.base_uri %]/feed.json — and add it your reader.",
+  "title": "[% config.title %]",
+  "home_page_url": "[% config.base_uri %]",
+  "feed_url": "[% config.base_uri %]/feed.json",
+  "user_comment": "This feed allows you to read the posts from this site in any feed reader that supports the JSON Feed format. To add this feed to your reader, copy the following URL — [% config.base_uri %]/feed.json — and add it your reader.",
   "author": {
-    "name": "[% plerd.author_name %]"[% IF plerd.author_email %],
-    "url": "mailto:[% plerd.author_email %]"[% END %]
+    "name": "[% config.author_name %]"[% IF config.author_email %],
+    "url": "mailto:[% config.author_email %]"[% END %]
   },
   "items": [
 [% post_count = 0 %]

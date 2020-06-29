@@ -2,16 +2,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[[% plerd.title %]]]></title>
-  <link href="[% plerd.base_uri %]/atom.xml" rel="self" />
-  <link href="[% plerd.base_uri %]" />
+  <title><![CDATA[[% config.title %]]]></title>
+  <link href="[% config.base_uri %]/atom.xml" rel="self" />
+  <link href="[% config.base_uri %]" />
   <updated>[% timestamp %]</updated>
-  <id>[% plerd.base_uri %]</id>
+  <id>[% config.base_uri %]</id>
   <author>
-    <name><![CDATA[[% plerd.author_name %]]]></name>
-    <email><![CDATA[[% plerd.author_email %]]]></email>
+    <name><![CDATA[[% config.author_name %]]]></name>
+    <email><![CDATA[[% config.author_email %]]]></email>
   </author>
-  <generator uri="https://github.com/jmacdotorg/plerd">Plerd</generator>
 
 [% FOR post IN posts %]
   <entry>

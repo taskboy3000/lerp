@@ -19,8 +19,6 @@ use Plerd::Model::SiteJavaScript;
 use Plerd::Model::TagIndex;
 use Plerd::Remembrancer;
 
-our $VERSION="1.0";
-
 #-------------------------------
 # Attributes and Builders
 #-------------------------------
@@ -81,7 +79,6 @@ sub _build_publisher {
             archive => $self->archive,
             config => $self->config,
             jsonFeed => $self->json_feed,
-            plerd_version => $VERSION,
             rssFeed => $self->rss_feed,
             siteCSS => $self->site_css,
             siteJS => $self->site_js,
@@ -515,8 +512,8 @@ sub next_source_file {
 sub _publish {
     my ($self, $template_file, $target_file, $vars) = @_;
 
-    my $tmpl_fh = $template_file->open('<:encoding(utf8)');
-    my $trg_fh = $target_file->open('>:encoding(utf8)');
+    my $tmpl_fh = $template_file->open('<:encoding(UTF-8)');
+    my $trg_fh = $target_file->open('>:encoding(UTF-8)');
 
     unless ($self->publisher->process(
                         $tmpl_fh,

@@ -19,10 +19,15 @@ BEGIN {
     if (! exists $ENV{PLERD_HOME}) {
         die("Please set the PLERD_HOME environment variable");
     }
+    if (! -d $ENV{PLERD_HOME}) {
+        die("PLERD_HOME '$ENV{PLERD_HOME}' does not appear to exist");
+    }
 }
-
 use lib "$ENV{PLERD_HOME}/lib";
+
 use Plerd::Remembrancer;
+
+our $VERSION="1.0";
 
 #------------
 # Attributes
@@ -69,6 +74,15 @@ sub _build_config_tt {
     Template->new(%params);    
 }
 
+has 'custom_nav_items' => (
+    is => 'rw',
+    lazy => 1,
+    builder => '_build_custom_nav_items',
+);
+sub _build_custom_nav_items {
+    return [];
+}
+
 has 'database_directory' => (
     is => 'ro',
     lazy => 1, 
@@ -81,6 +95,10 @@ sub _build_database_directory {
 }
 
 has 'datetime_formatter' => (is => 'ro', default => sub { DateTime::Format::W3CDTF->new });
+
+has 'engine_name' => (is => 'ro', default => sub { "Taskboy Plerd"});
+has 'engine_uri' => (is => 'ro', default => sub { URI->new('https://github.com/taskboy3000/plerd') });
+has 'engine_version' => (is => 'ro', default => sub { $VERSION });
 
 has 'image' => (is => 'rw', predicate => 1, coerce => \&_coerce_image);
 has 'image_alt' => (is => 'rw', default => sub { "[image]" });
@@ -119,7 +137,6 @@ sub _build_post_memory {
     my $db_dir = Path::Class::Dir->new($self->database_directory, 'posts');
     return Plerd::Remembrancer->new(database_directory => $db_dir);
 }
-
 
 has 'publication_directory' => (
     is => 'ro',
@@ -254,19 +271,17 @@ sub initialize {
     }
 
     # add default templates 
-    # @fixme: pick up all *tt in the directory and move them
-    for my $template (qw[archive feed jsonfeed post tags wrapper front_page]) {
-        my $basename = $template . ".tt";
-        my $src_file = Path::Class::File->new($self->config_template_dir, $basename);
-        if (-e $src_file) {
-            my $dst_file = Path::Class::File->new($self->template_directory, $basename);
-            if (-e $dst_file) {
-                push @messages, "Removing existing $dst_file";
-                $dst_file->remove;
-            }
-            push @messages, "Copying $src_file -> $dst_file";
-            copy($src_file, $dst_file) or die("Cannot copy $src_file -> $dst_file: $!");
+    my $src_template_dir = Path::Class::Dir->new($ENV{PLERD_HOME}, "lib", "Plerd", "Template");
+    while (my $src_file = $src_template_dir->next) {
+        next if substr($src_file, -3, 3) ne '.tt';
+
+        my $dst_file = Path::Class::File->new($self->template_directory, $src_file->basename);
+        if (-e $dst_file) {
+            push @messages, "Removing existing $dst_file";
+            $dst_file->remove;
         }
+        push @messages, "Copying $src_file -> $dst_file";
+        copy($src_file, $dst_file) or die("Cannot copy $src_file -> $dst_file: $!");
     }
 
     # create configuration
@@ -314,7 +329,7 @@ sub serialize {
         rename $self->config_file, $self->config_file . ".bak";
     }
 
-    $self->config_file->spew(iomode=>'>:encoding(utf8)', $out);
+    $self->config_file->spew(iomode=>'>:encoding(UTF-8)', $out);
 }
 
 1;
