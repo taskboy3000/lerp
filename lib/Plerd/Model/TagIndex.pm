@@ -31,7 +31,7 @@ sub _build_publication_file {
 
     Path::Class::File->new(
         $self->config->publication_directory,
-        "tags_index.html"
+        "tags.html"
     );
 }
 
@@ -93,7 +93,6 @@ sub get_tag_links {
     for my $key ( @{$tm->keys} ) {
         my $first_letter = uc(substr($key->[0], 0, 1));
         my $key_struct = $tm->load($key) || next;
-
 
         for my $rec ( @$key_struct ) {
             my $tag = $key->[0];

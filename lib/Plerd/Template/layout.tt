@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>[% config.title %] :: [% section_title %]</title>
+    <title>[% config.title %] :: [% section_title | html %]</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
@@ -42,9 +42,7 @@
         <h1>[% config.title %]</h1>
 
         <div class="row">
-            <div class="col-sm-9">
-                [% content %]
-            </div>
+            <div class="col-sm-9">[%- content %]</div>
             <div class="col-sm-3 sidebar">
                 <h2>Sidebar</h2>
 

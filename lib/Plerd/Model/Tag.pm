@@ -33,6 +33,16 @@ sub _coerce_source_file {
     return Path::Class::File->new($file);
 }
 
+has 'template_file' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_template_file'
+);
+sub _build_template_file {
+    my ($self) = @_;
+    Path::Class::File->new($self->config->template_directory, "tags.tt");
+}
+
 has 'uri' => (
     is => 'ro',
     lazy => 1,
@@ -42,7 +52,8 @@ sub _build_uri {
     my $self = shift;
 
     return URI->new_abs(
-        'tags/' . $self->name . '.html',
+        # @todo: ensure name is URL safe
+        'tags.html#tag-' . $self->name . '-list',
         $self->config->base_uri,
     );
 }

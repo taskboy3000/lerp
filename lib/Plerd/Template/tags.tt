@@ -1,27 +1,25 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
-[% WRAPPER layout.tt title = 'Tags' %]
+[% WRAPPER layout.tt section_title = 'Tags' %]
+<h2>All Tags</h2>
 
-[%   IF is_tags_index_page %]
-<section>
-    <h1>All Tags</h1>
-
-    <ul>
-    [% FOREACH tag = tags.keys.sort %]
-        <li><a href="[% plerd.tag_uri(tag) %]">[% tag %]</a> ([% tags.$tag.size %])</li>
-    [% END %]
-    </ul>
-</section>
-[%   ELSE %]
-
-    [% FOREACH tag = tags.keys %]
-      <h1>Tag: [% tag %]</h1>
-      <ul>
-        [% FOREACH post = tags.$tag %]
-            <li><a href="[% post.uri %]">[% post.title %]</a></li>
+<ul id="all-tags-list">
+  [% FOREACH letter = tag_links.keys.sort %]
+    <li>
+      <h3>[% letter %]</h3>
+      <ul id="[% letter %]-tag-list">
+      [% FOREACH tag = tag_links.$letter.keys.sort %]
+        <h4>[% tag %] ([% tag_links.$letter.$tag.size %])</h4>
+        <ul id="tag-[% tag | html %]-list">
+        [% FOREACH link = tag_links.$letter.$tag %]
+          <li>
+              <a href="[% link.uri %]">[% link.title | html %]</a>
+          </li>
         [% END %]
+        </ul>
+      [% END %]
       </ul>
-    [% END %]
-
-[%   END %]
+      </li>
+  [% END %]
+</ul>
 
 [% END %]

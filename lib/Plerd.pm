@@ -138,7 +138,6 @@ has source_dir_handle => (
     predicate => 1,
 );
 
-
 has 'tags_index' => (
     is => 'ro',
     clearer => 1,
@@ -229,9 +228,18 @@ sub publish_post {
     return 1;
 }
 
-
-sub publish_tags_index {
+sub publish_tag_page {
     my ($self, $tag) = (shift, shift);
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+    die("NYI");
+}
+
+sub publish_tags_index_page {
+    my ($self) = (shift);
     my (%opts) = (
         'force' => 0,
         'verbose' => 0,
@@ -241,6 +249,9 @@ sub publish_tags_index {
     # Get the mtime of the published tags index
     my $tags_index = $self->tags_index;
     if (!$opts{force} && !$tags_index->out_of_date) {
+        if ($opts{verbose}) {
+            say "Declining to republish tags index";
+        }
         return; # no updates needed
     }
 
@@ -249,7 +260,7 @@ sub publish_tags_index {
     if ($self->_publish(
             $tags_index->template_file, 
             $tags_index->publication_file, 
-            { tag_links => $tag_links, thisURI => $tags_index->uri }) 
+            { tag_links => $tag_links, thisURI => $tags_index->uri, activeSection => 'tags' }) 
     ) {
         if ($opts{verbose}) {
             say "Published " . $tags_index->publication_file->basename;            
@@ -393,7 +404,6 @@ sub publish_front_page {
         return 1;
     }
     die("assert - Publishing failed for archive page");
-
 }
 
 sub publish_archive_page {
@@ -405,8 +415,6 @@ sub publish_archive_page {
     );
    
     my $feed = $self->archive;
-
-    # @todo: check to see if this needs to be regenerated
 
     my $post_memory = $self->config->post_memory;
     my @posts;
@@ -426,7 +434,7 @@ sub publish_archive_page {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts, thisURI => $feed->uri }
+        { posts => \@posts, thisURI => $feed->uri, activeSection => 'archive' }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
@@ -483,10 +491,10 @@ sub publish_all {
     $self->publish_archive_page(%opts);
     $self->publish_rss_feed(%opts);
     $self->publish_json_feed(%opts);
+    $self->publish_tags_index_page(%opts);
 
     return 1;
 }
-
 
 sub next_source_file {
     my ($self) = @_;
@@ -508,14 +516,43 @@ sub next_source_file {
     return;
 }
 
+sub get_recent_posts {
+    my ($self) = @_;
+    my $max_posts = 5;
+    # @fixme - need to regen?
+
+    my $post_memory = $self->config->post_memory;
+    my @posts;
+    my @latest_keys = reverse @{ $post_memory->keys };
+    for my $key ( @latest_keys ) {
+        if ($max_posts-- < 0){
+            last;
+        }
+
+        my $rec = $post_memory->load($key);
+        my $post = Plerd::Model::Post->new(
+            config => $self->config,
+            source_file => $rec->{source_file}
+        );
+        $post->load_source;
+        push @posts, $post;
+    }
+
+    return \@posts;
+}
+
 #-----------------
 # Private methods
 #-----------------
 sub _publish {
     my ($self, $template_file, $target_file, $vars, $section) = @_;
     $section //= "blog";
-    if (!exists $vars->{actionSection}) {
-        $vars->{actionSection} = $section;
+    if (!exists $vars->{activeSection}) {
+        $vars->{activeSection} = $section;
+    }
+
+    if (exists $vars->{recent_posts}) {
+        $vars->{recent_posts} = $self->get_recent_posts;
     }
 
     my $tmpl_fh = $template_file->open('<:encoding(UTF-8)');
