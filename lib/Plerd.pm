@@ -78,6 +78,7 @@ sub _build_publisher {
         PRE_DEFINE => {
             archive => $self->archive,
             config => $self->config,
+            frontPage => $self->front_page,
             jsonFeed => $self->json_feed,
             rssFeed => $self->rss_feed,
             siteCSS => $self->site_css,
@@ -511,7 +512,11 @@ sub next_source_file {
 # Private methods
 #-----------------
 sub _publish {
-    my ($self, $template_file, $target_file, $vars) = @_;
+    my ($self, $template_file, $target_file, $vars, $section) = @_;
+    $section //= "blog";
+    if (!exists $vars->{actionSection}) {
+        $vars->{actionSection} = $section;
+    }
 
     my $tmpl_fh = $template_file->open('<:encoding(UTF-8)');
     my $trg_fh = $target_file->open('>:encoding(UTF-8)');

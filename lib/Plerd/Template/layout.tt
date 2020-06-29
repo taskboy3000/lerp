@@ -24,7 +24,7 @@
                     <a class="nav-link" href="[% frontPage.uri %]">Blog</a>
                 </li>
                 <li class="nav-item" [% activeSection == "tags" ? "active" : "" %]>
-                    <a class="nav-link" href="[% tagIndex.uri %]">Tags</a>
+                    <a class="nav-link" href="[% tagsIndex.uri %]">Tags</a>
                 </li>
                 <li class="nav-item" [% activeSection == "archive" ? "active" : "" %]>
                     <a class="nav-link" href="[% archive.uri %]">Archive</a>
@@ -62,7 +62,7 @@
                     <input type="submit" value="Go" />
                     </form>
                 </section>
-                <!-- @fixme -->
+
                 <section class="recent_posts">
                     <h3>Recent Posts</h3>
                     <ul>
@@ -73,12 +73,12 @@
                 </section>
                 <section>
                     <h3>HTML Validation</h3>
-                    <a href="[% u = w3validator.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
+                    <a href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
                 </section>
             </div>
         </div>
         <footer class="engine_attribution">
-            <p>Powered by <a href="config.engine_uri">[% config.engine_name %] / [% config.engine_version %]</a>.</p>
+            <p>Powered by <a href="[% config.engine_uri %]">[% config.engine_name %] / [% config.engine_version %]</a>.</p>
         </footer>
     </div>
 
