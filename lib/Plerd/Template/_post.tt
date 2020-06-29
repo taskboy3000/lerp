@@ -7,7 +7,7 @@
 
     <p>
         Published by <a class="p-author h-card" href="[% config.base_uri %]">[% config.author_name%]</a>
-        on <time class="dt-published" datetime="[% post.ymd %] [% post.hms %]">[% post.date %]</time>
+        on <time class="dt-published" datetime="[% post.ymd %] [% post.hms %]">[% post.month_name %] [% post.day %], [% post.year %]</time>
     </p>
     <data class="u-url u-uid" value="[% post.uri %]"></data>
 
