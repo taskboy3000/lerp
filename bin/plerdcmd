@@ -122,6 +122,8 @@ sub initialize {
 sub publish_all {
     my ($conf_file, $verbose, $force) = @_;
 
+    my $start = time();
+
     my $config;
     if (defined $conf_file) {
         $config = Plerd::Config->new(config_file => $conf_file);
@@ -137,4 +139,8 @@ sub publish_all {
 
     my $plerd = Plerd->new(config => $config);
     $plerd->publish_all(verbose => $verbose, force => $force);
+
+    if ($verbose) {
+        printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
+    }
 }
