@@ -66,14 +66,14 @@ USAGE:
 COMMAND:
 
 --init                   Create a new plerd site
---P|publish-all            Republish all known source files
+--P|publish-all          Republish all known source files
 
 OPTIONS:
 
 --c|config [FILE]        Name of plerd configuration file to use
 --base-dir [DIR]         Directory into which plerd artifacts are copied
 --force                  Force the publication of files, even if source has not changed
---verbose                Enable verbose messages
+--v|verbose              Enable verbose messages
 --version                Print plerd version number
 --help                   This screen
 

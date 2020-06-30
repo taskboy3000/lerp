@@ -458,6 +458,10 @@ sub publish_all {
         @_
     );
 
+    if ($opts{verbose}) {
+        say "Looking for candidate source files in " . $self->config->source_directory;
+    }
+
     my $post_memory = $self->config->post_memory;
     my ($latest_post) = @{ $post_memory->latest_keys };
     my $latest_post_mtime;
