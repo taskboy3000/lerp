@@ -53,7 +53,6 @@ sub TestPublishingOnePost {
     $config->path("$FindBin::Bin/init/new-site");
     $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
 
- $DB::single=1;
     ok($config->initialize, "Creating test site for publication");
     for my $file (glob("$FindBin::Bin/source_model/*")) {
         copy $file, $config->source_directory;

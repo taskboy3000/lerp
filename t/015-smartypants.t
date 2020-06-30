@@ -4,7 +4,7 @@
 use Modern::Perl '2018';
 use FindBin;
 BEGIN {
-    $::gLIBDIR="/Users/jjohn/src/plerd_taskboy3000/t/../lib";
+    $::gLIBDIR="$FindBin::Bin/../lib";
 }
 use lib $::gLIBDIR;
 
