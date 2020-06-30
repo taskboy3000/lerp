@@ -9,4 +9,5 @@ Makefile.old
 blib
 plerd.code-workspace
 *.old
+.perl-version
 
