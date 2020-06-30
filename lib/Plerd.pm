@@ -260,7 +260,9 @@ sub publish_tags_index_page {
     if ($self->_publish(
             $tags_index->template_file, 
             $tags_index->publication_file, 
-            { tag_links => $tag_links, thisURI => $tags_index->uri, activeSection => 'tags' }) 
+            { tag_links => $tag_links, thisURI => $tags_index->uri,},
+            "archive"
+            ) 
     ) {
         if ($opts{verbose}) {
             say "Published " . $tags_index->publication_file->basename;            
@@ -402,7 +404,8 @@ sub publish_front_page {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts, thisURI => $feed->uri }
+        { posts => \@posts, thisURI => $feed->uri },
+        "blog"
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
@@ -440,7 +443,8 @@ sub publish_archive_page {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts, thisURI => $feed->uri, activeSection => 'archive' }
+        { posts => \@posts, thisURI => $feed->uri},
+        "archive"
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
@@ -468,7 +472,8 @@ sub publish_site_css_page {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        {}
+        {},
+        "blog"
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
