@@ -450,6 +450,62 @@ sub publish_archive_page {
     die("assert - Publishing failed for archive page");
 }
 
+sub publish_site_css_page {
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+   
+    my $feed = $self->site_css;
+
+    my $parent = $feed->publication_file->parent;
+    if (!-d $parent) {
+        $parent->mkpath;
+    }
+
+    if ($self->_publish(
+        $feed->template_file,
+        $feed->publication_file,
+        {}
+    )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;            
+        }
+        return 1;
+    }
+    die("assert - Publishing failed for site css page");
+}
+
+sub publish_site_js_page {
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+   
+    my $feed = $self->site_js;
+
+    my $parent = $feed->publication_file->parent;
+    if (!-d $parent) {
+        $parent->mkpath;
+    }
+
+    if ($self->_publish(
+        $feed->template_file,
+        $feed->publication_file,
+        {}
+    )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;            
+        }
+        return 1;
+    }
+    die("assert - Publishing failed for site css page");
+}
+
 sub publish_all {
     my ($self) = shift;
     my (%opts) = (
@@ -502,6 +558,8 @@ sub publish_all {
     $self->publish_rss_feed(%opts);
     $self->publish_json_feed(%opts);
     $self->publish_tags_index_page(%opts);
+    $self->publish_site_css_page(%opts);
+    $self->publish_site_js_page(%opts);
 
     return 1;
 }

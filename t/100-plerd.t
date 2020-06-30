@@ -314,7 +314,7 @@ sub TestDefaultSiteAgainstBaseline {
         my $delta = $got - $expected;
         # negative numbers means $got is missing expected strings
         # positive means $got produced more output than expected
-        ok(abs($delta) < 10, "  [diff: $delta] context within tolerance of baseline: " . $baseline->basename);
+        ok(abs($delta) < 40, "  [diff: $delta] context within tolerance of baseline: " . $baseline->basename);
     }
 
     $plerd->config->path->rmtree;

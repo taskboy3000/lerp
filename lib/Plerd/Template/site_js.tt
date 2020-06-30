@@ -1,1 +1,2 @@
-[%- Joe Johnston <jjohn@taskboy.com> %]
+[%# Joe Johnston <jjohn@taskboy.com> %]
+/* Top-level JS included in all templates */

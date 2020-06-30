@@ -1,6 +1,6 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>[% config.title %] :: [% section_title | html %]</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
@@ -20,17 +20,17 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item" [% activeSection == "blog" ? "active" : "" %]>
+                <li class="nav-item" class="[% activeSection == "blog" ? "active" : "" %]">
                     <a class="nav-link" href="[% frontPage.uri %]">Blog</a>
                 </li>
-                <li class="nav-item" [% activeSection == "tags" ? "active" : "" %]>
+                <li class="nav-item" class="[% activeSection == "tags" ? "active" : "" %]">
                     <a class="nav-link" href="[% tagsIndex.uri %]">Tags</a>
                 </li>
-                <li class="nav-item" [% activeSection == "archive" ? "active" : "" %]>
+                <li class="nav-item" class="[% activeSection == "archive" ? "active" : "" %]">
                     <a class="nav-link" href="[% archive.uri %]">Archive</a>
                 </li>
                 [% FOREACH customNavItem = config.custom_nav_items %]
-                <li class="nav-item" [% activeSection == customNavItem.title ? "active" : "" %]>
+                <li class="nav-item" class="[% activeSection == customNavItem.title ? "active" : "" %]">
                     <a class="nav-link" href="[% customNavItem.uri %]">[% customNavItem.title %]</a>
                 </li>
                 [% END %]
