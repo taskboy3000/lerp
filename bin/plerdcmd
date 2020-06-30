@@ -29,10 +29,10 @@ sub Main {
         # commands
         'init' => \$opts{initialize},
         'publish=s' => \$opts{publish},
-        'publish-all' => \$opts{publish_all},
+        'P|publish-all' => \$opts{publish_all},
 
         # options
-        'c|onfig=s' => \$opts{config},
+        'c|config=s' => \$opts{config},
         'd|base-dir=s' => \$opts{base_dir},
         'force'        => \$opts{force},
         'h|help' => \$opts{usage},
@@ -66,7 +66,7 @@ USAGE:
 COMMAND:
 
 --init                   Create a new plerd site
---publish-all            Republish all known source files
+--P|publish-all            Republish all known source files
 
 OPTIONS:
 
