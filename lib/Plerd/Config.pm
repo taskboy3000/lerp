@@ -169,7 +169,6 @@ has 'source_directory' => (
 sub _build_source_directory {
     my $self = shift;
     return Path::Class::Dir->new($self->path, "source");
-
 }
 
 has tag_memory => (
@@ -305,7 +304,13 @@ sub unserialize {
         die("Cannot read or parse: " . $self->source_file);
     };
 
+    # In the config file, there are *_path values that need to 
+    # get mapped to *_directory properties here. 
     for my $property (keys %$config_ref) {
+        if ((my $base_prop = $property) =~ /^(\w+)_path$/) {
+            $property = $base_prop . "_directory";
+        }
+
         if ($self->can($property)) {
             $self->$property( $config_ref->{$property} );
         }
