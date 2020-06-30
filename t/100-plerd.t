@@ -191,16 +191,16 @@ sub TestTagMemory {
     }
 
 
-    ok($plerd->publish_tags_index, "Publishing tags index");
+    ok($plerd->publish_tags_index_page, "Publishing tags index");
     ok(-e $plerd->tags_index->publication_file, "Appears to have created a tags index file");
-    ok(!$plerd->publish_tags_index, "Declined to publish unchanged tags index");
+    ok(!$plerd->publish_tags_index_page, "Declined to publish unchanged tags index");
 
     sleep(3);
 
     my $new_tag = Plerd::Model::Tag->new(name => 'bar');
     $TIdx->update_tag_for_post($new_tag => $post2);
 
-    ok($plerd->publish_tags_index, "Republished changed tags index");
+    ok($plerd->publish_tags_index_page, "Republished changed tags index");
  
     $plerd->config->path->rmtree;
 }
