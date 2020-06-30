@@ -12,6 +12,8 @@ This version of plerd does not attempt to install to the wider system, save for 
 
 I recomending using plenv to have a modern perl on your system.  If you do use plenv, cpanm will install the modules into your home directory.   You should not need super-user privileges to run this.
 
+Get some confidence in the system by running 'make' in the plerd_sandbox directory.  This runs a series of tests in the t directory.
+
 # Run
 
 1. cd plerd_sandbox
