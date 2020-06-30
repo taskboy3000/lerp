@@ -308,7 +308,7 @@ sub unserialize {
     # get mapped to *_directory properties here. 
     for my $property (keys %$config_ref) {
         if ((my $base_prop = $property) =~ /^(\w+)_path$/) {
-            $property = $base_prop . "_directory";
+            $property = $1 . "_directory";
         }
 
         if ($self->can($property)) {
