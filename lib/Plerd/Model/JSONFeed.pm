@@ -3,6 +3,7 @@ package Plerd::Model::JSONFeed;
 use Modern::Perl '2018';
 
 use Path::Class::File;
+use JSON;
 use Moo;
 use URI;
 
@@ -54,5 +55,38 @@ sub _build_uri {
     );
 }
 
+# See: https://jsonfeed.org/version/1
+sub make_feed {
+    my ($self, $posts) = @_;
+
+    my %author = ( name => $self->config->author_name );
+    if ($self->config->author_email) {
+        $author{url} = "mailto:" . $self->config->author_email;
+    }
+
+    my @items;
+    for my $post (@$posts) {
+        push @items, {
+            id => $post->uri->as_string,
+            url => $post->uri->as_string,
+            title => $post->stripped_title,
+            content_html => $post->body,
+            date_published => $post->published_timestamp,
+        };
+    }
+
+    my %feed = (
+        version => "https://jsonfeed.org/version/1",
+        title => $self->config->title,
+        home_page_url => $self->config->base_uri->as_string,
+        feed_url => $self->uri->as_string,
+        author => \%author,
+        items => \@items,
+    );
+
+    my $json = JSON::to_json(\%feed, {utf8 => 1, canonical => 1, pretty => 1});
+
+    return $json;
+}
 
 1;

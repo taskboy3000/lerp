@@ -332,7 +332,7 @@ sub publish_json_feed {
     my @posts;
 
     # @todo: allow customization from config
-    my $max_posts = 3;
+    my $max_posts = 5;
     my @latest_keys = reverse @{ $post_memory->keys };
 
     for my $key (@latest_keys) {
@@ -349,10 +349,16 @@ sub publish_json_feed {
         push @posts, $post;
     }
 
+    my $json = $feed->make_feed(\@posts);
+    my $vars = {
+        'thisURI' => $feed->uri,
+        'feed' => $json,
+    };
+
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts, thisURI => $feed->uri }
+        $vars 
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            

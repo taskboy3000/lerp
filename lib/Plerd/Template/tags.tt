@@ -5,11 +5,7 @@
 <ul class="nav">
   [%- FOREACH letter = ['A'..'Z'] %]
   <li class="nav-item">
-    [%- IF tag_links.$letter %]
     <a class="nav-link" href="#[% letter %]-tag-list">[% letter %]</a>
-    [%- ELSE %]
-    [% letter %]
-    [%- END %]
   </li>
   [%- END %]
 </ul>
