@@ -84,7 +84,7 @@ sub _build_custom_nav_items {
 }
 
 has 'database_directory' => (
-    is => 'ro',
+    is => 'rw',
     lazy => 1, 
     builder => '_build_database_directory',
     coerce => \&_coerce_directory,
@@ -106,7 +106,7 @@ has 'image_alt' => (is => 'rw', default => sub { "[image]" });
 has facebook_id => (is => 'rw', predicate => 1);
 
 has log_directory => (
-    is => 'ro', 
+    is => 'rw', 
     lazy => 1,
     builder => '_build_log_directory',
     coerce => \&_coerce_directory
@@ -139,7 +139,7 @@ sub _build_post_memory {
 }
 
 has 'publication_directory' => (
-    is => 'ro',
+    is => 'rw',
     lazy => 1,
     builder => '_build_publication_directory',
     coerce => \&_coerce_directory
@@ -150,7 +150,7 @@ sub _build_publication_directory {
 }
 
 has 'run_directory' => (
-    is => 'ro',
+    is => 'rw',
     lazy => 1,
     builder => '_build_run_directory',
     coerce => \&_coerce_directory    
@@ -212,11 +212,19 @@ has twitter_id => (is => 'rw', predicate => 1);
 #-------------
 sub _coerce_directory {
     my ($path) = @_;
+    return if !defined $path;
+
     if (ref $path eq 'Path::Class::Dir') {
         return $path->absolute;
     }
 
-    return Path::Class::Dir->new($path)->absolute;    
+    my $dir = Path::Class::Dir->new($path); 
+    if (!$dir) {
+        die("assert - could not convert '$path' to Path. exists? "
+        . (-d $path ? "yes" : "no")
+        );
+    }
+    return $dir->absolute;    
 }
 
 sub _coerce_file {
@@ -307,12 +315,13 @@ sub unserialize {
     # In the config file, there are *_path values that need to 
     # get mapped to *_directory properties here. 
     for my $property (keys %$config_ref) {
+        my $method = $property;
         if ((my $base_prop = $property) =~ /^(\w+)_path$/) {
-            $property = $1 . "_directory";
+            $method = $1 . "_directory";
         }
 
-        if ($self->can($property)) {
-            $self->$property( $config_ref->{$property} );
+        if ($self->can($method)) {
+            $self->$method( $config_ref->{$property} );
         }
     }
     return 1;
