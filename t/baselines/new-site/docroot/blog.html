@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +9,7 @@
     <link href="http://localhost/atom.xml" rel="alternate" title="Atom feed" type="application/atom+xml">
     <link href="http://localhost/feed.json" rel="alternate" title="JSON feed" type="application/json">
 
-    <link rel="stylesheet" href="http://localhost/site.css">
+    <link rel="stylesheet" href="http://localhost/css/site.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -36,8 +35,10 @@
     </nav>
 
     <div class="container-fluid">
-        <h1>Another Plerd Blog</h1>
-
+        <div class="jumbotron text-center">
+            <h1>Another Plerd Blog</h1>
+        </div>
+        <br>
         <div class="row">
             <div class="col-sm-9">
 <h1>Lastest Articles</h1>
@@ -52,7 +53,7 @@
 
     <p>
         Published by <a class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-        on <time class="dt-published" datetime="2020-07-01T13:39:14+00:00">July 1, 2020</time>
+        on <time class="dt-published" datetime="2020-07-01T15:15:58+00:00">July 1, 2020</time>
     </p>
     <data class="u-url u-uid" value="http://localhost/2020-07-01-two-tags.html"></data>
 
@@ -64,11 +65,11 @@
             <li class="list-inline-item">Tags:</li>
             
                 <li class="list-inline-item p-category">
-                    <a href="http://localhost/tags.html#tag-foo-list">foo</a>
+                    <a href="http://localhost/tags.html#tag-bar_with_spaces-list">bar_with_spaces</a>
                 </li>
             
                 <li class="list-inline-item p-category">
-                    <a href="http://localhost/tags.html#tag-bar_with_spaces-list">bar_with_spaces</a>
+                    <a href="http://localhost/tags.html#tag-foo-list">foo</a>
                 </li>
             
         </ul>
@@ -84,7 +85,7 @@
 
     <p>
         Published by <a class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-        on <time class="dt-published" datetime="2020-07-01T13:39:13+00:00">July 1, 2020</time>
+        on <time class="dt-published" datetime="2020-07-01T15:15:58+00:00">July 1, 2020</time>
     </p>
     <data class="u-url u-uid" value="http://localhost/2020-07-01-one-tag.html"></data>
 
@@ -112,7 +113,7 @@
 
     <p>
         Published by <a class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-        on <time class="dt-published" datetime="2020-07-01T13:39:13+00:00">July 1, 2020</time>
+        on <time class="dt-published" datetime="2020-07-01T15:15:58+00:00">July 1, 2020</time>
     </p>
     <data class="u-url u-uid" value="http://localhost/2020-07-01-no-title.html"></data>
 
@@ -131,7 +132,7 @@
 
     <p>
         Published by <a class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-        on <time class="dt-published" datetime="2020-07-01T13:39:14+00:00">July 1, 2020</time>
+        on <time class="dt-published" datetime="2020-07-01T15:15:59+00:00">July 1, 2020</time>
     </p>
     <data class="u-url u-uid" value="http://localhost/2020-07-01-metatags.html"></data>
 
@@ -147,13 +148,14 @@
 </div>
             <div class="col-sm-3 sidebar">
                 <h2>Sidebar</h2>
-
+                <br>
                 <section class="about">
                     <h3>About this site</h3>
                     <p>
                         This is a blog by <a href="mailto:s.handwich@localhost">Sam Handwich</a>.
                     </p>
                 </section>
+                <br>
                 <section class="search">
                     <h3>Search</h3>
                     <form action="https://duckduckgo.com" method="get">
@@ -162,7 +164,7 @@
                     <input type="submit" value="Go" />
                     </form>
                 </section>
-
+                <br>
                 <section class="recent_posts">
                     <h3>Recent Posts</h3>
                     <ul>
@@ -176,7 +178,7 @@
                 </section>
                 <section>
                     <h3>HTML Validation</h3>
-                    <a href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2Fblog.html">Validate now</a>
+                    <a target="_blank" rel="noreferrer noopener" href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2Fblog.html">Validate now</a>
                 </section>
             </div>
         </div>
@@ -187,6 +189,6 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-    <script src="http://localhost/site.js"></script>
+    <script src="http://localhost/js/site.js"></script>
 </body>
 </html>

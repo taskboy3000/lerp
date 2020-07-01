@@ -12,19 +12,21 @@
 
 <ul id="all-tags-list">
   [% FOREACH letter = ['A'..'Z'] %]
-    <li>
+    <li id="[% letter %]-tag-list">
       <h3>[% letter %]</h3>
       [% IF tag_links.$letter %]
-      <ul id="[% letter %]-tag-list">
+      <ul>
       [%- FOREACH tag = tag_links.$letter.keys.sort %]
-        <h4>[% tag %] ([% tag_links.$letter.$tag.size %])</h4>
-        <ul id="tag-[% tag | html %]-list">
-        [% FOREACH link = tag_links.$letter.$tag %]
-          <li>
-              <a href="[% link.uri %]">[% link.title | html %]</a>
-          </li>
-        [% END %]
-        </ul>
+        <li>
+          <h4>[% tag %] ([% tag_links.$letter.$tag.size %])</h4>
+          <ul id="tag-[% tag | html %]-list">
+          [% FOREACH link = tag_links.$letter.$tag %]
+            <li>
+                <a href="[% link.uri %]">[% link.title | html %]</a>
+            </li>
+          [% END %]
+          </ul>
+        </li>
       [%- END %]
       </ul>
       [%- ELSE %]

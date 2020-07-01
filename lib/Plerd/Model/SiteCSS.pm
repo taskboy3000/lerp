@@ -26,7 +26,7 @@ sub _build_publication_file {
     my $self = shift;
     Path::Class::File->new(
         $self->config->publication_directory,
-        "css/site.css",
+        "/css/site.css",
     );
 }
 
@@ -48,10 +48,7 @@ has 'uri' => (
 sub _build_uri {
     my $self = shift;
 
-    return URI->new_abs(
-        $self->publication_file->basename,
-        $self->config->base_uri,
-    );
+    return URI->new( $self->config->base_uri . "css/" . $self->publication_file->basename);
 }
 
 

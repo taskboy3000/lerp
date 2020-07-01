@@ -60,6 +60,7 @@ sub TestConfigWithPubDir {
 
 
 sub TestRunAtDefaultLocation {
+    diag("Testing Run At Default Location");
     my $config = Plerd::Config->new(config_file => "$FindBin::Bin/init/new-site.conf");
     $config->initialize();
     ok(-d $config->path, "Default site directory exists: " . $config->path);
