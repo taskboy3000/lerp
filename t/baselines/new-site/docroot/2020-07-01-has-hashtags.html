@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +12,11 @@
     <link rel="stylesheet" href="http://localhost/css/site.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="http://localhost/">Another Plerd Blog</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+        <div class="logo-container">
+            <a class="navbar-brand" href="http://localhost/">Another Plerd Blog</a>
+        </div>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -33,21 +37,62 @@
         </div>
     </nav>
 
+    
+
     <div class="container-fluid">
-        <div class="jumbotron text-center">
-            <h1>Another Plerd Blog</h1>
-        </div>
-        <br>
         <div class="row">
-            <div class="col-sm-9">
+            <div class="col-sm-3 sidebar d-none d-sm-block">
+                <h2>Utilities</h2>
+                <br>
+                <section class="about">
+                    <h3>About this site</h3>
+                    <p>
+                        This is a blog by <a class="text-info" href="mailto:s.handwich@localhost">Sam Handwich</a>.
+                    </p>
+                </section>
+                <br>
+                <section class="search">
+                    <h3>Search</h3>
+                    <form action="https://duckduckgo.com" method="get" class="form">
+                        <input name="sites" type="hidden" value="http://localhost/">
+                        <div class="input-group input-group-sm">
+                            <input name="q" type="text" placeholder="Search this blog" class="form-control">
+                            <div class="input-group-append">
+                                <input type="submit" value="Go" class="btn btn-info btn-xs">
+                            </div>
+                        </div>
+                    </form>
+                </section>
+                <br>
+                <section class="recent_posts">
+                    <h3>Recent Posts</h3>
+                    <ul>
+                        <li><a class="text-info" href="http://localhost/2020-07-01-one-tag.html">One tag</a></li>
+                        <li><a class="text-info" href="http://localhost/2020-07-01-metatags-with-image.html">Metatags with image</a></li>
+                        <li><a class="text-info" href="http://localhost/2020-07-01-metatags-with-image-and-alt.html">Metatags with image and alt</a></li>
+                        <li><a class="text-info" href="http://localhost/2020-07-01-a-source-file-with-a-manual-filename.html">A source file with a manual filename</a></li>
+                        <li><a class="text-info" href="http://localhost/2000-01-01-this-post-has-extra-headers.html">This post has extra headers</a></li>
+                        <li><a class="text-info" href="http://localhost/2000-01-01-a-good-timestamp.html">A good timestamp</a></li>
+                    </ul>
+                </section>
+                <br>
+                <section>
+                    <h3>HTML Validation</h3>
+                    <a class="text-info" target="_blank" rel="noreferrer noopener" href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2020-07-01-has-hashtags.html">Validate now</a>
+                </section>
+            </div>
+            <div class="col-sm-9 content">
     
 <article class="post h-entry">
-
-    <h2 class="p-name">Has hashtags</h2>
+    <h2>
+        <a class="text-info" href="http://localhost/2020-07-01-has-hashtags.html">
+           <span class="p-name">Has hashtags</span>
+        </a>
+    </h2>
 
     <p>
-        Published by <a class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-        on <time class="dt-published" datetime="2020-07-01T15:15:58+00:00">July 1, 2020</time>
+        Published by <a class="text-info" class="p-author h-card" href="http://localhost/">Sam Handwich</a>
+        on <time class="dt-published" datetime="2020-07-01T23:46:04+00:00">July 1, 2020</time>
     </p>
     <data class="u-url u-uid" value="http://localhost/2020-07-01-has-hashtags.html"></data>
 
@@ -61,44 +106,11 @@
     
 </article>
 </div>
-            <div class="col-sm-3 sidebar">
-                <h2>Sidebar</h2>
-                <br>
-                <section class="about">
-                    <h3>About this site</h3>
-                    <p>
-                        This is a blog by <a href="mailto:s.handwich@localhost">Sam Handwich</a>.
-                    </p>
-                </section>
-                <br>
-                <section class="search">
-                    <h3>Search</h3>
-                    <form action="https://duckduckgo.com" method="get">
-                    <input name="q" type="text" placeholder="Search this blog" />
-                    <input name="sites" type="hidden" value="http://localhost/" />
-                    <input type="submit" value="Go" />
-                    </form>
-                </section>
-                <br>
-                <section class="recent_posts">
-                    <h3>Recent Posts</h3>
-                    <ul>
-                        <li><a href="http://localhost/2020-07-01-one-tag.html">One tag</a></li>
-                        <li><a href="http://localhost/2020-07-01-metatags-with-image.html">Metatags with image</a></li>
-                        <li><a href="http://localhost/2020-07-01-metatags-with-image-and-alt.html">Metatags with image and alt</a></li>
-                        <li><a href="http://localhost/2020-07-01-a-source-file-with-a-manual-filename.html">A source file with a manual filename</a></li>
-                        <li><a href="http://localhost/2000-01-01-this-post-has-extra-headers.html">This post has extra headers</a></li>
-                        <li><a href="http://localhost/2000-01-01-a-good-timestamp.html">A good timestamp</a></li>
-                    </ul>
-                </section>
-                <section>
-                    <h3>HTML Validation</h3>
-                    <a target="_blank" rel="noreferrer noopener" href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2020-07-01-has-hashtags.html">Validate now</a>
-                </section>
-            </div>
         </div>
-        <footer class="engine_attribution">
-            <p>Powered by <a href="https://github.com/taskboy3000/plerd">Taskboy Plerd / 1.0</a>.</p>
+        <footer class="engine-attribution text-center">
+            <p>
+                Powered by <a class="text-info" href="https://github.com/taskboy3000/plerd">Taskboy Plerd v1.0</a>
+            </p>
         </footer>
     </div>
 

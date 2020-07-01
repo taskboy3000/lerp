@@ -10,7 +10,7 @@ use Plerd::Config;
 #-------------------------
 # Attributes and Builders
 #-------------------------
-has config => ('is' => 'ro', lazy => 1, builder => '_build_config');
+has config => ('is' => 'rw', lazy => 1, builder => '_build_config');
 sub _build_config {
     Plerd::Config->new();    
 }
@@ -52,10 +52,7 @@ sub _build_uri {
     my $self = shift;
 
     # @todo: ensure name is URL safe
-    return URI->new_abs(
-        'tags.html#tag-' . $self->name . '-list',
-        $self->config->base_uri,
-    );
+    return URI->new('tags.html#tag-' . $self->name . '-list');
 }
 
 #-----------

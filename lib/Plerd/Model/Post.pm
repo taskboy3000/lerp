@@ -452,7 +452,15 @@ sub _build_tags {
 sub _coerce_tags {
     my ($value) = @_;
     my @tags;
-    if ($value) {
+    if (ref $value eq []) {
+        for my $val (@$value) {
+            if (ref $val eq 'Plerd::Model::Tag') {
+                push @tags, $val;
+            } else {
+                push @tags, Plerd::Model::Tag->new(name => $val);
+            }
+        }
+    } elsif ($value) {
         my @tmp = split /\s*,\s*/, $value;
         for (@tmp) {
             push @tags, Plerd::Model::Tag->new(name => $_);

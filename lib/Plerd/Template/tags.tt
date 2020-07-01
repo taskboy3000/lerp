@@ -5,7 +5,7 @@
 <ul class="nav">
   [%- FOREACH letter = ['A'..'Z'] %]
   <li class="nav-item">
-    <a class="nav-link" href="#[% letter %]-tag-list">[% letter %]</a>
+    <a class="text-info nav-link" href="#[% letter %]-tag-list">[% letter %]</a>
   </li>
   [%- END %]
 </ul>
@@ -24,7 +24,7 @@
           <ul id="tag-[% tag | html %]-list">
           [% FOREACH link = tag_links.$letter.$tag %]
             <li>
-                <a href="[% link.uri %]">[% link.title | html %]</a>
+                <a class="text-info" href="[% link.uri %]">[% link.title | html %]</a>
             </li>
           [% END %]
           </ul>

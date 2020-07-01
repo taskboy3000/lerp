@@ -1,3 +1,6 @@
+[% DEFAULT
+     jumbotron = 1
+%]
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +14,11 @@
     <link rel="stylesheet" href="[% siteCSS.uri %]">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="[% config.base_uri %]">[% config.title %]</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+        <div class="logo-container">
+            <a class="navbar-brand" href="[% config.base_uri %]">[% config.title %]</a>
+        </div>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -37,9 +43,11 @@
         </div>
     </nav>
 
+    [% IF jumbotron > 0 %]
     <div class="jumbotron text-center">
         <h1>[% section_title || config.title %]</h1>
     </div>
+    [% END %]
 
     <div class="container-fluid">
         <div class="row">
@@ -49,16 +57,20 @@
                 <section class="about">
                     <h3>About this site</h3>
                     <p>
-                        This is a blog by <a href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
+                        This is a blog by <a class="text-info" href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
                     </p>
                 </section>
                 <br>
                 <section class="search">
                     <h3>Search</h3>
-                    <form action="https://duckduckgo.com" method="get">
-                    <input name="q" type="text" placeholder="Search this blog" />
-                    <input name="sites" type="hidden" value="[% config.base_uri %]" />
-                    <input type="submit" value="Go" />
+                    <form action="https://duckduckgo.com" method="get" class="form">
+                        <input name="sites" type="hidden" value="[% config.base_uri %]">
+                        <div class="input-group input-group-sm">
+                            <input name="q" type="text" placeholder="Search this blog" class="form-control">
+                            <div class="input-group-append">
+                                <input type="submit" value="Go" class="btn btn-info btn-xs">
+                            </div>
+                        </div>
                     </form>
                 </section>
                 <br>
@@ -66,21 +78,21 @@
                     <h3>Recent Posts</h3>
                     <ul>
                     [%- FOREACH post IN recent_posts %]
-                        <li><a href="[% post.uri %]">[% post.title %]</a></li>
+                        <li><a class="text-info" href="[% post.uri %]">[% post.title %]</a></li>
                     [%- END %]
                     </ul>
                 </section>
                 <br>
                 <section>
                     <h3>HTML Validation</h3>
-                    <a target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
+                    <a class="text-info" target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
                 </section>
             </div>
             <div class="col-sm-9 content">[%- content %]</div>
         </div>
         <footer class="engine-attribution text-center">
             <p>
-                Powered by <a href="[% config.engine_uri %]">[% config.engine_name %] v[% config.engine_version %]</a>
+                Powered by <a class="text-info" href="[% config.engine_uri %]">[% config.engine_name %] v[% config.engine_version %]</a>
             </p>
         </footer>
     </div>

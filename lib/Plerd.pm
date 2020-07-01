@@ -198,6 +198,12 @@ sub publish_post {
         $post->serialize_source
     }
 
+    # @todo: make it so that I don't have to do this
+    # hydrate tags
+    for my $tag (@{ $post->tags }) {
+        $tag->config($self->config);
+    }
+
     if ($self->_publish(
             $post->template_file, 
             $post->publication_file, 
@@ -228,16 +234,6 @@ sub publish_post {
     return 1;
 }
 
-sub publish_tag_page {
-    my ($self, $tag) = (shift, shift);
-    my (%opts) = (
-        'force' => 0,
-        'verbose' => 0,
-        @_
-    );
-    die("NYI");
-}
-
 sub publish_tags_index_page {
     my ($self) = (shift);
     my (%opts) = (
@@ -261,7 +257,7 @@ sub publish_tags_index_page {
             $tags_index->template_file, 
             $tags_index->publication_file, 
             { tag_links => $tag_links, thisURI => $tags_index->uri,},
-            "archive"
+            "tags"
             ) 
     ) {
         if ($opts{verbose}) {

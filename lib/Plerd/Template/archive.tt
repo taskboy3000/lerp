@@ -1,7 +1,9 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
 [% WRAPPER layout.tt section_title = 'Archives' %]
 
-<h2>Archived Posts</h2>
+<h2>Posts grouped chronlogically</h2>
+
+<hr>
 
 [% current_month = 0 %]
 [% FOREACH post IN posts %]
@@ -13,7 +15,7 @@
         <h2>[% post.month_name %] [% post.year %]</h2>
         <ul>
     [% END %]
-    <li><a href="[% post.uri %]">[% post.title %]</a></li>
+    <li><a class="text-info" href="[% post.uri %]">[% post.title %]</a></li>
     [% current_month = post_month %]
 [% END %]
 
