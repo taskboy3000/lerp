@@ -12,7 +12,7 @@
 
 <hr>
 
-<ul id="all-tags-list">
+<ul id="all-tags-list" class="list-unstyled">
   [% FOREACH letter = ['A'..'Z'] %]
     <li id="[% letter %]-tag-list">
       <h3>[% letter %]</h3>
