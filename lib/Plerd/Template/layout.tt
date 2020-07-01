@@ -70,6 +70,7 @@
                     [%- END %]
                     </ul>
                 </section>
+                <br>
                 <section>
                     <h3>HTML Validation</h3>
                     <a target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>

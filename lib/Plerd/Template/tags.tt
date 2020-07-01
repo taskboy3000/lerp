@@ -10,6 +10,8 @@
   [%- END %]
 </ul>
 
+<hr>
+
 <ul id="all-tags-list">
   [% FOREACH letter = ['A'..'Z'] %]
     <li id="[% letter %]-tag-list">
