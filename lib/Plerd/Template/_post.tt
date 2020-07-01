@@ -2,8 +2,11 @@
    Posts use the h-entry microformat: http://microformats.org/wiki/h-entry
 %]
 <article class="post h-entry">
-
-    <h2 class="p-name">[% post.title %]</h2>
+    <h2>
+        <a href="[% post.uri %]">
+           <span class="p-name">[% post.title %]</span>
+        </a>
+    </h2>
 
     <p>
         Published by <a class="p-author h-card" href="[% config.base_uri %]">[% config.author_name%]</a>

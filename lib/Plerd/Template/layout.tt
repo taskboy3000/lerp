@@ -37,15 +37,14 @@
         </div>
     </nav>
 
+    <div class="jumbotron text-center">
+        <h1>[% section_title || config.title %]</h1>
+    </div>
+
     <div class="container-fluid">
-        <div class="jumbotron text-center">
-            <h1>[% config.title %]</h1>
-        </div>
-        <br>
         <div class="row">
-            <div class="col-sm-9">[%- content %]</div>
-            <div class="col-sm-3 sidebar">
-                <h2>Sidebar</h2>
+            <div class="col-sm-3 sidebar d-none d-sm-block">
+                <h2>Utilities</h2>
                 <br>
                 <section class="about">
                     <h3>About this site</h3>
@@ -76,9 +75,12 @@
                     <a target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
                 </section>
             </div>
+            <div class="col-sm-9 content">[%- content %]</div>
         </div>
-        <footer class="engine_attribution">
-            <p>Powered by <a href="[% config.engine_uri %]">[% config.engine_name %] / [% config.engine_version %]</a>.</p>
+        <footer class="engine-attribution text-center">
+            <p>
+                Powered by <a href="[% config.engine_uri %]">[% config.engine_name %] v[% config.engine_version %]</a>
+            </p>
         </footer>
     </div>
 
