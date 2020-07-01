@@ -50,7 +50,7 @@ sub save {
     }
 
     if (ref $payload) {
-        $entry->spew(iomode => '>:encoding(UTF-8)', Dump($payload));
+        $entry->spew(Dump($payload));
     } else {
         $entry->touch;
     }
@@ -81,7 +81,7 @@ sub load {
 
     if (-e $entry) {
         if (-s $entry) {
-            my $yaml = $entry->slurp(iomode => '<:encoding(UTF-8)');
+            my $yaml = $entry->slurp();
             return Load($yaml);
         } else {
             return 1;

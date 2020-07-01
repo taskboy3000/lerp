@@ -8,6 +8,7 @@ BEGIN {
 }
 use lib $::gLIBDIR;
 
+use Path::Class::File;
 use Plerd::SmartyPants;
 
 use Test::More;
@@ -22,16 +23,14 @@ sub TestDefault {
     my %baselines = (
         "-- Russia, with love" => q[— Russia, with love],
         q[My "smartquotes"] => q[My “smartquotes”],
-    );
+        q[I can't believe it's not butter!] => q[I can’t believe it’s not butter!],
+     );
 
     for my $test (sort keys %baselines) {
         my $got = Plerd::SmartyPants->process($test);
         ok($got eq $baselines{$test}, $test);
-
-        # say "> $test";
-        # say "----";
-        # say "< $got";
     }
+
 }
 
 #------------

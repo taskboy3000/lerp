@@ -84,7 +84,7 @@ sub make_feed {
         items => \@items,
     );
 
-    my $json = JSON::to_json(\%feed, {utf8 => 1, canonical => 1, pretty => 1});
+    my $json = JSON::to_json(\%feed, {canonical => 1, pretty => 1});
 
     return $json;
 }

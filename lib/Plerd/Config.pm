@@ -343,7 +343,7 @@ sub serialize {
         rename $self->config_file, $self->config_file . ".bak";
     }
 
-    $self->config_file->spew(iomode=>'>:encoding(UTF-8)', $out);
+    $self->config_file->spew($out);
 }
 
 1;

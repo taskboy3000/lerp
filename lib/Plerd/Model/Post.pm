@@ -12,7 +12,6 @@ use HTML::Strip;
 use Moo;
 use Path::Class::File;
 use Text::MultiMarkdown qw( markdown );
-use Text::Unidecode;
 use URI;
 
 use Plerd::Config;
@@ -250,13 +249,13 @@ sub _build_published_filename {
         $filename = $stripper->parse( $filename );
         $filename =~ s/\s+/-/g;
         $filename =~ s/--+/-/g;
-        $filename =~ s/[^\w\-]+//g;
+        $filename =~ s/[^A-Z0-9\-]+//ig; # \w breaks on smartypants
+
         $filename = lc $filename;
         $filename = $self->date->ymd( q{-} ) . q{-} . $filename;
         $filename .= '.html';
     }
 
-    $filename = unidecode($filename);
     return $filename;
 }
 
@@ -552,7 +551,7 @@ sub load_source {
         die("Cannot find source file: " . $self->source_file);
     }
 
-    my $fh = $self->source_file->open('<:encoding(UTF-8)');
+    my $fh = $self->source_file->openr;
     my @ordered_attribute_names = qw( title time published_filename guid tags );
     my $line;
     while ( $line = <$fh> ) {
@@ -598,7 +597,7 @@ sub serialize_source {
         }
     }
     $new_content .= "\n" . $self->raw_body . "\n";
-    $self->source_file->spew( iomode=>'>:encoding(UTF-8)', $new_content );   
+    $self->source_file->spew($new_content );   
 }
 
 sub can_publish {

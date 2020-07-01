@@ -51,8 +51,8 @@ has 'uri' => (
 sub _build_uri {
     my $self = shift;
 
+    # @todo: ensure name is URL safe
     return URI->new_abs(
-        # @todo: ensure name is URL safe
         'tags.html#tag-' . $self->name . '-list',
         $self->config->base_uri,
     );

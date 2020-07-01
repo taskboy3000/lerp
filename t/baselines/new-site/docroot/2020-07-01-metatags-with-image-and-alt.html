@@ -1,8 +1,8 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Another Plerd Blog :: A source file with a manual filename</title>
+    <title>Another Plerd Blog :: Metatags with image and alt</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
@@ -20,13 +20,13 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item" active>
+                <li class="nav-item active">
                     <a class="nav-link" href="http://localhost/blog.html">Blog</a>
                 </li>
-                <li class="nav-item" >
+                <li class="nav-item ">
                     <a class="nav-link" href="http://localhost/tags.html">Tags</a>
                 </li>
-                <li class="nav-item" >
+                <li class="nav-item ">
                     <a class="nav-link" href="http://localhost/archive.html">Archive</a>
                 </li>
                 
@@ -42,15 +42,21 @@
     
 <article class="post h-entry">
 
-    <h2 class="p-name">A source file with a manual filename</h2>
+    <h2 class="p-name">Metatags with image and alt</h2>
 
     <p>
         Published by <a class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-        on <time class="dt-published" datetime="2020-06-30T01:55:54+00:00">June 29, 2020</time>
+        on <time class="dt-published" datetime="2020-07-01T13:39:13+00:00">July 1, 2020</time>
     </p>
-    <data class="u-url u-uid" value="http://localhost/2020-06-29-a-source-file-with-a-manual-filename.html"></data>
+    <data class="u-url u-uid" value="http://localhost/2020-07-01-metatags-with-image-and-alt.html"></data>
 
-    <div class="body e-content"><p>This postâs filename includes a manually set date. (Sort of. âTODAYâ in the template-sourceâs filename isnât actually a Plerd keyword; Plerdâs tests just know to replace it with a todayâs ymd string, when creating the test source directory.)</p>
+    <div class="body e-content"><p><img src="image: http://blog.example.com/example.png" alt="A lovely bunch of coconuts." /></p>
+
+<p>This file, which is <strong>awesome</strong>, sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
+
+<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description!</p>
+
+<p>It also leads with an image tag hanging out all by itself, which Plerd ought not to consider a paragraph of body text.</p>
 </div>
 
     
@@ -77,16 +83,15 @@
                 <section class="recent_posts">
                     <h3>Recent Posts</h3>
                     <ul>
-                        <li><a href="http://localhost/2020-06-29-one-tag.html">One tag</a></li>
-                        <li><a href="http://localhost/2020-06-29-metatags-with-image.html">Metatags with image</a></li>
-                        <li><a href="http://localhost/2020-06-29-metatags-with-image-and-alt.html">Metatags with image and alt</a></li>
+                        <li><a href="http://localhost/2020-07-01-one-tag.html">One tag</a></li>
+                        <li><a href="http://localhost/2020-07-01-metatags-with-image.html">Metatags with image</a></li>
                         <li><a href="http://localhost/2000-01-01-this-post-has-extra-headers.html">This post has extra headers</a></li>
                         <li><a href="http://localhost/2000-01-01-a-good-timestamp.html">A good timestamp</a></li>
                     </ul>
                 </section>
                 <section>
                     <h3>HTML Validation</h3>
-                    <a href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2020-06-29-a-source-file-with-a-manual-filename.html">Validate now</a>
+                    <a href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2020-07-01-metatags-with-image-and-alt.html">Validate now</a>
                 </section>
             </div>
         </div>
@@ -96,7 +101,7 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript" src="http://localhost/site.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+    <script src="http://localhost/site.js"></script>
 </body>
 </html>

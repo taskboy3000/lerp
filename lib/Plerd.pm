@@ -87,7 +87,7 @@ sub _build_publisher {
             w3validatorURI => URI->new("https://validator.w3.org/nu/"),
         }
     );
-    my $json = JSON->new->utf8;
+    my $json = JSON->new;
 
     $Template::Stash::HASH_OPS->{json} = sub {
         $json->encode($_[0]);
@@ -527,7 +527,12 @@ sub publish_all {
     my ($latest_post) = @{ $post_memory->latest_keys };
     my $latest_post_mtime;
     if (defined $latest_post) {
-        $latest_post_mtime = $post_memory->load($latest_post)->{mtime};
+        my $rec = $post_memory->load($latest_post);
+        if ($rec) {
+            $latest_post_mtime = $rec->{mtime};
+        } else {
+            undef($latest_post_mtime);
+        }
     }   
 
     my @source_files;
@@ -628,8 +633,8 @@ sub _publish {
         $vars->{recent_posts} = $self->get_recent_posts;
     }
 
-    my $tmpl_fh = $template_file->open('<:encoding(UTF-8)');
-    my $trg_fh = $target_file->open('>:encoding(UTF-8)');
+    my $tmpl_fh = $template_file->openr;
+    my $trg_fh = $target_file->openw;
 
     unless ($self->publisher->process(
                         $tmpl_fh,
