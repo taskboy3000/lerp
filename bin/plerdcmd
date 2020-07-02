@@ -11,6 +11,7 @@ BEGIN {
 use lib "$ENV{PLERD_HOME}/lib";
 
 use Cwd;
+use Fcntl ':flock';
 use Getopt::Long;
 use Path::Class::Dir;
 use Plerd;
@@ -89,8 +90,8 @@ sub version {
     );
 }
 
-sub initialize {
-    my ($conf_file, $base_dir, $verbose) = @_;
+sub get_config {
+    my ($conf_file, $base_dir) = @_;
 
     my $config;
     if (defined $conf_file && -e $conf_file) {
@@ -106,12 +107,26 @@ sub initialize {
         }
         $config = Plerd::Config->new(%params);
     }
+    return $config;
+}
+
+sub initialize {
+    my ($conf_file, $base_dir, $verbose) = @_;
+
+    my $config = get_config($conf_file, $base_dir);
 
     if ($verbose) {
         printf("Using conf: %s\n", $config->config_file);
     }
 
+    if ($verbose) {
+        say "Trying to obtain lock";
+    }
+
+    my ($lock_fh) = get_lock($config);
     my @messages = $config->initialize;
+    free_lock($lock_fh);
+
     if ($verbose) {
         for my $line (@messages) {
             printf("%s\n", $line);
@@ -124,12 +139,7 @@ sub publish_all {
 
     my $start = time();
 
-    my $config;
-    if (defined $conf_file) {
-        $config = Plerd::Config->new(config_file => $conf_file);
-    } else {
-        $config = Plerd::Config->new;
-    }
+    my $config = get_config($conf_file);
 
     if (!-e $config->config_file) {
         die("Cannot find plerd config file: " . $config->config_file);
@@ -138,9 +148,34 @@ sub publish_all {
     $config->unserialize;
 
     my $plerd = Plerd->new(config => $config);
+    if ($verbose) {
+        say "Trying to obtain lock";
+    }
+
+    my $lock_fh = get_lock($config);
     $plerd->publish_all(verbose => $verbose, force => $force);
+    free_lock($lock_fh);
 
     if ($verbose) {
         printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
     }
+}
+
+sub get_lock {
+    my ($config) = @_;
+
+    my $lock_file = Path::Class::File->new($ENV{TMPDIR} || "/tmp", "running.lock");
+    if (!-e $lock_file) {
+        $lock_file->touch;
+    }
+
+    open my $fh, '<', $lock_file or die("assert");
+    flock($fh, LOCK_EX) or die "Cannot lock mailbox - $!\n";
+    return $fh;
+}
+
+sub free_lock {
+    my ($fh) = @_;
+    flock($fh, LOCK_UN);
+    close($fh);
 }
