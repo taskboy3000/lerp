@@ -1,5 +1,6 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
 [% WRAPPER layout.tt section_title = 'Tags' %]
+<br>
 <h2>Index</h2>
 
 <ul class="nav">

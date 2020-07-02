@@ -1,6 +1,6 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
 [% WRAPPER layout.tt section_title = 'Archives' %]
-
+<br>
 <h2>Posts grouped chronologically</h2>
 
 <hr>
