@@ -172,10 +172,18 @@ sub update_tag_for_post {
 
 sub remove_tag_from_post {
     my ($self, $tag, $post) = @_;
-    return if !ref $tag && !ref $post;
+    return if !$tag;
 
+    my $src_file;
+    if (ref $post eq 'Plerd::Model::Post') {
+        $src_file = $post->source_file->stringify;
+    } else {
+        $src_file = $post;
+    }
+
+    my $tag_name = ref $tag ? $tag->name : $tag;
     my $tm = $self->config->tag_memory;
-    my $memory = $tm->load($tag->name);
+    my $memory = $tm->load($tag_name);
 
     my $changed = 0;
 
@@ -183,7 +191,7 @@ sub remove_tag_from_post {
         # Does this memory have this post?
         my @tmp;
         for my $rec (@$memory) {
-            if ($rec->{source_file} eq $post->source_file->stringify) {
+            if ($rec->{source_file} eq $src_file) {
                 $changed = 1;
             } else {
                 push @tmp, $rec;
@@ -191,7 +199,12 @@ sub remove_tag_from_post {
         }
 
         if ($changed) {
-            $tm->save($tag->name, \@tmp);
+            if (@tmp) {
+                $tm->save($tag_name, \@tmp);
+            } else {
+                # No further references to this tag
+                $tm->remove($tag->name);
+            }
         }
     }
 

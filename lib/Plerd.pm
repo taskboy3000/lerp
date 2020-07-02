@@ -227,7 +227,7 @@ sub publish_post {
         {
             mtime => $post->source_file_mtime,
             source_file => $post->source_file->absolute->stringify,
-            tags => $post->tags
+            tags => [ sort map { $_->name } @{ $post->tags } ]
         }
     );
 
@@ -291,6 +291,11 @@ sub publish_rss_feed {
         }
 
         my $rec = $post_memory->load($key);
+        if (!-e $rec->{source_file}) {
+            $self->forget_post($key => $rec, %opts);
+            next;
+        }
+
         my $post = Plerd::Model::Post->new(
             config => $self->config,
             source_file => $rec->{source_file}
@@ -339,6 +344,11 @@ sub publish_json_feed {
         }
 
         my $rec = $post_memory->load($key);
+        if (!-e $rec->{source_file}) {
+            $self->forget_post($key => $rec, %opts);
+            next;
+        }
+
         my $post = Plerd::Model::Post->new(
             config => $self->config,
             source_file => $rec->{source_file}
@@ -389,6 +399,11 @@ sub publish_front_page {
         }
 
         my $rec = $post_memory->load($key);
+        if (!-e $rec->{source_file}) {
+            $self->forget_post($key => $rec, %opts);
+            next;
+        }
+
         my $post = Plerd::Model::Post->new(
             config => $self->config,
             source_file => $rec->{source_file}
@@ -431,14 +446,17 @@ sub publish_archive_page {
 
     my @latest_keys = reverse @{ $post_memory->keys };
     for my $key ( @latest_keys ) {
-
         my $rec = $post_memory->load($key);
-        my $post = Plerd::Model::Post->new(
-            config => $self->config,
-            source_file => $rec->{source_file}
-        );
-        $post->load_source;
-        push @posts, $post;
+        if (!-e $rec->{source_file}) {
+            $self->forget_post($key => $rec);
+        } else {
+            my $post = Plerd::Model::Post->new(
+                config => $self->config,
+                source_file => $rec->{source_file}
+            );
+            $post->load_source;
+            push @posts, $post;
+        }  
     }
 
     if ($self->_publish(
@@ -474,7 +492,6 @@ sub publish_site_css_page {
         $feed->template_file,
         $feed->publication_file,
         {},
-        "blog"
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;            
@@ -521,7 +538,7 @@ sub publish_all {
     );
 
     if ($opts{verbose}) {
-        say "Looking for candidate source files in " . $self->config->source_directory;
+        say "Looking for new source files in " . $self->config->source_directory;
     }
 
     my $post_memory = $self->config->post_memory;
@@ -530,7 +547,12 @@ sub publish_all {
     if (defined $latest_post) {
         my $rec = $post_memory->load($latest_post);
         if ($rec) {
-            $latest_post_mtime = $rec->{mtime};
+            if (! -e $rec->{source_file}) {
+                say "Looks like this source file was removed: " . $rec->{source_file};
+                say "Rerun with the --force flag to clean up";
+            } else {
+                $latest_post_mtime = $rec->{mtime};
+            }
         } else {
             undef($latest_post_mtime);
         }
@@ -564,6 +586,7 @@ sub publish_all {
         };
     }
 
+
     $self->publish_front_page(%opts);
     $self->publish_archive_page(%opts);
     $self->publish_rss_feed(%opts);
@@ -596,7 +619,13 @@ sub next_source_file {
 }
 
 sub get_recent_posts {
-    my ($self) = @_;
+    my $self = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+
     my $max_posts = 5;
     # @fixme - need to regen?
 
@@ -609,16 +638,54 @@ sub get_recent_posts {
         }
 
         my $rec = $post_memory->load($key);
-        my $post = Plerd::Model::Post->new(
-            config => $self->config,
-            source_file => $rec->{source_file}
-        );
-        $post->load_source;
-        push @posts, $post;
+        if (! -e $rec->{source_file}) {
+            $self->forget_post($key => $rec, %opts);
+        } else {
+            my $post = Plerd::Model::Post->new(
+                config => $self->config,
+                source_file => $rec->{source_file}
+            );
+            $post->load_source;
+            push @posts, $post;
+        }
     }
 
     return \@posts;
 }
+
+sub forget_post {
+    my ($self, $key, $rec) = (shift, shift, shift);
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+
+    if ($opts{verbose}) {
+        say "Forgetting old post: $rec->{source_file}";
+    }
+
+    $self->config->post_memory->remove($key);
+    for my $tag (@{$rec->{tags} || []}) {
+        $self->tags_index->remove_tag_from_post($tag, $rec->{source_file});
+    }
+
+    my $file = Path::Class::File->new(
+        $self->config->publication_directory,
+        @$key
+    );
+
+    if (-e $file) {
+        if ($opts{verbose}) {
+            say "Removing published post: " . $file;
+        }
+
+        $file->remove;
+    }
+    return 1;
+}
+
+
 
 #-----------------
 # Private methods

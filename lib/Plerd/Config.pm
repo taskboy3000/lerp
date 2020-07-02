@@ -160,7 +160,7 @@ sub _build_run_directory {
     return Path::Class::Dir->new($self->path, "run");
 }
 
-has 'site_description' => (is => 'rw', predicate => 1,);
+has 'site_description' => (is => 'rw', predicate => 1);
 
 has 'source_directory' => (
     is => 'rw',

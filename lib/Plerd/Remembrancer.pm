@@ -136,8 +136,8 @@ sub latest_keys {
 
 
 sub remove {
-    my ($self, $keys) = @_;
-    my $entry = $self->_key_to_entry;
+    my ($self, $key) = @_;
+    my $entry = $self->_key_to_entry($key);
 
     return if !-e $entry;
 
