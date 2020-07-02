@@ -8,20 +8,49 @@ h1 {
 }
 
 h2 {
-    font-size: 2.2 rem;
+    font-size: 2.1 rem;
 }
 
 h3 {
-    font-size: 2.0 rem;
+    font-size: 1.8 rem;
 }
 
 h4 {
-    font-size: 1.7 rem;
+    font-size: 1.6 rem;
     font-variant: small-caps;
 }
 
+/* common page-layout styling */
 .logo-container {
     padding-right: 40px;
+}
+
+.jumbotron {
+    margin-bottom: 0;
+}
+
+.sidebar {
+    overflow: hidden;
+}
+.sidebar-inner {
+    box-shadow: 5px 5px 10px #ddd;
+    padding-bottom: 20px;
+    padding-top: 10px;    
+
+}
+.sidebar h2 {
+    font-size: 1.7rem;
+    padding: 10px;
+    margin: -10px 0 0 -15px;
+}
+
+.sidebar h3 {
+    font-size: 1.5rem;
+}
+
+.content {
+    padding-right: 0;
+    margin-top: -10px;
 }
 
 footer.engine-attribution {
@@ -30,29 +59,29 @@ footer.engine-attribution {
     font-size: 90%;
 }
 
-.jumbotron {
-    margin-bottom: 0;
-}
 
+/* component-specific styling */
 article.post {
     margin-top: 10px;
     padding-bottom: 10px;
-    border-bottom: #ddd dashed 1px;
 }
 
-ul.latest-posts li:last-child article.post {
-    border-bottom: 0;
+article.post.h-entry h2.bg-info {
+    padding: 5px 0 5px 10px; 
 }
 
-.content {
-    padding-left: 40px;
-    padding-right: 20px;
-    padding-top: 10px;
+#all-tags-list h3 {
+    padding-left: 10px;
 }
 
-.sidebar {
-    box-shadow: 5px 5px 10px #ddd;
-    padding-bottom: 20px;
-    padding-top: 10px;    
+.tagged-articles-list {
+    padding-bottom: 10px;
 }
 
+.tags-grouped-by-letter-list h4 {
+    font-size: 1.3rem;
+}
+
+.archived-articles-list h2 {
+    padding: 5px 10px;
+}

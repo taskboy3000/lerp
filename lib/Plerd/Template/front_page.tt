@@ -4,7 +4,7 @@
 <ul class="latest-posts list-unstyled">
 [% FOREACH post = posts %]
     <li>
-        [% INCLUDE "_post.tt" %]
+        [% INCLUDE "_post.tt" title_hightlight = 1%]
     </li>
 [% END %]
 </ul>

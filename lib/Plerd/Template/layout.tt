@@ -45,50 +45,56 @@
 
     [% IF jumbotron > 0 %]
     <div class="jumbotron text-center">
-        <h1>[% section_title || config.title %]</h1>
+        <h1 class="display-3">[% section_title || config.title %]</h1>
+        [% IF section_description %]
+        <p class="lead">[% section_description %]</p>
+        [% END %]
     </div>
     [% END %]
 
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3 sidebar d-none d-sm-block">
-                <h2>Utilities</h2>
-                <br>
-                <section class="about">
-                    <h3>About this site</h3>
-                    <p>
-                        This is a blog by <a class="text-info" href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
-                    </p>
-                </section>
-                <br>
-                <section class="search">
-                    <h3>Search</h3>
-                    <form action="https://duckduckgo.com" method="get" class="form">
-                        <input name="sites" type="hidden" value="[% config.base_uri %]">
-                        <div class="input-group input-group-sm">
-                            <input name="q" type="text" placeholder="Search this blog" class="form-control">
-                            <div class="input-group-append">
-                                <input type="submit" value="Go" class="btn btn-info btn-xs">
+                <div class="sidebar-inner">
+                    <h2 class="bg-info text-light text-center">Utilities</h2>
+                    <br>
+                    <section class="about">
+                        <h3>About this site</h3>
+                        <p>
+                            This is a blog by <a class="text-info" href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
+                        </p>
+                    </section>
+                    <br>
+                    <section class="search">
+                        <h3>Search</h3>
+                        <form action="https://duckduckgo.com" method="get" class="form">
+                            <input name="sites" type="hidden" value="[% config.base_uri %]">
+                            <div class="input-group input-group-sm">
+                                <input name="q" type="text" placeholder="Search this blog" class="form-control">
+                                <div class="input-group-append">
+                                    <input type="submit" value="Go" class="btn btn-info btn-xs">
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </section>
-                <br>
-                <section class="recent_posts">
-                    <h3>Recent Posts</h3>
-                    <ul>
-                    [%- FOREACH post IN recent_posts %]
-                        <li><a class="text-info" href="[% post.uri %]">[% post.title %]</a></li>
-                    [%- END %]
-                    </ul>
-                </section>
-                <br>
-                <section>
-                    <h3>HTML Validation</h3>
-                    <a class="text-info" target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
-                </section>
+                        </form>
+                    </section>
+                    <br>
+                    <section class="recent_posts">
+                        <h3>Recent Posts</h3>
+                        <ul>
+                        [%- FOREACH post IN recent_posts %]
+                            <li><a class="text-info" href="[% post.uri %]">[% post.title %]</a></li>
+                        [%- END %]
+                        </ul>
+                    </section>
+                    <br>
+                    <section>
+                        <h3>HTML Validation</h3>
+                        <a class="text-info" target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
+                    </section>
+                </div>
             </div>
-            <div class="col-sm-9 content">[%- content %]</div>
+            <div class="col-sm-9 content pl-0">[%- content %]</div>
+            
         </div>
         <footer class="engine-attribution text-center">
             <p>

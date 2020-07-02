@@ -42,61 +42,67 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3 sidebar d-none d-sm-block">
-                <h2>Utilities</h2>
-                <br>
-                <section class="about">
-                    <h3>About this site</h3>
-                    <p>
-                        This is a blog by <a class="text-info" href="mailto:s.handwich@localhost">Sam Handwich</a>.
-                    </p>
-                </section>
-                <br>
-                <section class="search">
-                    <h3>Search</h3>
-                    <form action="https://duckduckgo.com" method="get" class="form">
-                        <input name="sites" type="hidden" value="http://localhost/">
-                        <div class="input-group input-group-sm">
-                            <input name="q" type="text" placeholder="Search this blog" class="form-control">
-                            <div class="input-group-append">
-                                <input type="submit" value="Go" class="btn btn-info btn-xs">
+                <div class="sidebar-inner">
+                    <h2 class="bg-info text-light text-center">Utilities</h2>
+                    <br>
+                    <section class="about">
+                        <h3>About this site</h3>
+                        <p>
+                            This is a blog by <a class="text-info" href="mailto:s.handwich@localhost">Sam Handwich</a>.
+                        </p>
+                    </section>
+                    <br>
+                    <section class="search">
+                        <h3>Search</h3>
+                        <form action="https://duckduckgo.com" method="get" class="form">
+                            <input name="sites" type="hidden" value="http://localhost/">
+                            <div class="input-group input-group-sm">
+                                <input name="q" type="text" placeholder="Search this blog" class="form-control">
+                                <div class="input-group-append">
+                                    <input type="submit" value="Go" class="btn btn-info btn-xs">
+                                </div>
                             </div>
-                        </div>
-                    </form>
-                </section>
-                <br>
-                <section class="recent_posts">
-                    <h3>Recent Posts</h3>
-                    <ul>
-                        <li><a class="text-info" href="http://localhost/2000-01-01-this-post-has-extra-headers.html">This post has extra headers</a></li>
-                    </ul>
-                </section>
-                <br>
-                <section>
-                    <h3>HTML Validation</h3>
-                    <a class="text-info" target="_blank" rel="noreferrer noopener" href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2000-01-01-a-good-timestamp.html">Validate now</a>
-                </section>
+                        </form>
+                    </section>
+                    <br>
+                    <section class="recent_posts">
+                        <h3>Recent Posts</h3>
+                        <ul>
+                            <li><a class="text-info" href="http://localhost/2000-01-01-this-post-has-extra-headers.html">This post has extra headers</a></li>
+                        </ul>
+                    </section>
+                    <br>
+                    <section>
+                        <h3>HTML Validation</h3>
+                        <a class="text-info" target="_blank" rel="noreferrer noopener" href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2000-01-01-a-good-timestamp.html">Validate now</a>
+                    </section>
+                </div>
             </div>
-            <div class="col-sm-9 content">
+            <div class="col-sm-9 content pl-0">
     
 <article class="post h-entry">
-    <h2>
+    <h2 class="text-center pt-2">
         <a class="text-info" href="http://localhost/2000-01-01-a-good-timestamp.html">
            <span class="p-name">A good timestamp</span>
         </a>
     </h2>
 
-    <p>
-        Published by <a class="text-info" class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-        on <time class="dt-published" datetime="2000-01-01T05:00:00+00:00">January 1, 2000</time>
-    </p>
-    <data class="u-url u-uid" value="http://localhost/2000-01-01-a-good-timestamp.html"></data>
+    <div class="post-content pl-2">
+        <p>
+            Published by <a class="text-info" class="p-author h-card" href="http://localhost/">Sam Handwich</a>
+            on <time class="dt-published" datetime="2000-01-01T05:00:00+00:00">January 1, 2000</time>
+        </p>
+        <data class="u-url u-uid" value="http://localhost/2000-01-01-a-good-timestamp.html"></data>
 
-    <div class="body e-content"><p>This file has a good timestmp.</p>
+        <div class="body e-content"><p>This file has a good timestmp.</p>
 </div>
 
-    
+        
+    </div>
+
 </article>
 </div>
+            
         </div>
         <footer class="engine-attribution text-center">
             <p>

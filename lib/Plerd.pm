@@ -397,10 +397,15 @@ sub publish_front_page {
         push @posts, $post;
     }
 
+    my $desc = "";
+    if ($self->config->has_site_description) {
+        $desc = $self->config->site_description;
+    }
+
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts, thisURI => $feed->uri },
+        { posts => \@posts, thisURI => $feed->uri, section_description => $desc },
         "blog"
     )) {
         if ($opts{verbose}) {

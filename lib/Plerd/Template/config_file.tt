@@ -27,6 +27,9 @@ path:         [% config.path %]
 # title: This blog's title.
 title:        [% config.title %]
 
+# description: An optional blurb that will appear on the recent posts view
+site_description:  [% config.site_description %]
+
 # author_name: The name of this blog's author.
 author_name:  [% config.author_name %]
 
