@@ -74,9 +74,6 @@ article.post.h-entry h2.bg-info {
     padding: 5px 0 5px 10px; 
 }
 
-article .post-content {
-    margin-right: 20px;
-}
 
 article pre {
     background-color: #e9ecef;

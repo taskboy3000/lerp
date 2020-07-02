@@ -58,14 +58,14 @@
                 <div class="sidebar-inner">
                     <h2 class="bg-info text-light text-center">Utilities</h2>
                     <br>
-                    <section class="about">
+                    <section class="about pr-1">
                         <h3>About this site</h3>
                         <p>
                             This is a blog by <a class="text-info" href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
                         </p>
                     </section>
                     <br>
-                    <section class="search">
+                    <section class="search pr-1">
                         <h3>Search</h3>
                         <form action="https://duckduckgo.com" method="get" class="form">
                             <input name="sites" type="hidden" value="[% config.base_uri %]">
@@ -78,7 +78,7 @@
                         </form>
                     </section>
                     <br>
-                    <section class="recent_posts">
+                    <section class="recent_posts pr-1">
                         <h3>Recent Posts</h3>
                         <ul>
                         [%- FOREACH post IN recent_posts %]
@@ -87,7 +87,7 @@
                         </ul>
                     </section>
                     <br>
-                    <section>
+                    <section class="pr-1">
                         <h3>HTML Validation</h3>
                         <a class="text-info" target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
                     </section>
