@@ -15,8 +15,8 @@
   <entry>
     <title type="html"><![CDATA[Two tags]]></title>
     <link href="http://localhost/2020-07-03-two-tags.html"/>
-    <published>2020-07-03T07:06:42-04:00</published>
-    <updated>2020-07-03T07:06:42-04:00</updated>
+    <published>2020-07-03T09:29:36-04:00</published>
+    <updated>2020-07-03T09:29:36-04:00</updated>
     <id>http://localhost/2020-07-03-two-tags.html</id>
     <content type="html"><![CDATA[<p>This is a perfectly good and typical source file.</p>
 ]]></content>
@@ -25,8 +25,8 @@
   <entry>
     <title type="html"><![CDATA[One tag]]></title>
     <link href="http://localhost/2020-07-03-one-tag.html"/>
-    <published>2020-07-03T07:06:42-04:00</published>
-    <updated>2020-07-03T07:06:42-04:00</updated>
+    <published>2020-07-03T09:29:36-04:00</published>
+    <updated>2020-07-03T09:29:36-04:00</updated>
     <id>http://localhost/2020-07-03-one-tag.html</id>
     <content type="html"><![CDATA[<p>This is a perfectly good and typical source file.</p>
 ]]></content>
@@ -35,8 +35,8 @@
   <entry>
     <title type="html"><![CDATA[no-title]]></title>
     <link href="http://localhost/2020-07-03-no-title.html"/>
-    <published>2020-07-03T07:06:42-04:00</published>
-    <updated>2020-07-03T07:06:42-04:00</updated>
+    <published>2020-07-03T09:29:36-04:00</published>
+    <updated>2020-07-03T09:29:36-04:00</updated>
     <id>http://localhost/2020-07-03-no-title.html</id>
     <content type="html"><![CDATA[<p>Uh oh, this file doesn’t have a title!</p>
 ]]></content>
@@ -45,8 +45,8 @@
   <entry>
     <title type="html"><![CDATA[Metatags]]></title>
     <link href="http://localhost/2020-07-03-metatags.html"/>
-    <published>2020-07-03T07:06:42-04:00</published>
-    <updated>2020-07-03T07:06:42-04:00</updated>
+    <published>2020-07-03T09:29:36-04:00</published>
+    <updated>2020-07-03T09:29:36-04:00</updated>
     <id>http://localhost/2020-07-03-metatags.html</id>
     <content type="html"><![CDATA[<p>This file sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
 ]]></content>
@@ -55,10 +55,10 @@
   <entry>
     <title type="html"><![CDATA[Metatags with image]]></title>
     <link href="http://localhost/2020-07-03-metatags-with-image.html"/>
-    <published>2020-07-03T07:06:42-04:00</published>
-    <updated>2020-07-03T07:06:42-04:00</updated>
+    <published>2020-07-03T09:29:36-04:00</published>
+    <updated>2020-07-03T09:29:36-04:00</updated>
     <id>http://localhost/2020-07-03-metatags-with-image.html</id>
-    <content type="html"><![CDATA[<p><a href="http://example.com/">This file</a> sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
+    <content type="html"><![CDATA[<p><a href="https://en.wikipedia.org/wiki/Coconut#/media/File:Cocos_nucifera_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-187.jpg">This file</a> sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
 
 <p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description! It does have a hyperlink in the first paragraph, though.</p>
 ]]></content>
@@ -67,8 +67,8 @@
   <entry>
     <title type="html"><![CDATA[Metatags with image and alt]]></title>
     <link href="http://localhost/2020-07-03-metatags-with-image-and-alt.html"/>
-    <published>2020-07-03T07:06:42-04:00</published>
-    <updated>2020-07-03T07:06:42-04:00</updated>
+    <published>2020-07-03T09:29:36-04:00</published>
+    <updated>2020-07-03T09:29:36-04:00</updated>
     <id>http://localhost/2020-07-03-metatags-with-image-and-alt.html</id>
     <content type="html"><![CDATA[<p><img src="image: http://blog.example.com/example.png" alt="A lovely bunch of coconuts." /></p>
 
