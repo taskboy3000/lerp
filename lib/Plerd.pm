@@ -675,7 +675,7 @@ sub next_source_file {
             }
         }
 
-        @files = sort { $b->stat->mtime <=> $a->stat->mtime } @files;
+        @files = sort { $a->stat->mtime <=> $b->stat->mtime } @files;
         $self->sorted_source_files(\@files);
     }
 
