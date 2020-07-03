@@ -145,6 +145,10 @@ sub publish_all {
         die("Cannot find plerd config file: " . $config->config_file);
     }
 
+    if ($verbose) {
+        say "Using config file: " . $config->config_file;
+    }
+
     $config->unserialize;
 
     my $plerd = Plerd->new(config => $config);
@@ -153,6 +157,10 @@ sub publish_all {
     }
 
     my $lock_fh = get_lock($config);
+    if ($verbose) {
+        say "Publishing articles to " . $config->publication_directory;
+    }
+
     $plerd->publish_all(verbose => $verbose, force => $force);
     free_lock($lock_fh);
 

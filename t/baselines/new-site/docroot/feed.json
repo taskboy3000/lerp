@@ -8,45 +8,45 @@
    "items" : [
       {
          "content_html" : "<p>This is a perfectly good and typical source file.</p>\n",
-         "date_published" : "2020-07-02T15:50:42-04:00",
-         "id" : "http://localhost/2020-07-02-two-tags.html",
+         "date_published" : "2020-07-03T07:06:42-04:00",
+         "id" : "http://localhost/2020-07-03-two-tags.html",
          "title" : "Two tags",
-         "url" : "http://localhost/2020-07-02-two-tags.html"
+         "url" : "http://localhost/2020-07-03-two-tags.html"
       },
       {
          "content_html" : "<p>This is a perfectly good and typical source file.</p>\n",
-         "date_published" : "2020-07-02T15:50:42-04:00",
-         "id" : "http://localhost/2020-07-02-one-tag.html",
+         "date_published" : "2020-07-03T07:06:42-04:00",
+         "id" : "http://localhost/2020-07-03-one-tag.html",
          "title" : "One tag",
-         "url" : "http://localhost/2020-07-02-one-tag.html"
+         "url" : "http://localhost/2020-07-03-one-tag.html"
       },
       {
          "content_html" : "<p>Uh oh, this file doesn’t have a title!</p>\n",
-         "date_published" : "2020-07-02T15:50:42-04:00",
-         "id" : "http://localhost/2020-07-02-no-title.html",
+         "date_published" : "2020-07-03T07:06:42-04:00",
+         "id" : "http://localhost/2020-07-03-no-title.html",
          "title" : "no-title",
-         "url" : "http://localhost/2020-07-02-no-title.html"
+         "url" : "http://localhost/2020-07-03-no-title.html"
       },
       {
          "content_html" : "<p>This file sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n",
-         "date_published" : "2020-07-02T15:50:42-04:00",
-         "id" : "http://localhost/2020-07-02-metatags.html",
+         "date_published" : "2020-07-03T07:06:42-04:00",
+         "id" : "http://localhost/2020-07-03-metatags.html",
          "title" : "Metatags",
-         "url" : "http://localhost/2020-07-02-metatags.html"
+         "url" : "http://localhost/2020-07-03-metatags.html"
       },
       {
          "content_html" : "<p><a href=\"http://example.com/\">This file</a> sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n\n<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description! It does have a hyperlink in the first paragraph, though.</p>\n",
-         "date_published" : "2020-07-02T15:50:42-04:00",
-         "id" : "http://localhost/2020-07-02-metatags-with-image.html",
+         "date_published" : "2020-07-03T07:06:42-04:00",
+         "id" : "http://localhost/2020-07-03-metatags-with-image.html",
          "title" : "Metatags with image",
-         "url" : "http://localhost/2020-07-02-metatags-with-image.html"
+         "url" : "http://localhost/2020-07-03-metatags-with-image.html"
       },
       {
          "content_html" : "<p><img src=\"image: http://blog.example.com/example.png\" alt=\"A lovely bunch of coconuts.\" /></p>\n\n<p>This file, which is <strong>awesome</strong>, sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n\n<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description!</p>\n\n<p>It also leads with an image tag hanging out all by itself, which Plerd ought not to consider a paragraph of body text.</p>\n",
-         "date_published" : "2020-07-02T15:50:42-04:00",
-         "id" : "http://localhost/2020-07-02-metatags-with-image-and-alt.html",
+         "date_published" : "2020-07-03T07:06:42-04:00",
+         "id" : "http://localhost/2020-07-03-metatags-with-image-and-alt.html",
          "title" : "Metatags with image and alt",
-         "url" : "http://localhost/2020-07-02-metatags-with-image-and-alt.html"
+         "url" : "http://localhost/2020-07-03-metatags-with-image-and-alt.html"
       }
    ],
    "title" : "Another Plerd Blog",

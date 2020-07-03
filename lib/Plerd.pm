@@ -282,8 +282,8 @@ sub publish_rss_feed {
     # @fixme - need to regen?
     my @posts;
 
-    # @todo: allow customization from config
-    my $max_posts = 3;
+    my $max_posts = $self->config->show_max_posts;
+
     my @latest_keys = reverse @{ $post_memory->keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
@@ -334,8 +334,7 @@ sub publish_json_feed {
     # @fixme - need to regen?
     my @posts;
 
-    # @todo: allow customization from config
-    my $max_posts = 5;
+    my $max_posts = $self->config->show_max_posts;
     my @latest_keys = reverse @{ $post_memory->keys };
 
     for my $key (@latest_keys) {
@@ -386,15 +385,15 @@ sub publish_front_page {
     );
     my $feed = $self->front_page;
 
-    # @todo: allow customization from config
-    my $max_posts = 3;
+    my $max_posts = $self->config->show_max_posts;
+
     # @fixme - need to regen?
 
     my $post_memory = $self->config->post_memory;
     my @posts;
     my @latest_keys = reverse @{ $post_memory->keys };
     for my $key ( @latest_keys ) {
-        if ($max_posts-- < 0){
+        if ($max_posts-- < 1){
             last;
         }
 

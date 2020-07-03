@@ -162,6 +162,8 @@ sub _build_run_directory {
 
 has 'site_description' => (is => 'rw', predicate => 1);
 
+has 'show_max_posts' => (is => 'rw', default => sub { 5 });
+
 has 'source_directory' => (
     is => 'rw',
     lazy => 1,

@@ -62,6 +62,10 @@ image: [% config.has_image ? config.image : "" %]
 #            Optional, but if you define an image, you should define this too.
 image_alt: [% config.image_alt %]
 
+# This is the number of posts to show on the Latets Posts page and 
+# the number of items in the RSS and JSON feeds
+show_max_posts: [% config.show_max_posts %]
+
 ######################
 # Split-location setup
 ######################
