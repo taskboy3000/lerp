@@ -34,12 +34,12 @@ sub _build_archive {
 }
 
 has 'config' => (
-    is => 'ro', 
-    lazy => 1, 
+    is => 'ro',
+    lazy => 1,
     builder => '_build_config'
 );
 sub _build_config {
-    Plerd::Config->new;    
+    Plerd::Config->new;
 }
 
 has 'front_page' => (
@@ -69,7 +69,7 @@ has 'publisher' => (
     is => 'ro',
     lazy => 1,
     builder => '_build_publisher'
-); 
+);
 sub _build_publisher {
     my ($self) = @_;
     my %params = (
@@ -96,7 +96,7 @@ sub _build_publisher {
         $json->encode($_[0]);
     };
 
-    return Template->new(%params);   
+    return Template->new(%params);
 }
 
 has 'rss_feed' => (
@@ -112,8 +112,8 @@ sub _build_rss_feed {
 }
 
 has 'site_css' => (
-    is => 'ro', 
-    lazy => 1, 
+    is => 'ro',
+    lazy => 1,
     builder => '_build_site_css'
 );
 sub _build_site_css {
@@ -122,8 +122,8 @@ sub _build_site_css {
 }
 
 has 'site_js' => (
-    is => 'ro', 
-    lazy => 1, 
+    is => 'ro',
+    lazy => 1,
     builder => '_build_site_js'
 );
 sub _build_site_js {
@@ -170,7 +170,7 @@ sub publish_post {
     my $post_key = $post->publication_file->basename;
 
     if (!$opts{force}) {
-        if (my $memory = $post_memory->load($post_key)) { 
+        if (my $memory = $post_memory->load($post_key)) {
             if ($memory->{mtime} >= $post->source_file_mtime) {
                 # the cache is newer than the source.
                 # decline to proceed.
@@ -204,12 +204,12 @@ sub publish_post {
     }
 
     if ($self->_publish(
-            $post->template_file, 
-            $post->publication_file, 
-            { post => $post, thisURI => $post->uri }) 
+            $post->template_file,
+            $post->publication_file,
+            { post => $post, thisURI => $post->uri })
     ) {
         if ($opts{verbose}) {
-            say "Published " . $post->publication_file->basename;            
+            say "Published " . $post->publication_file->basename;
         }
 
         # @todo: fix orphan tag problem when a post is updated with tags removed
@@ -220,9 +220,9 @@ sub publish_post {
         die("assert - Publishing failed for " . $post->source_file);
     }
 
-    # Remember publishing this post 
+    # Remember publishing this post
     $post_memory->save(
-        $post->publication_file->basename, 
+        $post->publication_file->basename,
         {
             mtime => $post->source_file_mtime,
             source_file => $post->source_file->absolute->stringify,
@@ -253,14 +253,14 @@ sub publish_tags_index_page {
     # If any tag memory is newer, regenerate index
     my $tag_links = $tags_index->get_tag_links;
     if ($self->_publish(
-            $tags_index->template_file, 
-            $tags_index->publication_file, 
+            $tags_index->template_file,
+            $tags_index->publication_file,
             { tag_links => $tag_links, thisURI => $tags_index->uri,},
             "tags"
-            ) 
+            )
     ) {
         if ($opts{verbose}) {
-            say "Published " . $tags_index->publication_file->basename;            
+            say "Published " . $tags_index->publication_file->basename;
         }
         return 1;
     }
@@ -283,7 +283,7 @@ sub publish_rss_feed {
 
     my $max_posts = $self->config->show_max_posts;
 
-    my @latest_keys = reverse @{ $post_memory->keys };
+    my @latest_keys = @{ $post_memory->latest_keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
@@ -304,7 +304,7 @@ sub publish_rss_feed {
     }
 
     # @fixme: make the structure in perl,
-    # pass to the template like 
+    # pass to the template like
     # [% feed.json %]
     if ($self->_publish(
         $feed->template_file,
@@ -312,7 +312,7 @@ sub publish_rss_feed {
         { posts => \@posts, thisURI => $feed->uri }
     )) {
         if ($opts{verbose}) {
-            say "Published " . $feed->publication_file->basename;            
+            say "Published " . $feed->publication_file->basename;
         }
 
         return 1;
@@ -334,7 +334,7 @@ sub publish_json_feed {
     my @posts;
 
     my $max_posts = $self->config->show_max_posts;
-    my @latest_keys = reverse @{ $post_memory->keys };
+    my @latest_keys = @{ $post_memory->latest_keys };
 
     for my $key (@latest_keys) {
         if ($max_posts-- < 0){
@@ -364,10 +364,10 @@ sub publish_json_feed {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        $vars 
+        $vars
     )) {
         if ($opts{verbose}) {
-            say "Published " . $feed->publication_file->basename;            
+            say "Published " . $feed->publication_file->basename;
         }
         return 1;
     }
@@ -390,7 +390,7 @@ sub publish_front_page {
 
     my $post_memory = $self->config->post_memory;
     my @posts;
-    my @latest_keys = reverse @{ $post_memory->keys };
+    my @latest_keys = @{ $post_memory->latest_keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 1){
             last;
@@ -422,7 +422,7 @@ sub publish_front_page {
         "blog"
     )) {
         if ($opts{verbose}) {
-            say "Published " . $feed->publication_file->basename;            
+            say "Published " . $feed->publication_file->basename;
         }
         return 1;
     }
@@ -436,13 +436,13 @@ sub publish_archive_page {
         'verbose' => 0,
         @_
     );
-   
+
     my $feed = $self->archive;
 
     my $post_memory = $self->config->post_memory;
     my @posts;
 
-    my @latest_keys = reverse @{ $post_memory->keys };
+    my @latest_keys = @{ $post_memory->latest_keys };
     for my $key ( @latest_keys ) {
         my $rec = $post_memory->load($key);
         if (!-e $rec->{source_file}) {
@@ -454,7 +454,7 @@ sub publish_archive_page {
             );
             $post->load_source;
             push @posts, $post;
-        }  
+        }
     }
 
     if ($self->_publish(
@@ -464,7 +464,7 @@ sub publish_archive_page {
         "archive"
     )) {
         if ($opts{verbose}) {
-            say "Published " . $feed->publication_file->basename;            
+            say "Published " . $feed->publication_file->basename;
         }
         return 1;
     }
@@ -478,7 +478,7 @@ sub publish_site_css_page {
         'verbose' => 0,
         @_
     );
-   
+
     my $feed = $self->site_css;
 
     my $parent = $feed->publication_file->parent;
@@ -492,7 +492,7 @@ sub publish_site_css_page {
         {},
     )) {
         if ($opts{verbose}) {
-            say "Published " . $feed->publication_file->basename;            
+            say "Published " . $feed->publication_file->basename;
         }
         return 1;
     }
@@ -506,7 +506,7 @@ sub publish_site_js_page {
         'verbose' => 0,
         @_
     );
-   
+
     my $feed = $self->site_js;
 
     my $parent = $feed->publication_file->parent;
@@ -520,12 +520,13 @@ sub publish_site_js_page {
         {}
     )) {
         if ($opts{verbose}) {
-            say "Published " . $feed->publication_file->basename;            
+            say "Published " . $feed->publication_file->basename;
         }
         return 1;
     }
     die("assert - Publishing failed for site css page");
 }
+
 
 sub publish_all {
     my ($self) = shift;
@@ -554,7 +555,7 @@ sub publish_all {
         } else {
             undef($latest_post_mtime);
         }
-    }   
+    }
 
     my @source_files;
     while (my $source_file = $self->next_source_file) {
@@ -711,7 +712,7 @@ sub _publish {
                         $tmpl_fh,
                         $vars,
                         $trg_fh,
-                    ) 
+                    )
     ) {
         die(sprintf("assert[processing %s] %s\n",
                         $target_file,
