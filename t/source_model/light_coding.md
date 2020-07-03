@@ -8,4 +8,4 @@ Here is an example of some perl code:
      use Modern::Perl '2018';
      say "Hello, 🌐";
 
-It turns out, modern Perl is pretty OK with unicode.
+It turns out, modern [Perl](https://perl.com/) is pretty OK with unicode.

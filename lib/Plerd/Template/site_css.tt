@@ -24,6 +24,10 @@ img {
     width: 100%;
 }
 
+a, a:visited, a:hover, a:active {
+    color: var(--info);
+}
+
 /* common page-layout styling */
 .logo-container {
     padding-right: 40px;
