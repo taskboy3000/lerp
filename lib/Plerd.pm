@@ -131,9 +131,8 @@ sub _build_site_js {
     Plerd::Model::SiteJavaScript->new(config => $self->config);
 }
 
-has source_dir_handle => (
+has 'sorted_source_files' => (
     is => 'rw',
-    lazy => 1,
     clearer => 1,
     predicate => 1,
 );
@@ -597,26 +596,6 @@ sub publish_all {
     return 1;
 }
 
-sub next_source_file {
-    my ($self) = @_;
-
-    if (!$self->has_source_dir_handle()) {
-        $self->source_dir_handle($self->config->source_directory->open);
-    }
-
-    while (my $file = $self->source_dir_handle()->read) {
-        $file = $self->config->source_directory->file($file)->absolute;
-        next if -d $file;
-        if ($file->stringify =~ /\.(?:md|markdown)$/) {
-            return $file;
-        }
-    }
-
-    # Failed to find a source file
-    $self->clear_source_dir_handle;
-    return;
-}
-
 sub get_recent_posts {
     my $self = shift;
     my (%opts) = (
@@ -684,6 +663,31 @@ sub forget_post {
     return 1;
 }
 
+sub next_source_file {
+    my ($self) = @_;
+
+    if (!$self->has_sorted_source_files) {
+        my @files;
+        while (my $file = $self->config->source_directory->next) {
+            next if -d $file;
+            if ($file->stringify =~ /\.(?:md|markdown)$/) {
+                push @files, $file;
+            }
+        }
+
+        @files = sort { $b->stat->mtime <=> $a->stat->mtime } @files;
+        $self->sorted_source_files(\@files);
+    }
+
+    my $file = pop @{ $self->sorted_source_files };
+
+    if (!@{ $self->sorted_source_files }) {
+        $self->clear_sorted_source_files;
+        return;
+    }
+
+    return $file;
+}
 
 
 #-----------------

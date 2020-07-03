@@ -1,5 +1,16 @@
 TODO
 
+- POST memories are broken
+  - need to remove old memories with source changes title
+  - Ordering is wrong to 
+    Something like:
+       Get all post memories,
+       add new sources,
+       sort this list
+
+- TAG memories are broken
+  - need to remove duplicate source file
+
 - support plugins
   - need plugin.yml
   - need models/publish_page method
@@ -12,3 +23,5 @@ TODO
   create an index of all galleries 
   autocreate thumbnails
   maybe create geographic galleries based on graphic metadata?
+
+  - notes
