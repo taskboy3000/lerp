@@ -41,6 +41,29 @@ sub _build_publication_file {
     );
 }
 
+has 'source_file' => (
+    is => 'rw',
+    predicate => 1,
+    coerce => \&_coerce_file,
+);
+has 'source_file_loaded' => (is => 'rw', default => sub { 0 });
+
+has 'source_file_mtime' => (
+    is => 'ro', 
+    lazy => 1,
+    clearer => 1, 
+    builder => '_build_source_file_mtime'
+);
+sub _build_source_file_mtime {
+    my ($self) = @_;
+    if (-e $self->source_file->stringify) {
+        my $stat = $self->source_file->stat();
+        return $stat->mtime;
+    } 
+
+    die("assert - source file cannot be found: " . $self->source_file);
+}
+
 has 'raw_body' => (is => 'rw', predicate => 1);
 
 has 'tags' => (is => 'ro', default => sub { [] });
@@ -92,6 +115,16 @@ sub _build_uri {
 #-------------------
 # Public Methods
 #-------------------
+sub can_publish {
+    my ($self) = @_;
+
+    if (!$self->source_file_loaded) {
+        die("Please load this note first");
+    }
+
+    return $self->has_raw_body;
+}
+
 sub parse {
     my ($self, $raw) = @_;
 
@@ -154,12 +187,22 @@ sub parse {
 
 sub load {
     my ($self, $file) = @_;
+
+    if ($self->has_source_file && !defined($file)) {
+        $file = $self->source_file;
+    }
+
     die "Cannot find file $file\n" if !-e $file;
 
-    my $new = $self->new(config => $self->config);
+    my $new = $self->new(
+        config => $self->config,
+        source_file => $self->source_file,
+    );
+
     my $raw_body = $file->slurp();
     $new->raw_body($raw_body);
     $new->parse();
+    $new->source_file_loaded(1);
 
     return $new;
 }
@@ -175,4 +218,13 @@ sub _strip_html {
     return $stripped;
 }
 
+sub _coerce_file {
+    my ($thing) = @_;
+
+    if (ref $thing eq 'Path::Class::File') {
+        return $thing;
+    }
+
+    return Path::Class::File->new($thing);
+}
 1;

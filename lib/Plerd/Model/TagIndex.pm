@@ -175,7 +175,9 @@ sub remove_tag_from_post {
     return if !$tag;
 
     my $src_file;
-    if (ref $post eq 'Plerd::Model::Post') {
+    if (ref $post eq 'Plerd::Model::Post'
+        || ref $post eq 'Plerd::Mode::Note'
+       ) {
         $src_file = $post->source_file->stringify;
     } else {
         $src_file = $post;
@@ -210,4 +212,5 @@ sub remove_tag_from_post {
 
     return 1;
 }
+
 1;

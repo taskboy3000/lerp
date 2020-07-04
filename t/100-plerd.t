@@ -9,6 +9,7 @@ use Path::Class::File;
 use Test::More;
 
 use Plerd;
+use Plerd::Model::Note;
 use Plerd::Model::Post;
 use Plerd::Model::TagIndex;
 
@@ -320,6 +321,40 @@ sub TestDefaultSiteAgainstBaseline {
     $plerd->config->path->rmtree;
 }
 
+sub TestPublishNotes {
+    diag("Testing notes publication");
+
+    my $plerd = Plerd->new;
+
+    my $config = $plerd->config;
+    $config->path("$FindBin::Bin/init/new-site");
+    $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
+
+    if (-d $config->path) {
+        $config->path->rmtree;
+    }
+
+    ok($config->initialize, "Creating default test site");
+
+    for my $file (glob("$FindBin::Bin/source_model/notes/*")) {
+        copy $file, $config->source_notes_directory;
+    }
+
+    while (my $file = $plerd->config->source_notes_directory->next) {
+        next if -d $file;
+
+        my $note = Plerd::Model::Note->new(
+            config => $plerd->config, 
+            source_file => $file
+        );
+
+        ok($plerd->publish_note($note, verbose => 1), "Published " . $note->publication_file->basename);
+        sleep(2); # timestamp limited here.  delay will cause new timestamps
+    }
+
+    $plerd->config->path->rmtree;
+}
+
 #---------
 # Helpers
 #---------
@@ -329,6 +364,7 @@ sub Main {
     TestInvoked();
     TestSourceListing();
     TestPublishingOnePost();
+    TestPublishNotes();
     TestTagMemory();
     TestArchiveRSSRecentPages();
     TestPublishAll();

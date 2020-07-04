@@ -233,6 +233,83 @@ sub publish_post {
     return 1;
 }
 
+sub publish_note {
+    my ($self, $note) = (shift, shift);
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+
+    if (!$note->has_source_file) {
+        die("assert - post has no source file");
+    }
+
+    # Does this note need to be regenerated?
+    my $memory = $self->config->notes_memory;
+    my $key = $note->publication_file->basename;
+
+    if (!$opts{force}) {
+        if (my $m = $memory->load($key)) {
+            if ($m->{mtime} >= $note->source_file_mtime) {
+                # the cache is newer than the source.
+                # decline to proceed.
+                if ($opts{verbose}) {
+                    say "Declining to reprocess unchanged " . $note->source_file->basename;
+                }
+                return;
+            }
+        }
+    }
+
+    if (!$note->source_file_loaded) {
+        $note = $note->load();
+    }
+
+    if (!$note->can_publish) {
+        if ($opts{verbose}) {
+            say "Note cannot be published without a body."
+        }
+        return;
+    }
+
+    # @todo: make it so that I don't have to do this
+    # hydrate tags
+    for my $tag (@{ $note->tags }) {
+        $tag->config($self->config);
+    }
+
+    if ($self->_publish(
+            $note->template_file,
+            $note->publication_file,
+            { note => $note, thisURI => $note->uri })
+    ) {
+        if ($opts{verbose}) {
+            say "Published " . $note->publication_file->basename;
+        }
+
+        # @todo: fix orphan tag problem when a post is updated with tags removed
+        for my $tag (@{ $note->tags }) {
+            $self->tags_index->update_tag_for_post( $tag, $note );
+        }
+    } else {
+        die("assert - Publishing failed for " . $note->source_file);
+    }
+
+    # Remember publishing this post
+    $memory->save(
+        $note->publication_file->basename,
+        {
+            mtime => $note->source_file_mtime,
+            source_file => $note->source_file->absolute->stringify,
+            tags => [ sort map { $_->name } @{ $note->tags } ]
+        }
+    );
+
+    return 1;
+}
+
+
 sub publish_tags_index_page {
     my ($self) = (shift);
     my (%opts) = (

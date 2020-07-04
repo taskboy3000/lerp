@@ -116,6 +116,17 @@ sub _build_log_directory {
     return Path::Class::Dir->new($self->path, "log");
 }
 
+has notes_memory => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_notes_memory',
+);
+sub _build_notes_memory {
+    my ($self) = @_;
+    my $db_dir = Path::Class::Dir->new($self->database_directory, 'notes');
+    return Plerd::Remembrancer->new(database_directory => $db_dir);
+}
+
 has 'notes_publication_directory' => (
     is => 'rw',
     lazy => 1,
