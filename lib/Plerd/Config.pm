@@ -116,6 +116,17 @@ sub _build_log_directory {
     return Path::Class::Dir->new($self->path, "log");
 }
 
+has 'notes_publication_directory' => (
+    is => 'rw',
+    lazy => 1,
+    builder => '_build_notes_publication_directory',
+    coerce => \&_coerce_directory        
+);
+sub _build_notes_publication_directory {
+    my ($self) = @_;
+    return Path::Class::Dir->new($self->publication_directory, "notes");    
+}
+
 has path => (
     is => 'rw', 
     lazy => 1,
@@ -198,16 +209,6 @@ sub _build_tag_memory {
     return Plerd::Remembrancer->new(database_directory => $db_dir);
 }
 
-has 'tags_publication_directory' => (
-    is => 'rw',
-    lazy => 1,
-    builder => '_build_tags_publication_directory',
-    coerce => \&_coerce_directory    
-);
-sub _build_tags_publication_directory {
-    my $self = shift;
-    return Path::Class::Dir->new($self->publication_directory, "tags");
-}
 
 has 'template_directory' => (
     is => 'rw',
@@ -279,14 +280,14 @@ sub initialize {
     my @messages;
     for my $dir_method (qw[
         path
-        publication_directory
-        tags_publication_directory
         database_directory
-        run_directory
+        publication_directory
         log_directory
+        notes_publication_directory
         template_directory
         source_directory
         source_notes_directory
+        run_directory
     ]) {
         if (!-d $self->$dir_method) {
             push @messages, "Creating " . $self->$dir_method();

@@ -45,11 +45,13 @@ sub TestConfigWithPubDir {
     diag("Testing config with publication_directory");
 
     my $pubDir = "/var/lib/html";
+    my $notesPubDir = "/var/lib/html/notes";
     my $Cfg = Plerd::Config->new(publication_directory => $pubDir);
 
     # properties => default values
     my %baselines = (
         "publication_directory" => $pubDir,
+        "notes_publication_directory" => $notesPubDir,
     );
 
     for my $property (keys %baselines) {

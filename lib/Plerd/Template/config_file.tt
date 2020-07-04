@@ -73,13 +73,14 @@ show_max_posts: [% config.show_max_posts %]
 # master directory (configured withe the "path" directive, as seen above), then
 # you can define the directories with these separate directives instead:
 #
-source_path:       [% config.source_directory %]
-source_notes_path: [% config.source_notes_directory %]
-publication_path:  [% config.publication_directory %]
-template_path:     [% config.template_directory %]
-database_path:     [% config.database_directory %]
-run_path:          [% config.run_directory %]
-log_path:          [% config.log_directory %]
+source_path:            [% config.source_directory %]
+source_notes_path:      [% config.source_notes_directory %]
+publication_path:       [% config.publication_directory %]
+notes_publication_path: [% config.notes_publication_directory %]
+template_path:          [% config.template_directory %]
+database_path:          [% config.database_directory %]
+run_path:               [% config.run_directory %]
+log_path:               [% config.log_directory %]
 
 # Custom navigation items can be added to the top-level 
 # nav bar by adding a title and URI, as is shown below:
