@@ -687,7 +687,7 @@ sub get_recent_posts {
 
     my $post_memory = $self->config->post_memory;
     my @posts;
-    my @latest_keys = reverse @{ $post_memory->keys };
+    my @latest_keys = @{ $post_memory->latest_keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
