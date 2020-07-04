@@ -7,46 +7,46 @@
    "home_page_url" : "http://localhost/",
    "items" : [
       {
-         "content_html" : "<p>This is a perfectly good and typical source file.</p>\n",
-         "date_published" : "2020-07-03T12:37:22-04:00",
-         "id" : "http://localhost/2020-07-03-two-tags.html",
-         "title" : "Two tags",
-         "url" : "http://localhost/2020-07-03-two-tags.html"
-      },
-      {
-         "content_html" : "<p>This is a perfectly good and typical source file.</p>\n",
-         "date_published" : "2020-07-03T12:37:23-04:00",
-         "id" : "http://localhost/2020-07-03-one-tag.html",
-         "title" : "One tag",
-         "url" : "http://localhost/2020-07-03-one-tag.html"
-      },
-      {
-         "content_html" : "<p>Uh oh, this file doesn’t have a title!</p>\n",
-         "date_published" : "2020-07-03T12:37:23-04:00",
-         "id" : "http://localhost/2020-07-03-no-title.html",
-         "title" : "no-title",
-         "url" : "http://localhost/2020-07-03-no-title.html"
-      },
-      {
-         "content_html" : "<p>This file sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n",
-         "date_published" : "2020-07-03T12:37:22-04:00",
-         "id" : "http://localhost/2020-07-03-metatags.html",
-         "title" : "Metatags",
-         "url" : "http://localhost/2020-07-03-metatags.html"
-      },
-      {
-         "content_html" : "<p><a href=\"https://en.wikipedia.org/wiki/Coconut#/media/File:Cocos_nucifera_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-187.jpg\">This file</a> sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n\n<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description! It does have a hyperlink in the first paragraph, though.</p>\n",
-         "date_published" : "2020-07-03T12:37:23-04:00",
-         "id" : "http://localhost/2020-07-03-metatags-with-image.html",
-         "title" : "Metatags with image",
-         "url" : "http://localhost/2020-07-03-metatags-with-image.html"
+         "content_html" : "<p>This post’s filename includes a manually set date. (Sort of. “TODAY” in the template-source’s filename isn’t actually a Plerd keyword; Plerd’s tests just know to replace it with a today’s ymd string, when creating the test source directory.)</p>\n",
+         "date_published" : "2020-07-04T09:06:53-04:00",
+         "id" : "http://localhost/2020-07-04-a-source-file-with-a-manual-filename.html",
+         "title" : "A source file with a manual filename",
+         "url" : "http://localhost/2020-07-04-a-source-file-with-a-manual-filename.html"
       },
       {
          "content_html" : "<p><img src=\"image: http://blog.example.com/example.png\" alt=\"A lovely bunch of coconuts.\" /></p>\n\n<p>This file, which is <strong>awesome</strong>, sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n\n<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description!</p>\n\n<p>It also leads with an image tag hanging out all by itself, which Plerd ought not to consider a paragraph of body text.</p>\n",
-         "date_published" : "2020-07-03T12:37:23-04:00",
-         "id" : "http://localhost/2020-07-03-metatags-with-image-and-alt.html",
+         "date_published" : "2020-07-04T09:06:54-04:00",
+         "id" : "http://localhost/2020-07-04-metatags-with-image-and-alt.html",
          "title" : "Metatags with image and alt",
-         "url" : "http://localhost/2020-07-03-metatags-with-image-and-alt.html"
+         "url" : "http://localhost/2020-07-04-metatags-with-image-and-alt.html"
+      },
+      {
+         "content_html" : "<p><a href=\"https://en.wikipedia.org/wiki/Coconut#/media/File:Cocos_nucifera_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-187.jpg\">This file</a> sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n\n<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description! It does have a hyperlink in the first paragraph, though.</p>\n",
+         "date_published" : "2020-07-04T09:06:54-04:00",
+         "id" : "http://localhost/2020-07-04-metatags-with-image.html",
+         "title" : "Metatags with image",
+         "url" : "http://localhost/2020-07-04-metatags-with-image.html"
+      },
+      {
+         "content_html" : "<p>Here is an example of some perl code:</p>\n\n<pre><code> #!/usr/bin/env perl\n use Modern::Perl '2018';\n say \"Hello, 🌐\";\n</code></pre>\n\n<p>It turns out, modern <a href=\"https://perl.com/\">Perl</a> is pretty OK with unicode.</p>\n",
+         "date_published" : "2020-07-04T09:06:54-04:00",
+         "id" : "http://localhost/2020-07-04-example-code.html",
+         "title" : "Example code",
+         "url" : "http://localhost/2020-07-04-example-code.html"
+      },
+      {
+         "content_html" : "<p>This is a perfectly good and typical source file.</p>\n",
+         "date_published" : "2020-07-04T09:06:54-04:00",
+         "id" : "http://localhost/2020-07-04-one-tag.html",
+         "title" : "One tag",
+         "url" : "http://localhost/2020-07-04-one-tag.html"
+      },
+      {
+         "content_html" : "<p>This file has a good timestmp.</p>\n",
+         "date_published" : "2000-01-01T00:00:00-05:00",
+         "id" : "http://localhost/2000-01-01-a-good-timestamp.html",
+         "title" : "A good timestamp",
+         "url" : "http://localhost/2000-01-01-a-good-timestamp.html"
       }
    ],
    "title" : "Another Plerd Blog",
