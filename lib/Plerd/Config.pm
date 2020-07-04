@@ -175,6 +175,18 @@ sub _build_source_directory {
     return Path::Class::Dir->new($self->path, "source");
 }
 
+has 'source_notes_directory' => (
+    is => 'rw',
+    lazy => 1,
+    builder => '_build_source_notes_directory',
+    coerce => \&_coerce_directory
+
+);
+sub _build_source_notes_directory {
+    my $self = shift;
+    return Path::Class::Dir->new($self->path, "source", "notes");
+}
+
 has tag_memory => (
     is => 'ro',
     lazy => 1,
@@ -274,6 +286,7 @@ sub initialize {
         log_directory
         template_directory
         source_directory
+        source_notes_directory
     ]) {
         if (!-d $self->$dir_method) {
             push @messages, "Creating " . $self->$dir_method();

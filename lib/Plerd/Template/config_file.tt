@@ -74,6 +74,7 @@ show_max_posts: [% config.show_max_posts %]
 # you can define the directories with these separate directives instead:
 #
 source_path:       [% config.source_directory %]
+source_notes_path: [% config.source_notes_directory %]
 publication_path:  [% config.publication_directory %]
 template_path:     [% config.template_directory %]
 database_path:     [% config.database_directory %]

@@ -23,11 +23,12 @@ sub Main {
         exit;
     }
 
-    if (-e $ARGV[0]) {
-        die("Declining to overwrite:  " . $ARGV[0]);
+    my $file = Path::Class::File->new($FindBin::Bin, $ARGV[0]);
+    
+    if (-e $file) {
+        die("Declining to overwrite:  " . $file);
     }
 
-    my $file = Path::Class::File->new($ARGV[0]);
     $file->spew(iomode => '>:encoding(UTF-8)', test_tmpl());
 
     say("Created " . $file);

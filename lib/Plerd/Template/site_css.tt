@@ -101,3 +101,7 @@ article pre {
 .archived-articles-list h2 {
     padding: 5px 10px;
 }
+
+.note .e-content {
+    white-space: pre;
+}
