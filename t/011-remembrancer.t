@@ -183,7 +183,7 @@ sub TestKeyRemoval {
         [
             "Remove 2 element array key",
             [
-                ["foo", "bar"],
+                ["baz", "foo"],
             ]
         ],
     );
