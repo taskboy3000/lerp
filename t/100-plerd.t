@@ -349,7 +349,7 @@ sub TestPublishNotes {
         );
 
         ok($plerd->publish_note($note, verbose => 1), "Published " . $note->publication_file->basename);
-        sleep(2); # timestamp limited here.  delay will cause new timestamps
+
     }
 
     $plerd->config->path->rmtree;

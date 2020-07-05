@@ -32,13 +32,23 @@ has 'publication_file' => (
 sub _build_publication_file {
     my ($self) = @_;
 
-    my $filename = "notes-" . time() . ".html";
+    my $file;
+    my $count=0;
+    while (1) {
+        my $filename = 'notes-' . time() . '-' . ++$count . '.html';
 
-    Path::Class::File->new(
-        $self->config->publication_directory,
-                           "notes",
-                           $filename,
-    );
+        $file = Path::Class::File->new(
+            $self->config->publication_directory,
+                            'notes',
+                            $filename,
+        );
+
+        if (!-e $file) {
+            last;
+        }
+    }
+
+    return $file;
 }
 
 has 'source_file' => (
