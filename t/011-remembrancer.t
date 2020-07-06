@@ -160,6 +160,7 @@ sub TestPayloadRetrieval {
 
         if (ref $expected eq ref {}) {
             while (my ($got_key, $got_value) = each %$ret) {
+                next if $got_key eq 'created_at'; # this will always vary
                 ok($ret->{$got_key} eq $expected->{$got_key},
                     "  Key '$got_key' had expected value"
                 );

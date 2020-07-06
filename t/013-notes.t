@@ -97,7 +97,7 @@ sub TestNotesModel {
     diag("Testing models from source files");
 
     my $N = Plerd::Model::Note->new;
-    $N->config->source_notes_directory("$FindBin::Bin/source_model/notes");
+    $N->config->source_notes_directory("$FindBin::Bin/source_notes");
     while (my $file = $N->config->source_notes_directory->next) {
         next if -d $file;
         diag("Loading $file");

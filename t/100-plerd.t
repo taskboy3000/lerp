@@ -73,7 +73,7 @@ sub TestPublishingOnePost {
     diag("Src: " . $source_file);
     ok($plerd->publish_post($post), "Published post without tags");
     ok(-s $post->publication_file, "Published file exists and is non-empty: " . $post->publication_file->basename);
-    ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file");
+    ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file: " . $post->source_file->basename);
     sleep(3);
     $source_file->touch;
     $post->clear_source_file_mtime;
@@ -385,13 +385,13 @@ sub TestPublishNotes {
 sub Main {
     setup();
 
-    #TestInvoked();
+    TestInvoked();
     TestSourceListing();
-    #TestPublishingOnePost();
-    #TestPublishNotes();
-    #TestTagMemory();
-    #TestArchiveRSSRecentPages();
-    #TestPublishAll();
+    TestPublishingOnePost();
+    TestPublishNotes();
+    TestTagMemory();
+    TestArchiveRSSRecentPages();
+    TestPublishAll();
     TestDefaultSiteAgainstBaseline();
 
     teardown();
