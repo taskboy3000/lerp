@@ -29,8 +29,8 @@ sub Main {
     GetOptions(
         # commands
         'init' => \$opts{initialize},
-        'publish=s' => \$opts{publish},
         'P|publish-all' => \$opts{publish_all},
+        'list-recent-posts' => \$opts{list_recent_posts},
 
         # options
         'c|config=s' => \$opts{config},
@@ -49,6 +49,8 @@ sub Main {
         initialize($opts{config}, $opts{base_dir}, $opts{verbose});
     } elsif ($opts{publish_all}) {
         publish_all($opts{config}, $opts{verbose}, $opts{force});
+    } elsif ($opts{list_recent_posts}) {
+        list_recent_posts($opts{config});
     } else {
         usage();
     }
@@ -167,6 +169,33 @@ sub publish_all {
     if ($verbose) {
         printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
     }
+}
+
+sub list_recent_posts {
+    my ($conf_file) = @_;
+
+    my $config = get_config($conf_file);
+    if (!-e $config->config_file) {
+        die("Cannot find plerd config file: " . $config->config_file);
+    }
+
+    $config->unserialize;
+
+    my $plerd = Plerd->new(config => $config);
+    my $recent = $plerd->get_recent_posts;
+    if (@$recent == 0) {
+        say "No post published yet.";
+        return;
+    }
+
+    for my $post (@$recent) {
+        printf("[%s] %s published to %s\n",
+            scalar(localtime($post->source_file_mtime)),
+            $post->source_file->basename,
+            $post->publication_file->basename,
+        );
+    }
+
 }
 
 sub get_lock {

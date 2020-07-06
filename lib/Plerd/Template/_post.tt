@@ -10,7 +10,7 @@
 
     <div class="post-content pl-3 pr-3">
         <p>
-            Published by <a class="text-info p-author h-card" href="[% config.base_uri %]">[% config.author_name%]</a>
+            Published by <a class="p-author h-card" href="[% config.base_uri %]">[% config.author_name%]</a>
             on <time class="dt-published" datetime="[% post.utc_date.ymd %]T[% post.utc_date.hms %]+00:00">[% post.month_name %] [% post.day %], [% post.year %]</time>
         </p>
 
@@ -21,7 +21,7 @@
                 <li class="list-inline-item">Tags:</li>
                 [% FOREACH tag = post.tags %]
                     <li class="list-inline-item p-category">
-                        <a class="text-info" href="[% tag.uri %]">[% tag.name %]</a>
+                        <a href="[% tag.uri %]">[% tag.name %]</a>
                     </li>
                 [% END %]
             </ul>

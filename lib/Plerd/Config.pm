@@ -206,7 +206,7 @@ has 'source_notes_directory' => (
 );
 sub _build_source_notes_directory {
     my $self = shift;
-    return Path::Class::Dir->new($self->path, "source", "notes");
+    return Path::Class::Dir->new($self->path, 'notes');
 }
 
 has tag_memory => (

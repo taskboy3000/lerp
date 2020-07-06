@@ -3,6 +3,7 @@ use Modern::Perl '2018';
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
+use File::Basename;
 use File::Copy;
 use Path::Class::Dir;
 use Path::Class::File;
@@ -32,8 +33,8 @@ sub TestSourceListing {
     # and there is no persisted plerd site.
     $config->source_directory("$FindBin::Bin/source_model");
 
-    my $first_fetch = $plerd->next_source_file;
-    ok(defined $first_fetch, "next_source_file");
+    my $first_fetch = $plerd->first_source_file;
+    ok(defined $first_fetch, "first_source_file");
 
     diag("Src: " . $first_fetch) if defined $first_fetch;
     while (my $source_file = $plerd->next_source_file) {
@@ -279,22 +280,27 @@ sub TestPublishAll {
 
 sub TestDefaultSiteAgainstBaseline {
     diag("Testing default site against baselines");
+    my $baseline_dir = Path::Class::Dir->new("$FindBin::Bin/baselines/new-site/docroot");
+
     my $plerd = Plerd->new;
     my $config = $plerd->config;
     $config->path("$FindBin::Bin/init/new-site");
     $config->config_file("$FindBin::Bin/init/new-site/new-site.conf");
 
     ok($config->initialize, "Creating default test site");
-    for my $file (glob("$FindBin::Bin/source_model/*")) {
+    for my $file (sort glob("$FindBin::Bin/source_model/*")) {
+        diag("Copying " . basename($file));
         copy $file, $config->source_directory;
+        sleep(1); # the sources need different timestamps for stable baselines
+
     }
 
     ok($plerd->publish_all(verbose => 1), "Published entire source");
+
     my $pub_dir = $plerd->config->publication_directory;
     my @pub_files = $pub_dir->children;
 
-    my $baseline_dir = Path::Class::Dir->new("$FindBin::Bin/baselines/new-site/docroot");
-    my $title_pattern = q[^\d{4}-\d{2}-\d{2}-];
+    my $title_pattern = q[^\d+y\d+m\d+d_\d+h\d+m\d+s];
 
     while (my $baseline = $baseline_dir->next) {
         next if -d $baseline;
@@ -309,6 +315,11 @@ sub TestDefaultSiteAgainstBaseline {
             }
         }
 
+        if (!$got_file) {
+            ok(0, "Could not find a baseline for " . $baseline->basename);
+            next;
+        }
+
         ok(-e $got_file, "Found published target: " . $got_file->basename);
         my $got = -s $got_file;
         my $expected = -s $baseline;
@@ -316,6 +327,19 @@ sub TestDefaultSiteAgainstBaseline {
         # negative numbers means $got is missing expected strings
         # positive means $got produced more output than expected
         ok(abs($delta) < 40, "  [diff: $delta] context within tolerance of baseline: " . $baseline->basename);
+=pod
+        if (abs($delta) >= 40) {
+            if ($^O ne 'MSWin32') {
+                my $diff = '/usr/bin/diff';
+                if (-x $diff) {
+                    diag('Diffing the expected against got');
+                    my $cmd = sprintf('%s %s %s', $diff, $baseline->stringify, $got_file->stringify);
+                    diag(qx($cmd));
+                    diag('#'x75)
+                }
+            }
+        }
+=cut
     }
 
     $plerd->config->path->rmtree;
@@ -336,7 +360,7 @@ sub TestPublishNotes {
 
     ok($config->initialize, "Creating default test site");
 
-    for my $file (glob("$FindBin::Bin/source_model/notes/*")) {
+    for my $file (glob("$FindBin::Bin/source_notes/*")) {
         copy $file, $config->source_notes_directory;
     }
 
@@ -348,7 +372,7 @@ sub TestPublishNotes {
             source_file => $file
         );
 
-        ok($plerd->publish_note($note, verbose => 1), "Published " . $note->publication_file->basename);
+        ok($plerd->publish_note($note, verbose => 0), "Published " . $note->publication_file->basename);
 
     }
 
@@ -361,13 +385,13 @@ sub TestPublishNotes {
 sub Main {
     setup();
 
-    TestInvoked();
+    #TestInvoked();
     TestSourceListing();
-    TestPublishingOnePost();
-    TestPublishNotes();
-    TestTagMemory();
-    TestArchiveRSSRecentPages();
-    TestPublishAll();
+    #TestPublishingOnePost();
+    #TestPublishNotes();
+    #TestTagMemory();
+    #TestArchiveRSSRecentPages();
+    #TestPublishAll();
     TestDefaultSiteAgainstBaseline();
 
     teardown();

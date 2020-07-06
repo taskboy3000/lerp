@@ -48,14 +48,15 @@ has 'date' => (
 sub _build_date {
     my ($self) = @_;
 
-    my ( $filename_year, $filename_month, $filename_day ) =
-        $self->source_file->basename =~ /^(\d\d\d\d)-(\d\d)-(\d\d)/;
+    my ( $filename_year, $filename_month, $filename_day,
+    $filename_hour, $filename_minute, $filename_second) =
+        $self->source_file->basename =~ /^(\d{4})y(\d{2})m(\d{2})d_(\d{2})h(\d{2})m(\d{2})s/;
 
     # Set the post's date, using these rules:
     # * If the post has a time attribute in W3 format, use that
     # * Elsif the post's filename asserts a date, use midnight of that date,
     #   and also add a time attribute to the file.
-    # * Else use right now, and also add a time attribute to the file.
+    # * Else use the mtime of the source file and also add a time attribute to the file.
     my $dt;
     my $now = DateTime->now( time_zone => 'local' );
     if ( $self->attributes->{ time } ) {
@@ -72,22 +73,22 @@ sub _build_date {
         # publication hour.
         # If the filename's date is today (locally), use the current time.
         # Otherwise, use midnight of the provided date.
-        my $ymd = $now->ymd( q{-} );
-        if ( $self->source_file->basename =~ /^$ymd/ ) {
-            $dt = $now;
-        } else {
-            $dt = DateTime->new(
-                year => $filename_year,
-                month => $filename_month,
-                day => $filename_day,
-                time_zone => 'local',
-            );
-        }
+        $dt = DateTime->new(
+            year      => $filename_year,
+            month     => $filename_month, 
+            day       => $filename_day,
+            hour      => $filename_hour,
+            minute    => $filename_minute,
+            second    => $filename_second,
+            time_zone => 'local'
+        );
         $self->attributes_have_changed(1);
     } else {
         # The file doesn't name the time, *and* the file doesn't contain the date
-        # in metadata (or else we wouldn't be here), so we'll just use right-now.
-        $dt = $now;
+        # in metadata (or else we wouldn't be here), so we'll just use mtime.
+        my $mtime = $self->source_file_mtime;
+
+        $dt = DateTime->from_epoch(epoch => $mtime, time_zone => 'local');
         $self->attributes_have_changed(1);
     }
 
@@ -241,7 +242,7 @@ sub _build_published_filename {
 
     # If the source filename already seems Plerdish, just replace its extension.
     # Else, generate a Plerdish filename based on the post's date and title.
-    if ( $filename =~ /^(\d\d\d\d)-(\d\d)-(\d\d)/ ) {
+    if ( $filename =~ /^\d{4}y\d{2}m\d{2}d_\d{2}h\d{2}m\d{2}s-/ ) {
         $filename =~ s/\..*$/.html/;
     } else {
         $filename = $self->title;
@@ -252,7 +253,17 @@ sub _build_published_filename {
         $filename =~ s/[^A-Z0-9\-]+//ig; # \w breaks on smartypants
 
         $filename = lc $filename;
-        $filename = $self->date->ymd( q{-} ) . q{-} . $filename;
+        # $filename = $self->date->ymd( q{-} ) . q{-} . $filename;
+        my $d = $self->date;
+        $filename = sprintf("%04dy%02dm%02dd_%02dh%02dm%02ds-%s",
+            $d->year,
+            $d->month,
+            $d->day,
+            $d->hour,
+            $d->minute,
+            $d->second,
+            $filename,
+        );
         $filename .= '.html';
     }
 

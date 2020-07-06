@@ -360,7 +360,7 @@ sub publish_rss_feed {
 
     my $max_posts = $self->config->show_max_posts;
 
-    my @latest_keys = @{ $post_memory->latest_keys };
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $post_memory->keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
@@ -411,7 +411,7 @@ sub publish_json_feed {
     my @posts;
 
     my $max_posts = $self->config->show_max_posts;
-    my @latest_keys = @{ $post_memory->latest_keys };
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $post_memory->keys };
 
     for my $key (@latest_keys) {
         if ($max_posts-- < 0){
@@ -463,11 +463,9 @@ sub publish_front_page {
 
     my $max_posts = $self->config->show_max_posts;
 
-    # @fixme - need to regen?
-
     my $post_memory = $self->config->post_memory;
     my @posts;
-    my @latest_keys = @{ $post_memory->latest_keys };
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $post_memory->keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 1){
             last;
@@ -519,8 +517,7 @@ sub publish_archive_page {
     my $post_memory = $self->config->post_memory;
     my @posts;
 
-    my @latest_keys = @{ $post_memory->latest_keys };
-    for my $key ( @latest_keys ) {
+    for my $key ( @{ $post_memory->keys } ) {
         my $rec = $post_memory->load($key);
         if (!-e $rec->{source_file}) {
             $self->forget_post($key => $rec);
@@ -533,6 +530,9 @@ sub publish_archive_page {
             push @posts, $post;
         }
     }
+
+    # put these in publication order
+    @posts = sort { $a->publication_file->basename cmp $b->publication_file->basename } @posts;
 
     if ($self->_publish(
         $feed->template_file,
@@ -635,7 +635,10 @@ sub publish_all {
     }
 
     my @source_files;
-    while (my $source_file = $self->next_source_file) {
+    for (my $source_file = $self->first_source_file;
+        defined($source_file);
+        $source_file = $self->next_source_file)
+    {
         if (defined $latest_post && !$opts{force}) {
             my $src_mtime = $source_file->stat->mtime;
             if ($src_mtime <= $latest_post_mtime) {
@@ -687,7 +690,12 @@ sub get_recent_posts {
 
     my $post_memory = $self->config->post_memory;
     my @posts;
-    my @latest_keys = @{ $post_memory->latest_keys };
+
+    # This is imperfect, since publising two posts on the same day
+    # returns a list in alpha, not published order.
+
+    my $keys = $post_memory->keys;
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
@@ -741,30 +749,34 @@ sub forget_post {
     return 1;
 }
 
+sub first_source_file {
+    my ($self) = @_;
+    $self->clear_sorted_source_files;
+    my @files;
+    while (my $file = $self->config->source_directory->next) {
+        next if -d $file;
+        if ($file->stringify =~ /\.(?:md|markdown)$/) {
+            push @files, $file;
+        }
+    }
+
+    @files = sort { $a->stat->mtime <=> $b->stat->mtime } @files;
+    $self->sorted_source_files(\@files);
+    return shift @files;
+}
+
 sub next_source_file {
     my ($self) = @_;
 
     if (!$self->has_sorted_source_files) {
-        my @files;
-        while (my $file = $self->config->source_directory->next) {
-            next if -d $file;
-            if ($file->stringify =~ /\.(?:md|markdown)$/) {
-                push @files, $file;
-            }
-        }
-
-        @files = sort { $a->stat->mtime <=> $b->stat->mtime } @files;
-        $self->sorted_source_files(\@files);
-    }
-
-    my $file = pop @{ $self->sorted_source_files };
-
-    if (!@{ $self->sorted_source_files }) {
-        $self->clear_sorted_source_files;
         return;
     }
 
-    return $file;
+    if (@{ $self->sorted_source_files } == 0) {
+        return;
+    }
+
+    return shift @{ $self->sorted_source_files };
 }
 
 
@@ -776,10 +788,6 @@ sub _publish {
     $section //= "blog";
     if (!exists $vars->{activeSection}) {
         $vars->{activeSection} = $section;
-    }
-
-    if (!exists $vars->{recent_posts}) {
-        $vars->{recent_posts} = $self->get_recent_posts;
     }
 
     my $tmpl_fh = $template_file->openr;

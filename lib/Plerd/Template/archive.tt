@@ -16,7 +16,7 @@
         <h2 class="bg-info text-light">[% post.month_name %] [% post.year %]</h2>
         <ul id="posts-by-month-[% post.year %]-[% post.month %]">
     [% END %]
-            <li><a class="text-info" href="[% post.uri %]">[% post.title %]</a></li>
+            <li><a href="[% post.uri %]">[% post.title %]</a></li>
     [% current_month = post_month %]
 [% END %]
 

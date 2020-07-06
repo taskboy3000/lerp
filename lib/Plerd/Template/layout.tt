@@ -65,7 +65,7 @@
                     <section class="about pr-1">
                         <h3>About this site</h3>
                         <p>
-                            This is a blog by <a class="text-info" href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
+                            This is a blog by <a href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
                         </p>
                     </section>
                     <br>
@@ -84,16 +84,12 @@
                     <br>
                     <section class="recent_posts pr-1">
                         <h3>Recent Posts</h3>
-                        <ul>
-                        [%- FOREACH post IN recent_posts %]
-                            <li><a class="text-info" href="[% post.uri %]">[% post.title %]</a></li>
-                        [%- END %]
-                        </ul>
+                        <ul id="recent-posts-list"></ul>
                     </section>
                     <br>
                     <section class="pr-1">
                         <h3>HTML Validation</h3>
-                        <a class="text-info" target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
+                        <a target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
                     </section>
                 </div>
             </div>
@@ -102,7 +98,7 @@
         </div>
         <footer class="engine-attribution text-center">
             <p>
-                Powered by <a class="text-info" href="[% config.engine_uri %]">[% config.engine_name %] v[% config.engine_version %]</a>
+                Powered by <a href="[% config.engine_uri %]">[% config.engine_name %] v[% config.engine_version %]</a>
             </p>
         </footer>
     </div>

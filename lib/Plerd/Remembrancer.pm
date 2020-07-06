@@ -13,6 +13,7 @@ use Path::Class::Dir;
 use Path::Class::File;
 
 use Moo;
+use Time::HiRes;
 use YAML;
 
 # Needs to be set by the caller
@@ -47,6 +48,10 @@ sub save {
         } else {
             $entry->parent->mkpath;
         }   
+    }
+
+    if (!-e $entry && ref $payload eq ref {}) {
+        $payload->{created_at} = Time::HiRes::time();
     }
 
     if (ref $payload) {
@@ -122,7 +127,7 @@ sub earliest_keys {
 
 # Chrono keys
 sub latest_keys {
-    my ($self) = @_;
+    my ($self) = shift;
 
     my $filter = sub {
         my ($files) = @_;
@@ -134,6 +139,20 @@ sub latest_keys {
     return [ map { $self->_entry_to_key($_) } @files ];
 }
 
+sub keys_in_created_order {
+    my $self = shift;
+    my $keys = $self->keys;
+
+    my @keys = map {
+            $_->[0]
+        } sort {
+            $a->[-1]->{created_at} <=> $b->[1]->{created_at} 
+        } map {
+            [ $_, $self->load($_) ]
+        } @$keys;
+
+    return \@keys;
+}
 
 sub remove {
     my ($self, $key) = @_;
