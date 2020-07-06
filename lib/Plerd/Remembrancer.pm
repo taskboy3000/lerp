@@ -212,6 +212,11 @@ sub _dir_walk {
             next;
         }
 
+        # no temp file from editors
+        if (substr($thing->basename, -1, 1) eq '~') {
+            next;
+        }
+
         if ($thing->is_dir) {
             push @found, _dir_walk($thing); # pass along filter? 
         } else {
