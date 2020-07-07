@@ -1,1 +1,37 @@
 /* Top-level JS included in all templates */
+function populateRecentPosts (feed) {
+    let list = document.getElementById('recent-posts-list');
+    if (!list) {
+        console.warn("Cannot find 'recent-posts-list'");
+        return;
+    }
+
+    if (feed && feed.items) {
+        for (let item of feed.items) {
+            let li = document.createElement("li");
+            let a = document.createElement("a");
+            a.innerHTML(item.title);
+            a.setAttribute("href", item.url);
+            li.append(a);
+            list.append(li);
+        }
+    }
+}
+
+function getRecentPosts () {
+    let feedURL = '[% jsonFeed.uri.as_string %]';
+    fetch(feedURL)
+        .then(response => {
+            response.text()
+        }).then(doc => { console.log(doc) })
+        /*
+        .then(feed => {
+            populateRecentPosts(feed) 
+        }); */    
+}
+
+function initialize () {
+    getRecentPosts();    
+}
+
+window.addEventListener('DOMContentLoaded', initialize, false);
