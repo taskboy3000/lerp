@@ -273,7 +273,7 @@ sub TestPublishAll {
     for my $update ('good-date.md', 'TODAY-dated-today.md', 'extra-headers.md') {
         Path::Class::File->new($config->source_directory, $update)->touch;    
     }
-    ok($plerd->publish_all(verbose => 1), "Published partial source");
+    ok($plerd->publish_all(verbose => 1), "Published partial sources");
 
     $plerd->config->path->rmtree;
 }

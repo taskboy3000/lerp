@@ -10,24 +10,21 @@ function populateRecentPosts (feed) {
         for (let item of feed.items) {
             let li = document.createElement("li");
             let a = document.createElement("a");
-            a.innerHTML(item.title);
+            a.innerHTML = item.title;
             a.setAttribute("href", item.url);
             li.append(a);
             list.append(li);
         }
+    } else {
+        console.info("No feed found");
     }
 }
 
-function getRecentPosts () {
+async function getRecentPosts () {
     let feedURL = '[% jsonFeed.uri.as_string %]';
-    fetch(feedURL)
-        .then(response => {
-            response.text()
-        }).then(doc => { console.log(doc) })
-        /*
-        .then(feed => {
-            populateRecentPosts(feed) 
-        }); */    
+    let response = await fetch(feedURL);
+    let json = await response.json();
+    populateRecentPosts(json);
 }
 
 function initialize () {
