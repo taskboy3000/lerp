@@ -197,6 +197,7 @@ sub _build_source_directory {
     return Path::Class::Dir->new($self->path, "source");
 }
 
+# @todo: change this to notes_source_directory
 has 'source_notes_directory' => (
     is => 'rw',
     lazy => 1,

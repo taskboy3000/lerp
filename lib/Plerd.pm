@@ -12,6 +12,8 @@ use Plerd::Config;
 use Plerd::Model::Archive;
 use Plerd::Model::FrontPage;
 use Plerd::Model::JSONFeed;
+use Plerd::Model::Note;
+use Plerd::Model::NoteJSONFeed;
 use Plerd::Model::Post;
 use Plerd::Model::RSSFeed;
 use Plerd::Model::SiteCSS;
@@ -21,6 +23,7 @@ use Plerd::Remembrancer;
 
 #-------------------------------
 # Attributes and Builders
+# (Please try to keep this alphabetized)
 #-------------------------------
 has 'archive' => (
     is => 'ro',
@@ -65,6 +68,15 @@ sub _build_json_feed {
     Plerd::Model::JSONFeed->new(config => $self->config);
 }
 
+has 'notes_json_feed' => (
+    is => 'ro',
+    builder => '_build_notes_json_feed'
+);
+sub _build_notes_json_feed {
+    my ($self) = @_;
+    Plerd::Model::NoteJSONFeed->new(config => $self->config);
+}
+
 has 'publisher' => (
     is => 'ro',
     lazy => 1,
@@ -80,6 +92,7 @@ sub _build_publisher {
             config => $self->config,
             frontPage => $self->front_page,
             jsonFeed => $self->json_feed,
+            noteJSONFeed => $self->notes_json_feed,
             rssFeed => $self->rss_feed,
             siteCSS => $self->site_css,
             siteJS => $self->site_js,
@@ -345,48 +358,45 @@ sub publish_tags_index_page {
     die("assert - Publishing failed for tag index");
 }
 
-sub publish_rss_feed {
+sub publish_note_json_feed {
     my ($self) = shift;
     my (%opts) = (
         'force' => 0,
         'verbose' => 0,
         @_
     );
-    my $feed = $self->rss_feed;
-    my $post_memory = $self->config->post_memory;
+    my $feed = $self->notes_json_feed;
+    my $memory = $self->config->notes_memory;
 
-    # @fixme - need to regen?
-    my @posts;
-
+    my @notes;
     my $max_posts = $self->config->show_max_posts;
 
-    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $post_memory->keys };
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $memory->keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
         }
 
-        my $rec = $post_memory->load($key);
+        my $rec = $memory->load($key);
         if (!-e $rec->{source_file}) {
-            $self->forget_post($key => $rec, %opts);
+            $self->forget_note($key => $rec, %opts);
             next;
         }
 
-        my $post = Plerd::Model::Post->new(
+        my $note = Plerd::Model::Note->new(
             config => $self->config,
             source_file => $rec->{source_file}
         );
-        $post->load_source;
-        push @posts, $post;
+        $note->load;
+        push @notes, $note;
     }
 
-    # @fixme: make the structure in perl,
-    # pass to the template like
-    # [% feed.json %]
+    my $json = $self->notes_json_feed->make_feed(\@notes);
+
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts, thisURI => $feed->uri }
+        { feed => $json, thisURI => $feed->uri }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;
@@ -394,7 +404,7 @@ sub publish_rss_feed {
 
         return 1;
     }
-    die("assert - Publishing failed for rss_feed");
+    die("assert - Publishing failed for notes_json_feed");
 }
 
 sub publish_json_feed {
@@ -450,6 +460,57 @@ sub publish_json_feed {
     }
     die("assert - Publishing failed for JSON feed");
 }
+
+
+sub publish_rss_feed {
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+    my $feed = $self->rss_feed;
+    my $post_memory = $self->config->post_memory;
+
+    # @fixme - need to regen?                                                              
+    my @posts;
+
+    my $max_posts = $self->config->show_max_posts;
+
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $post_memory->keys };
+    for my $key ( @latest_keys ) {
+        if ($max_posts-- < 0){
+            last;
+        }
+
+        my $rec = $post_memory->load($key);
+        if (!-e $rec->{source_file}) {
+            $self->forget_post($key => $rec, %opts);
+            next;
+        }
+
+        my $post = Plerd::Model::Post->new(
+            config => $self->config,
+            source_file => $rec->{source_file}
+        );
+        $post->load_source;
+        push @posts, $post;
+    }
+
+    if ($self->_publish(
+        $feed->template_file,
+        $feed->publication_file,
+        { posts => \@posts, thisURI => $feed->uri }
+    )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;
+        }
+
+        return 1;
+    }
+    die("assert - Publishing failed for rss_feed");
+}
+
 
 # This is the main blog page
 sub publish_front_page {
@@ -651,10 +712,7 @@ sub publish_all {
         push @source_files, $source_file;
     }
 
-    if (!@source_files) {
-        return;
-    }
-
+    my $did_publish = 0;
     for my $source_file (@source_files) {
         my $post = Plerd::Model::Post->new(config => $self->config, source_file => $source_file);
         eval {
@@ -663,14 +721,42 @@ sub publish_all {
         } or do {
             say $@;
         };
+        $did_publish = 1;
     }
 
+    # @todo: be selective about regenerating notes
+    while (my $file = $self->config->source_notes_directory->next) {
+        next if -d $file;
+        my $note = Plerd::Model::Note->new(config => $self->config, source_file => $file);
+        if (-e $note->publication_file
+            || $note->publication_file->stat->mtime > $file->stat->mtime) {
+
+            if ($opts{verbose}) {
+                say "Declining to reprocess old note"
+            }
+            next;
+                
+        }
+        
+        eval {
+            $self->publish_note($note, %opts);
+            $did_publish = 1;
+            1;
+        } or do {
+            say $@;
+        };
+    }
+
+    if (!$did_publish) {
+        return;
+    }
 
     $self->publish_front_page(%opts);
     $self->publish_archive_page(%opts);
     $self->publish_rss_feed(%opts);
     $self->publish_json_feed(%opts);
     $self->publish_tags_index_page(%opts);
+    $self->publish_note_json_feed(%opts);
     $self->publish_site_css_page(%opts);
     $self->publish_site_js_page(%opts);
 
@@ -748,6 +834,38 @@ sub forget_post {
     }
     return 1;
 }
+
+
+sub forget_note {
+    my ($self, $key, $rec) = (shift, shift, shift);
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+
+    if ($opts{verbose}) {
+        say "Forgetting old note: $rec->{source_file}";
+    }
+
+    $self->config->notes_memory->remove($key);
+
+    my $file = Path::Class::File->new(
+        $self->config->publication_directory,
+        @$key
+    );
+
+    if (-e $file) {
+        if ($opts{verbose}) {
+            say "Removing published note: " . $file;
+        }
+
+        $file->remove;
+    }
+
+    return 1;
+}
+
 
 sub first_source_file {
     my ($self) = @_;
