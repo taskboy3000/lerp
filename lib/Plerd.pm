@@ -14,6 +14,7 @@ use Plerd::Model::FrontPage;
 use Plerd::Model::JSONFeed;
 use Plerd::Model::Note;
 use Plerd::Model::NoteJSONFeed;
+use Plerd::Model::NotesRoll;
 use Plerd::Model::Post;
 use Plerd::Model::RSSFeed;
 use Plerd::Model::SiteCSS;
@@ -77,6 +78,16 @@ sub _build_notes_json_feed {
     Plerd::Model::NoteJSONFeed->new(config => $self->config);
 }
 
+has 'notes_roll' => (
+    is => 'ro',
+    builder => '_build_notes_roll'
+);
+sub _build_notes_roll {
+    my ($self) = shift;
+    Plerd::Model::NotesRoll->new(config=> $self->config);
+}
+
+
 has 'publisher' => (
     is => 'ro',
     lazy => 1,
@@ -92,7 +103,7 @@ sub _build_publisher {
             config => $self->config,
             frontPage => $self->front_page,
             jsonFeed => $self->json_feed,
-            noteJSONFeed => $self->notes_json_feed,
+            notesJSONFeed => $self->notes_json_feed,
             rssFeed => $self->rss_feed,
             siteCSS => $self->site_css,
             siteJS => $self->site_js,
@@ -184,7 +195,7 @@ sub publish_post {
 
     if (!$opts{force}) {
         if (my $memory = $post_memory->load($post_key)) {
-            if ($memory->{mtime} >= $post->source_file_mtime) {
+            if ($memory->{mtime} >= $post->source_file->stat->mtime) {
                 # the cache is newer than the source.
                 # decline to proceed.
                 if ($opts{verbose}) {
@@ -237,7 +248,7 @@ sub publish_post {
     $post_memory->save(
         $post->publication_file->basename,
         {
-            mtime => $post->source_file_mtime,
+            mtime => $post->source_file->stat->mtime,
             source_file => $post->source_file->absolute->stringify,
             tags => [ sort map { $_->name } @{ $post->tags } ]
         }
@@ -264,7 +275,7 @@ sub publish_note {
 
     if (!$opts{force}) {
         if (my $m = $memory->load($key)) {
-            if ($m->{mtime} >= $note->source_file_mtime) {
+            if ($m->{mtime} >= $note->source_file->stat->mtime) {
                 # the cache is newer than the source.
                 # decline to proceed.
                 if ($opts{verbose}) {
@@ -313,7 +324,7 @@ sub publish_note {
     $memory->save(
         $note->publication_file->basename,
         {
-            mtime => $note->source_file_mtime,
+            mtime => $note->source_file->stat->mtime,
             source_file => $note->source_file->absolute->stringify,
             tags => [ sort map { $_->name } @{ $note->tags } ]
         }
@@ -322,6 +333,50 @@ sub publish_note {
     return 1;
 }
 
+sub publish_notes_roll {
+    my ($self) = @_;
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+    my $feed = $self->notes_json_feed;
+    my $memory = $self->config->notes_memory;
+
+    my @notes;
+
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $memory->keys };
+    for my $key ( @latest_keys ) {
+
+        my $rec = $memory->load($key);
+        if (!-e $rec->{source_file}) {
+            $self->forget_note($key => $rec, %opts);
+            next;
+        }
+
+        my $note = Plerd::Model::Note->new(
+            config => $self->config,
+            source_file => $rec->{source_file}
+        );
+        $note->load;
+        push @notes, $note;
+    }
+
+    if ($self->_publish(
+        $feed->template_file,
+        $feed->publication_file,
+        { notes => \@notes, thisURI => $feed->uri }
+    )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;
+        }
+
+        return 1;
+    }
+
+    die("assert - Publishing failed for notes_roll");
+}
 
 sub publish_tags_index_page {
     my ($self) = (shift);
@@ -712,7 +767,7 @@ sub publish_all {
         push @source_files, $source_file;
     }
 
-    my $did_publish = 0;
+    my ($did_publish_posts, $did_publish_notes) = (0, 0);
     for my $source_file (@source_files) {
         my $post = Plerd::Model::Post->new(config => $self->config, source_file => $source_file);
         eval {
@@ -721,7 +776,7 @@ sub publish_all {
         } or do {
             say $@;
         };
-        $did_publish = 1;
+        $did_publish_posts = 1;
     }
 
     # @todo: be selective about regenerating notes
@@ -740,23 +795,32 @@ sub publish_all {
         
         eval {
             $self->publish_note($note, %opts);
-            $did_publish = 1;
+            $did_publish_notes = 1;
             1;
         } or do {
             say $@;
         };
     }
 
-    if (!$did_publish) {
+    if (!$did_publish_posts && !$did_publish_notes) {
         return;
     }
 
-    $self->publish_front_page(%opts);
-    $self->publish_archive_page(%opts);
-    $self->publish_rss_feed(%opts);
-    $self->publish_json_feed(%opts);
+    if ($did_publish_posts) {
+        $self->publish_front_page(%opts);
+        $self->publish_archive_page(%opts);
+        $self->publish_rss_feed(%opts);
+        $self->publish_json_feed(%opts);
+    }
+
+    if ($did_publish_notes) {
+        $self->publish_note_json_feed(%opts);
+        $self->publish_notes_roll(%opts);
+    }
+
+    # Cannot get to this point unless there is new content
+    # always republish these
     $self->publish_tags_index_page(%opts);
-    $self->publish_note_json_feed(%opts);
     $self->publish_site_css_page(%opts);
     $self->publish_site_js_page(%opts);
 

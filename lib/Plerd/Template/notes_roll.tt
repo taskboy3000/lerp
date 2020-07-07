@@ -1,0 +1,11 @@
+[% WRAPPER 'layout.tt' %]
+<br>
+<h2>Recent notes</h2>
+
+<hr>
+
+[% FOREACH note = notes %]  
+    [% INCLUDE "_note.tt" note = note %]
+[% END %]
+
+[% END %]

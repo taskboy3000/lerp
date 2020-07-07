@@ -86,7 +86,7 @@ sub _build_date {
     } else {
         # The file doesn't name the time, *and* the file doesn't contain the date
         # in metadata (or else we wouldn't be here), so we'll just use mtime.
-        my $mtime = $self->source_file_mtime;
+        my $mtime = $self->source_file->stat->mtime;
 
         $dt = DateTime->from_epoch(epoch => $mtime, time_zone => 'local');
         $self->attributes_have_changed(1);
@@ -419,22 +419,6 @@ has 'source_file' => (
 );
 has 'source_file_loaded' => (is => 'rw', default => sub { 0 });
 
-has 'source_file_mtime' => (
-    is => 'ro', 
-    lazy => 1,
-    clearer => 1, 
-    builder => '_build_source_file_mtime'
-);
-sub _build_source_file_mtime {
-    my ($self) = @_;
-    if (-e $self->source_file->stringify) {
-        my $stat = $self->source_file->stat();
-        return $stat->mtime;
-    } 
-
-    die("assert - source file cannot be found: " . $self->source_file);
-}
-
 has 'stripped_body' => (
     is => 'ro', 
     lazy => 1, 
@@ -511,7 +495,7 @@ has 'updated_timestamp' => (
 sub _build_updated_timestamp {
     my $self = shift;
 
-    my $mtime = $self->source_file_mtime;
+    my $mtime = $self->source_file->stat->mtime;
 
     my $formatter = DateTime::Format::W3CDTF->new;
     my $timestamp = $formatter->format_datetime(

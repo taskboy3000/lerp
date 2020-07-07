@@ -1,0 +1,3 @@
+<div class="h-entry note">
+    <div class="e-content">[% note.body %]</div>
+</div>

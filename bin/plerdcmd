@@ -190,7 +190,7 @@ sub list_recent_posts {
 
     for my $post (@$recent) {
         printf("[%s] %s published to %s\n",
-            scalar(localtime($post->source_file_mtime)),
+            scalar(localtime($post->source_file->stat->mtime)),
             $post->source_file->basename,
             $post->publication_file->basename,
         );

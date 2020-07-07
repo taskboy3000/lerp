@@ -76,7 +76,6 @@ sub TestPublishingOnePost {
     ok(!$plerd->publish_post($post), "Plerd declined to republish unchanged file: " . $post->source_file->basename);
     sleep(3);
     $source_file->touch;
-    $post->clear_source_file_mtime;
     ok($plerd->publish_post($post, verbose => 1), "Plerd republished an updated source file");
 
     diag("Creating a post with tags");
