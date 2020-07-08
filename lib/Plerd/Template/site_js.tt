@@ -20,6 +20,28 @@ function populateRecentPosts (feed) {
     }
 }
 
+function populateLatestNotes (feed) {
+    let list = document.getElementById('latest-notes-list');
+    if (!list) {
+        console.warn("Cannot find 'latest-notes-list'");
+        return;
+    }
+
+    if (feed && feed.items) {
+        for (let item of feed.items) {
+            let li = document.createElement("li");
+            let a = document.createElement("a");
+            a.innerHTML = item.title;
+            a.setAttribute("href", item.url);
+            li.append(a);
+            list.append(li);
+        }
+    } else {
+        console.info("No feed found");
+    }
+}
+
+
 async function getRecentPosts () {
     let feedURL = '[% jsonFeed.uri.as_string %]';
     let response = await fetch(feedURL);
@@ -27,8 +49,17 @@ async function getRecentPosts () {
     populateRecentPosts(json);
 }
 
+async function getRecentNotes () {
+    let feedURL = '[% notesJSONFeed.uri.as_string %]';
+    let response = await fetch(feedURL);
+    let json = await response.json();
+    populateLatestNotes(json);
+
+}
+
 function initialize () {
-    getRecentPosts();    
+    getRecentPosts();
+    getRecentNotes();    
 }
 
 window.addEventListener('DOMContentLoaded', initialize, false);

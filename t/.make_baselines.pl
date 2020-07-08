@@ -44,6 +44,13 @@ sub Main {
         sleep(1); # the sources need different timestamps for stable baselines
     }
 
+    for my $file (sort glob("$FindBin::Bin/source_notes/*")) {
+        my $src = Path::Class::File->new($file);
+        say "Copying " . $src->basename;
+        copy($src, $plerd->config->source_notes_directory);
+        sleep(1);
+    }
+
     say "Publishing temp site";
     $plerd->publish_all(verbose => 1);
 

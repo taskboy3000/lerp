@@ -262,6 +262,10 @@ sub TestPublishAll {
         copy $file, $config->source_directory;
     }
 
+    for my $file (glob("$FindBin::Bin/source_notes/*")) {
+        copy $file, $config->source_notes_directory;
+    }
+
     ok($plerd->publish_all(verbose => 1), "Published entire source");
 
     sleep(3);

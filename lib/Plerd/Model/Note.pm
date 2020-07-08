@@ -2,6 +2,8 @@
 package Plerd::Model::Note;
 use Modern::Perl '2018';
 
+use DateTime;
+use DateTime::Format::W3CDTF;
 use HTML::Strip;
 use Path::Class::File;
 use Moo;
@@ -13,7 +15,10 @@ use Plerd::Model::Tag;
 #-------------------------
 # Attributes and Builders
 #-------------------------
-has 'body' => (is => 'rw', predicate => 1);
+has 'body' => (
+    is => 'rw',
+    predicate => 1,
+);
 
 has 'config' => (
     is => 'ro', 
@@ -22,6 +27,18 @@ has 'config' => (
 );
 sub _build_config {
     Plerd::Config->new();    
+}
+
+has 'date' => (
+    is => 'rw', 
+    lazy => 1, 
+    builder => '_build_date',
+);
+sub _build_date {
+    my ($self) = @_;
+
+    my $mtime = $self->source_file->stat->mtime;
+    DateTime->from_epoch(epoch => $mtime, time_zone => 'local');
 }
 
 has 'publication_file' => (
@@ -49,6 +66,21 @@ sub _build_publication_file {
     }
 
     return $file;
+}
+
+
+has 'published_timestamp' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_published_timestamp'
+);
+sub _build_published_timestamp {
+    my $self = shift;
+
+    my $formatter = DateTime::Format::W3CDTF->new;
+    my $timestamp = $formatter->format_datetime( $self->date );
+
+    return $timestamp;
 }
 
 has 'source_file' => (
@@ -203,7 +235,7 @@ sub load {
 
 sub _strip_html {
     my ($raw_text) = @_;
-
+    return unless $raw_text;
     my $stripped = HTML::Strip->new->parse( $raw_text );
 
     # Clean up apparently orphaned punctuation

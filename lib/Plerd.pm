@@ -334,7 +334,6 @@ sub publish_note {
 }
 
 sub publish_notes_roll {
-    my ($self) = @_;
     my ($self) = shift;
     my (%opts) = (
         'force' => 0,
@@ -359,7 +358,7 @@ sub publish_notes_roll {
             config => $self->config,
             source_file => $rec->{source_file}
         );
-        $note->load;
+        $note = $note->load;
         push @notes, $note;
     }
 
@@ -413,7 +412,7 @@ sub publish_tags_index_page {
     die("assert - Publishing failed for tag index");
 }
 
-sub publish_note_json_feed {
+sub publish_notes_json_feed {
     my ($self) = shift;
     my (%opts) = (
         'force' => 0,
@@ -442,7 +441,7 @@ sub publish_note_json_feed {
             config => $self->config,
             source_file => $rec->{source_file}
         );
-        $note->load;
+        $note = $note->load;
         push @notes, $note;
     }
 
@@ -780,26 +779,28 @@ sub publish_all {
     }
 
     # @todo: be selective about regenerating notes
-    while (my $file = $self->config->source_notes_directory->next) {
-        next if -d $file;
-        my $note = Plerd::Model::Note->new(config => $self->config, source_file => $file);
-        if (-e $note->publication_file
-            || $note->publication_file->stat->mtime > $file->stat->mtime) {
+    if (-d $self->config->source_notes_directory) {
+        while (my $file = $self->config->source_notes_directory->next) {
+            next if -d $file;
+            my $note = Plerd::Model::Note->new(config => $self->config, source_file => $file);
+            if (-e $note->publication_file
+                && $note->publication_file->stat->mtime > $file->stat->mtime) {
 
-            if ($opts{verbose}) {
-                say "Declining to reprocess old note"
+                if ($opts{verbose}) {
+                    say "Declining to reprocess old note"
+                }
+                next;
+                    
             }
-            next;
-                
+            
+            eval {
+                $self->publish_note($note, %opts);
+                $did_publish_notes = 1;
+                1;
+            } or do {
+                say $@;
+            };
         }
-        
-        eval {
-            $self->publish_note($note, %opts);
-            $did_publish_notes = 1;
-            1;
-        } or do {
-            say $@;
-        };
     }
 
     if (!$did_publish_posts && !$did_publish_notes) {
@@ -814,7 +815,7 @@ sub publish_all {
     }
 
     if ($did_publish_notes) {
-        $self->publish_note_json_feed(%opts);
+        $self->publish_notes_json_feed(%opts);
         $self->publish_notes_roll(%opts);
     }
 
@@ -970,6 +971,10 @@ sub _publish {
     $section //= "blog";
     if (!exists $vars->{activeSection}) {
         $vars->{activeSection} = $section;
+    }
+
+    if (!-d $target_file->parent) {
+        $target_file->parent->mkpath;
     }
 
     my $tmpl_fh = $template_file->openr;
