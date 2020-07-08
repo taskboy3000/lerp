@@ -1,3 +1,14 @@
 [% WRAPPER 'layout.tt' %]
-    [% INCLUDE "_note.tt" note=note %]
+    <div class="single-note">
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="[% notesRoll.uri %]">Notes roll</a>
+                </li>
+                <li class="breadcrumb-item active">Details of '[% note.title %]'</li>
+            </ol>
+        </nav>
+        
+        [% INCLUDE "_note.tt" note=note %]
+    </div>
 [% END %]

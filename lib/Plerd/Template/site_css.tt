@@ -69,12 +69,12 @@ footer.engine-attribution {
 
 
 /* component-specific styling */
-article.post {
+.post {
     margin-top: 10px;
     padding-bottom: 10px;
 }
 
-article.post.h-entry h2.bg-info {
+.post.h-entry h2.bg-info {
     padding: 5px 0 5px 10px; 
 }
 
@@ -102,6 +102,32 @@ article pre {
     padding: 5px 10px;
 }
 
+.single-note nav {
+    margin-left: -15px;
+}
+
+.h-entry.note {
+    padding-bottom: 20px;
+}
 .h-entry.note .e-content {
     white-space: pre;
+    margin-right: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.h-entry.note .masthead {
+    font-style: italic;
+    background-color: var(--info);
+    color: var(--light);
+    padding: 10px 0 10px 10px;
+    margin-bottom: 10px;
+}
+
+.h-entry.note .masthead a,
+.h-entry.note .masthead a.p-author.h-card,
+.h-entry.note .masthead a:active,
+.h-entry.note .masthead a:visted,
+.h-entry.note .masthead a:focus {
+    color: var(--light);
 }

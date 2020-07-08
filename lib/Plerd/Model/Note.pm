@@ -127,6 +127,18 @@ sub _build_title {
     }
 
 }
+has 'utc_date' => (
+    is => 'rw', 
+    lazy => 1, 
+    builder => '_build_utc_date'
+);
+sub _build_utc_date {
+    my $self = shift;
+
+    my $dt = $self->date->clone;
+    $dt->set_time_zone( 'UTC' );
+    return $dt;
+}
 
 has 'uri' => (
     is => 'ro',

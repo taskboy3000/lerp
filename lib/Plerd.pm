@@ -87,7 +87,6 @@ sub _build_notes_roll {
     Plerd::Model::NotesRoll->new(config=> $self->config);
 }
 
-
 has 'publisher' => (
     is => 'ro',
     lazy => 1,
@@ -104,6 +103,7 @@ sub _build_publisher {
             frontPage => $self->front_page,
             jsonFeed => $self->json_feed,
             notesJSONFeed => $self->notes_json_feed,
+            notesRoll => $self->notes_roll,
             rssFeed => $self->rss_feed,
             siteCSS => $self->site_css,
             siteJS => $self->site_js,
@@ -759,7 +759,7 @@ sub publish_all {
                 next;
             };
 
-            if ($self->should_publish_post($post)) {
+            if ($self->should_publish_post($post) || $opts{force}) {
                 eval {
                     $self->publish_post($post, %opts);
                     $did_publish_posts = 1;
@@ -789,19 +789,21 @@ sub publish_all {
                 source_file => $file,
             );
 
-            if (!$self->should_publish_note($note)) {
+            if ($self->should_publish_note($note) || $opts{force}) {
+                eval {
+                    $self->publish_note($note, %opts);
+                    $did_publish_notes = 1;
+                    1;
+                } or do {
+                    say $@;
+                };
+            } else {
                 if ($opts{verbose}) {
                     say "Declining to reprocess old note: " . $file->basename;
                 }
                 next;                    
+
             }
-            eval {
-                $self->publish_note($note, %opts);
-                $did_publish_notes = 1;
-                1;
-            } or do {
-                say $@;
-            };
         }
     }
 
