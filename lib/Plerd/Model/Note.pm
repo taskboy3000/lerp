@@ -42,7 +42,7 @@ sub _build_date {
 }
 
 has 'publication_file' => (
-    is => 'ro', 
+    is => 'rw', 
     lazy => 1, 
     builder => '_build_publication_file'
 );

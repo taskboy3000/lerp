@@ -292,10 +292,15 @@ sub TestDefaultSiteAgainstBaseline {
 
     ok($config->initialize, "Creating default test site");
     for my $file (sort glob("$FindBin::Bin/source_model/*")) {
-        diag("Copying " . basename($file));
+        diag("Copying post " . basename($file));
         copy $file, $config->source_directory;
         sleep(1); # the sources need different timestamps for stable baselines
 
+    }
+    for my $file (glob("$FindBin::Bin/source_notes/*")) {
+        diag("Copying note " . basename($file));
+        copy $file, $config->source_notes_directory;
+        sleep(1);        
     }
 
     ok($plerd->publish_all(verbose => 1), "Published entire source");

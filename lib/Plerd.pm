@@ -322,9 +322,10 @@ sub publish_note {
 
     # Remember publishing this post
     $memory->save(
-        $note->publication_file->basename,
+        $note->source_file->basename,
         {
             mtime => $note->source_file->stat->mtime,
+            publication_file => $note->publication_file->absolute->stringify,
             source_file => $note->source_file->absolute->stringify,
             tags => [ sort map { $_->name } @{ $note->tags } ]
         }
@@ -732,67 +733,57 @@ sub publish_all {
         say "Looking for new source files in " . $self->config->source_directory;
     }
 
-    my $post_memory = $self->config->post_memory;
-    my ($latest_post) = @{ $post_memory->latest_keys };
-    my $latest_post_mtime;
-    if (defined $latest_post) {
-        my $rec = $post_memory->load($latest_post);
-        if ($rec) {
-            if (! -e $rec->{source_file}) {
-                say "Looks like this source file was removed: " . $rec->{source_file};
-                say "Rerun with the --force flag to clean up";
-            } else {
-                $latest_post_mtime = $rec->{mtime};
-            }
-        } else {
-            undef($latest_post_mtime);
-        }
-    }
+    my ($did_publish_posts, $did_publish_notes) = (0, 0);
+ 
+    if (-e $self->config->source_directory) {
+        for (my $source_file = $self->first_source_file;
+            defined($source_file);
+            $source_file = $self->next_source_file)
+        {
+            my $post;
+            eval {
+                $post = Plerd::Model::Post->new(
+                    config => $self->config,
+                    source_file => $source_file
+                );
+                1;
+            } or do {
+                say $@;
+                next;
+            };
 
-    my @source_files;
-    for (my $source_file = $self->first_source_file;
-        defined($source_file);
-        $source_file = $self->next_source_file)
-    {
-        if (defined $latest_post && !$opts{force}) {
-            my $src_mtime = $source_file->stat->mtime;
-            if ($src_mtime <= $latest_post_mtime) {
+            if ($self->should_publish_post($post)) {
+                eval {
+                    $self->publish_post($post, %opts);
+                    $did_publish_posts = 1;
+                    1;
+                } or do {
+                    say $@;
+                };
+
+            } else {
                 if ($opts{verbose}) {
                     say "Declining to reprocess old source: " . $source_file->basename;
                 }
-                next;
             }
         }
-        push @source_files, $source_file;
     }
 
-    my ($did_publish_posts, $did_publish_notes) = (0, 0);
-    for my $source_file (@source_files) {
-        my $post = Plerd::Model::Post->new(config => $self->config, source_file => $source_file);
-        eval {
-            $self->publish_post($post, %opts);
-            1;
-        } or do {
-            say $@;
-        };
-        $did_publish_posts = 1;
-    }
-
-    # @todo: be selective about regenerating notes
-    if (-d $self->config->source_notes_directory) {
+    if (-d $self->config->source_notes_directory) {        
+        # @todo: sort source by mtime
         while (my $file = $self->config->source_notes_directory->next) {
             next if -d $file;
-            my $note = Plerd::Model::Note->new(config => $self->config, source_file => $file);
-            if (-e $note->publication_file
-                && $note->publication_file->stat->mtime > $file->stat->mtime) {
+            my $note = Plerd::Model::Note->new(
+                config => $self->config,
+                source_file => $file,
+            );
 
+            if (!$self->should_publish_note($note)) {
                 if ($opts{verbose}) {
-                    say "Declining to reprocess old note"
+                    say "Declining to reprocess old note: " . $file->basename;
                 }
-                next;
-                    
+                next;                    
             }
-            
             eval {
                 $self->publish_note($note, %opts);
                 $did_publish_notes = 1;
@@ -931,6 +922,68 @@ sub forget_note {
     return 1;
 }
 
+sub should_publish_post {
+    my ($self, $post) = @_;
+    return if !$post;
+
+    my $memory = $self->config->post_memory;
+    if (!$post->source_file_loaded) {
+        eval {
+            $post->load_source;
+            $post->publication_file; # tests bad dates
+            1;
+        } or do {
+            say $@;
+            return;
+        }
+    }
+
+    my $record = $memory->load($post->publication_file->basename);
+    if (!$record) {
+        return 1;
+    }
+
+    if (! -e $post->publication_file) {
+        return 1;
+    }
+
+    if ($post->source_file->stat->mtime > $post->publication_file->stat->mtime) {
+        return 1;
+    }
+
+    return;
+}
+
+sub should_publish_note {
+    my ($self, $note) = @_;
+    return if !$note;
+
+    my $memory = $self->config->notes_memory;
+    my $record = $memory->load($note->source_file->basename);
+    if (!$record) {
+        # Don't remember publishing this note
+        return 1;
+    }
+
+    # This note looks familiar...
+    if ($record->{publication_file}) {
+        my $pub_file = Path::Class::File->new($record->{publication_file});
+        if (!-e $pub_file) {
+            # Someone deleted this from docroot?
+            $note->publication_file($pub_file); # keep the old name
+            return 1;
+        }
+
+        if ($pub_file->stat->mtime < $note->source_file->stat->mtime) {
+            # The note's source was updated
+            $note->publication_file($pub_file); # keep the old name
+            return 1;
+        }
+    }
+
+    # The source has not changed for this published file
+    return;
+}
 
 sub first_source_file {
     my ($self) = @_;
