@@ -5,6 +5,13 @@
         <time class="dt-published" datetime="[% note.utc_date.ymd %]T[% note.utc_date.hms %]+00:00">[% note.date.month_name %] [% note.date.day %], [% note.date.year %]</time>
         by 
         <a class="p-author h-card text-light" href="[% config.base_uri %]">[% config.author_name %]</a>
+
+        :: 
+
+        <a class="u-url u-uid" href="[% note.uri %]">
+           <span class="p-name">Permalink <sup>	⛓</sup></span>
+        </a>
+
     </div>
     <div class="e-content">[% note.body %]</div>
 </div>
