@@ -224,7 +224,8 @@ sub _build_publication_file_mtime {
 has 'published_filename' => (
     is => 'rw',
     lazy => 1, 
-    builder => '_build_published_filename'
+    builder => '_build_published_filename',
+    coerce => \&_coerce_file,
 );
 sub _build_published_filename {
     my $self = shift;

@@ -44,7 +44,8 @@ sub _build_date {
 has 'publication_file' => (
     is => 'rw', 
     lazy => 1, 
-    builder => '_build_publication_file'
+    builder => '_build_publication_file',
+    coerce => \&_coerce_file,
 );
 sub _build_publication_file {
     my ($self) = @_;
@@ -135,7 +136,7 @@ has 'uri' => (
 sub _build_uri {
     my ($self) = @_;
     my $base_uri = $self->config->base_uri;
-    URI->new($base_uri . "/notes/" . $self->publication_file->basename);
+    URI->new($base_uri . "notes/" . $self->publication_file->basename);
 }
 
 #-------------------

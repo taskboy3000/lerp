@@ -131,7 +131,7 @@ sub initialize {
 
     if ($verbose) {
         for my $line (@messages) {
-            printf("%s\n", $line);
+            say $line;
         }
     }
 }

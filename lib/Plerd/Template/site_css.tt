@@ -102,6 +102,6 @@ article pre {
     padding: 5px 10px;
 }
 
-.note .e-content {
+.h-entry.note .e-content {
     white-space: pre;
 }

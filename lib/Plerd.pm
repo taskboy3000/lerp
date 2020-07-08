@@ -341,7 +341,7 @@ sub publish_notes_roll {
         'verbose' => 0,
         @_
     );
-    my $feed = $self->notes_json_feed;
+    my $feed = $self->notes_roll;
     my $memory = $self->config->notes_memory;
 
     my @notes;
@@ -360,6 +360,9 @@ sub publish_notes_roll {
             source_file => $rec->{source_file}
         );
         $note = $note->load;
+        if ($rec->{publication_file}) {
+            $note->publication_file($rec->{publication_file});
+        }
         push @notes, $note;
     }
 
@@ -376,6 +379,58 @@ sub publish_notes_roll {
     }
 
     die("assert - Publishing failed for notes_roll");
+}
+
+sub publish_notes_json_feed {
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+    my $feed = $self->notes_json_feed;
+    my $memory = $self->config->notes_memory;
+
+    my @notes;
+    my $max_posts = $self->config->show_max_posts;
+
+    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $memory->keys };
+    for my $key ( @latest_keys ) {
+        if ($max_posts-- < 0){
+            last;
+        }
+
+        my $rec = $memory->load($key);
+        if (!-e $rec->{source_file}) {
+            $self->forget_note($key => $rec, %opts);
+            next;
+        }
+
+        my $note = Plerd::Model::Note->new(
+            config => $self->config,
+            source_file => $rec->{source_file}
+        );
+        $note = $note->load;
+        if ($rec->{publication_file}) {
+            $note->publication_file($rec->{publication_file});
+        }
+        push @notes, $note;
+    }
+
+    my $json = $self->notes_json_feed->make_feed(\@notes);
+
+    if ($self->_publish(
+        $feed->template_file,
+        $feed->publication_file,
+        { feed => $json, thisURI => $feed->uri }
+    )) {
+        if ($opts{verbose}) {
+            say "Published " . $feed->publication_file->basename;
+        }
+
+        return 1;
+    }
+    die("assert - Publishing failed for notes_json_feed");
 }
 
 sub publish_tags_index_page {
@@ -413,54 +468,6 @@ sub publish_tags_index_page {
     die("assert - Publishing failed for tag index");
 }
 
-sub publish_notes_json_feed {
-    my ($self) = shift;
-    my (%opts) = (
-        'force' => 0,
-        'verbose' => 0,
-        @_
-    );
-    my $feed = $self->notes_json_feed;
-    my $memory = $self->config->notes_memory;
-
-    my @notes;
-    my $max_posts = $self->config->show_max_posts;
-
-    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $memory->keys };
-    for my $key ( @latest_keys ) {
-        if ($max_posts-- < 0){
-            last;
-        }
-
-        my $rec = $memory->load($key);
-        if (!-e $rec->{source_file}) {
-            $self->forget_note($key => $rec, %opts);
-            next;
-        }
-
-        my $note = Plerd::Model::Note->new(
-            config => $self->config,
-            source_file => $rec->{source_file}
-        );
-        $note = $note->load;
-        push @notes, $note;
-    }
-
-    my $json = $self->notes_json_feed->make_feed(\@notes);
-
-    if ($self->_publish(
-        $feed->template_file,
-        $feed->publication_file,
-        { feed => $json, thisURI => $feed->uri }
-    )) {
-        if ($opts{verbose}) {
-            say "Published " . $feed->publication_file->basename;
-        }
-
-        return 1;
-    }
-    die("assert - Publishing failed for notes_json_feed");
-}
 
 sub publish_json_feed {
     my ($self) = shift;
@@ -730,7 +737,7 @@ sub publish_all {
     );
 
     if ($opts{verbose}) {
-        say "Looking for new source files in " . $self->config->source_directory;
+        say "Looking for new post files in " . $self->config->source_directory;
     }
 
     my ($did_publish_posts, $did_publish_notes) = (0, 0);
@@ -769,6 +776,10 @@ sub publish_all {
         }
     }
 
+    if ($opts{verbose}) {
+        say "Looking for new notes files in " . $self->config->source_notes_directory;
+    }
+
     if (-d $self->config->source_notes_directory) {        
         # @todo: sort source by mtime
         while (my $file = $self->config->source_notes_directory->next) {
@@ -794,7 +805,8 @@ sub publish_all {
         }
     }
 
-    if (!$did_publish_posts && !$did_publish_notes) {
+    if (!$opts{force}
+        && (!$did_publish_posts && !$did_publish_notes)) {
         return;
     }
 
