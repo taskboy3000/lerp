@@ -7,11 +7,18 @@
     <title>[% config.title %] :: [% section_title | html %]</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    [% IF post && post.social_meta_tags  %]
+        [% post.social_meta_tags %]
+    [% END %]
+
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="[% rssFeed.uri %]" rel="alternate" title="Atom feed" type="application/atom+xml">
     <link href="[% jsonFeed.uri %]" rel="alternate" title="JSON feed" type="application/json">
 
     <link rel="stylesheet" href="[% siteCSS.uri %]">
+
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-info">

@@ -102,7 +102,6 @@ sub _build_date {
 
 has 'description' => (
     is => 'rw', 
-    predicate => 1, 
     lazy => 1, 
     builder => '_build_description'
 );
@@ -128,15 +127,21 @@ sub _build_guid {
 has 'image' => (
     is => 'rw',
     lazy => 1,
-    predicate => 1,
     builder => '_build_image',
     coerce => \&_coerce_image,
 );
 sub _build_image {
     my $self = shift;
-    if ($self->config->has_image) {
+
+    my $post_image = $self->attributes->{image};
+    if ($post_image) {
+        return $post_image;
+    }
+
+    if ($self->config->image) {
         return $self->config->image;
     }
+
     return;
 }
 sub _coerce_image {
@@ -158,33 +163,11 @@ sub _build_image_alt {
     $self->config->image_alt;
 }
 
-
-=pod
-FIXME -- This is going to be handled by javascript
-has 'newer_post' => (is => 'ro', lazy => 1, builder => '_build_newer_post');
-sub _build_newer_post {
-    my $self = shift;
-
-    my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
-
-    my $newer_post;
-    if ( $index - 1 >= 0 ) {
-        $newer_post = $self->plerd->posts->[ $index - 1 ];
-    }
-
-    return $newer_post;
-}
-has 'older_post' => (is => 'ro', lazy => 1, builder => '_build_older_post');
-sub _build_older_post {
-    my $self = shift;
-
-    my $index = $self->plerd->index_of_post_with_guid->{ $self->guid };
-
-    my $older_post = $self->plerd->posts->[ $index + 1 ];
-
-    return $older_post;
-}
-=cut
+# @todo:
+#   If next/previous articles are desirable, then a feed of publication order of articles
+#   needs to be generated and made amenable to getting this answer.
+#
+#   Something like what is used for the sidebar now.
 
 has 'publication_file' => (
     is => 'ro',
@@ -360,7 +343,7 @@ has 'socialmeta' => (
 sub _build_socialmeta {
     my $self = shift;
 
-    unless ( $self->has_image ) {
+    unless ( $self->image ) {
         # Neither this post nor this whole blog defines an image URL.
         # So, no social meta-tags for this post.
         return;
@@ -406,7 +389,7 @@ sub _build_socialmeta_mode {
     my ($self) = @_;
 
     my $mode = 'summary';
-    if ($self->has_image) {
+    if ($self->image) {
         $mode = 'featured_image';
     }
 
