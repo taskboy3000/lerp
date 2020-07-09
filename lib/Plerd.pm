@@ -282,11 +282,13 @@ sub publish_note {
         $note->publication_file($record->{publication_file});
     }
 
-    if (!$opts{force}) {
-        if (-e $note->publication_file) {
-            if ($note->publication_file->stat->mtime >= $note->source_file->stat->mtime) {
-                # the cache is newer than the source.
-                # decline to proceed.
+    my $published_file_exists = (-e $note->publication_file);
+    my $must_republish = ($opts{force} || !$publish_file_exists);
+    if (!$must_republish) {
+            # ought I to republish?
+            if ($published_file_exists 
+                && ($note->publication_file->stat->mtime >= $note->source_file->stat->mtime)
+            ) {
                 if ($opts{verbose}) {
                     say "Declining to reprocess unchanged " . $note->source_file->basename;
                 }
