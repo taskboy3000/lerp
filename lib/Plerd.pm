@@ -346,7 +346,7 @@ sub publish_notes_roll {
 
     my @notes;
 
-    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $memory->keys };
+    my @latest_keys = @{ $memory->latest_keys };
     for my $key ( @latest_keys ) {
 
         my $rec = $memory->load($key);
