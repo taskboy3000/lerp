@@ -269,13 +269,23 @@ sub publish_note {
         die("assert - post has no source file");
     }
 
+    if (!$note->source_file_loaded) {
+        $note = $note->load();
+    }
+
     # Does this note need to be regenerated?
     my $memory = $self->config->notes_memory;
-    my $key = $note->publication_file->basename;
+    my $key = $note->source_file->basename;
+    my $record = $memory->load($key);
 
-    if (!$opts{force}) {
-        if (my $m = $memory->load($key)) {
-            if ($m->{mtime} >= $note->source_file->stat->mtime) {
+    if ($record && $record->{publication_file}) {
+        $note->publication_file($record->{publication_file});
+    }
+    
+    if (-e $note->publication_file) {
+        # should regenerate it?
+        if (!$opts{force}) {
+            if ($note->publication_file->stat->mtime >= $note->source_file->stat->mtime) {
                 # the cache is newer than the source.
                 # decline to proceed.
                 if ($opts{verbose}) {
@@ -286,9 +296,6 @@ sub publish_note {
         }
     }
 
-    if (!$note->source_file_loaded) {
-        $note = $note->load();
-    }
 
     if (!$note->can_publish) {
         if ($opts{verbose}) {
@@ -321,15 +328,18 @@ sub publish_note {
     }
 
     # Remember publishing this post
-    $memory->save(
-        $note->source_file->basename,
-        {
+    if ($record) {
+        $record->{mtime} = $note->source_file->stat->mtime;
+        $record->{tags} = [ sort map { $_->name } @{ $note->tags } ];
+    } else {
+        $record = {
             mtime => $note->source_file->stat->mtime,
             publication_file => $note->publication_file->absolute->stringify,
             source_file => $note->source_file->absolute->stringify,
             tags => [ sort map { $_->name } @{ $note->tags } ]
-        }
-    );
+        };
+    }
+    $memory->save($note->source_file->basename, $record);
 
     return 1;
 }

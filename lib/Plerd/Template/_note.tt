@@ -9,7 +9,7 @@
         :: 
 
         <a class="u-url u-uid text-light" href="[% note.uri %]">
-           <span class="">Permalink <sup>🔗</sup></span>
+           <span class="">Permalink <sup>&Lscr;</sup></span>
         </a>
 
     </div>
