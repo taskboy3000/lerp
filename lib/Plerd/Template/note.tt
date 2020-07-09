@@ -1,4 +1,4 @@
-[% WRAPPER 'layout.tt' %]
+[% WRAPPER 'layout.tt' section_title = (note.title || "Note") jumbotron=-1%]
     <div class="single-note">
         <nav>
             <ol class="breadcrumb">

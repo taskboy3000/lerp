@@ -1,11 +1,10 @@
-[% WRAPPER 'layout.tt' %]
-<br>
-<h2>Recent notes</h2>
+[% WRAPPER 'layout.tt' section_title = "Notes Roll" %]
 
-<hr>
 
+<div class="notes-roll">
 [% FOREACH note = notes %]  
     [% INCLUDE "_note.tt" note = note %]
 [% END %]
+</div>
 
 [% END %]
