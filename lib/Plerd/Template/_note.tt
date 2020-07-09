@@ -8,7 +8,7 @@
 
         :: 
 
-        <a class="u-url u-uid" href="[% note.uri %]">
+        <a class="u-url u-uid text-light" href="[% note.uri %]">
            <span class="p-name">Permalink <sup>	⛓</sup></span>
         </a>
 
