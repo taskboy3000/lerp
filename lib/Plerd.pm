@@ -281,10 +281,9 @@ sub publish_note {
     if ($record && $record->{publication_file}) {
         $note->publication_file($record->{publication_file});
     }
-    
-    if (-e $note->publication_file) {
-        # should regenerate it?
-        if (!$opts{force}) {
+
+    if (!$opts{force}) {
+        if (-e $note->publication_file) {
             if ($note->publication_file->stat->mtime >= $note->source_file->stat->mtime) {
                 # the cache is newer than the source.
                 # decline to proceed.
@@ -295,7 +294,6 @@ sub publish_note {
             }
         }
     }
-
 
     if (!$note->can_publish) {
         if ($opts{verbose}) {
