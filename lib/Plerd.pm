@@ -346,7 +346,7 @@ sub publish_notes_roll {
 
     my @notes;
 
-    my @latest_keys = @{ $memory->latest_keys };
+    my @latest_keys = reverse @{ $memory->keys_in_created_order };
     for my $key ( @latest_keys ) {
 
         my $rec = $memory->load($key);
@@ -394,7 +394,7 @@ sub publish_notes_json_feed {
     my @notes;
     my $max_posts = $self->config->show_max_posts;
 
-    my @latest_keys = @{ $memory->latest_keys };
+    my @latest_keys = reverse @{ $memory->keys_in_created_order };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
