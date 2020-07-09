@@ -394,7 +394,7 @@ sub publish_notes_json_feed {
     my @notes;
     my $max_posts = $self->config->show_max_posts;
 
-    my @latest_keys = sort { $b->[0] cmp $a->[0] } @{ $memory->keys };
+    my @latest_keys = @{ $memory->latest_keys };
     for my $key ( @latest_keys ) {
         if ($max_posts-- < 0){
             last;
