@@ -14,30 +14,30 @@
 
   <entry>
     <title type="html"><![CDATA[Two tags]]></title>
-    <link href="http://localhost/2020y07m07d_22h02m49s-two-tags.html"/>
-    <published>2020-07-07T22:02:49-04:00</published>
-    <updated>2020-07-07T22:02:55-04:00</updated>
-    <id>http://localhost/2020y07m07d_22h02m49s-two-tags.html</id>
+    <link href="http://localhost/2020y07m10d_15h29m25s-two-tags.html"/>
+    <published>2020-07-10T15:29:25-04:00</published>
+    <updated>2020-07-10T15:29:31-04:00</updated>
+    <id>http://localhost/2020y07m10d_15h29m25s-two-tags.html</id>
     <content type="html"><![CDATA[<p>This is a perfectly good and typical source file.</p>
 ]]></content>
   </entry>
 
   <entry>
     <title type="html"><![CDATA[One tag]]></title>
-    <link href="http://localhost/2020y07m07d_22h02m48s-one-tag.html"/>
-    <published>2020-07-07T22:02:48-04:00</published>
-    <updated>2020-07-07T22:02:55-04:00</updated>
-    <id>http://localhost/2020y07m07d_22h02m48s-one-tag.html</id>
+    <link href="http://localhost/2020y07m10d_15h29m24s-one-tag.html"/>
+    <published>2020-07-10T15:29:24-04:00</published>
+    <updated>2020-07-10T15:29:31-04:00</updated>
+    <id>http://localhost/2020y07m10d_15h29m24s-one-tag.html</id>
     <content type="html"><![CDATA[<p>This is a perfectly good and typical source file.</p>
 ]]></content>
   </entry>
 
   <entry>
     <title type="html"><![CDATA[Has hashtags]]></title>
-    <link href="http://localhost/2020y07m07d_22h02m47s-has-hashtags.html"/>
-    <published>2020-07-07T22:02:47-04:00</published>
-    <updated>2020-07-07T22:02:55-04:00</updated>
-    <id>http://localhost/2020y07m07d_22h02m47s-has-hashtags.html</id>
+    <link href="http://localhost/2020y07m10d_15h29m23s-has-hashtags.html"/>
+    <published>2020-07-10T15:29:23-04:00</published>
+    <updated>2020-07-10T15:29:31-04:00</updated>
+    <id>http://localhost/2020y07m10d_15h29m23s-has-hashtags.html</id>
     <content type="html"><![CDATA[<p>This is a test to see if we might accept tags with # but silently drop them from the tag list.</p>
 
 <p>When we reserialize this source file, the octothorpes will be removed.</p>
@@ -48,30 +48,30 @@
 
   <entry>
     <title type="html"><![CDATA[no-title]]></title>
-    <link href="http://localhost/2020y07m07d_22h02m46s-no-title.html"/>
-    <published>2020-07-07T22:02:46-04:00</published>
-    <updated>2020-07-07T22:02:55-04:00</updated>
-    <id>http://localhost/2020y07m07d_22h02m46s-no-title.html</id>
+    <link href="http://localhost/2020y07m10d_15h29m22s-no-title.html"/>
+    <published>2020-07-10T15:29:22-04:00</published>
+    <updated>2020-07-10T15:29:31-04:00</updated>
+    <id>http://localhost/2020y07m10d_15h29m22s-no-title.html</id>
     <content type="html"><![CDATA[<p>Uh oh, this file doesn’t have a title!</p>
 ]]></content>
   </entry>
 
   <entry>
     <title type="html"><![CDATA[Metatags]]></title>
-    <link href="http://localhost/2020y07m07d_22h02m45s-metatags.html"/>
-    <published>2020-07-07T22:02:45-04:00</published>
-    <updated>2020-07-07T22:02:55-04:00</updated>
-    <id>http://localhost/2020y07m07d_22h02m45s-metatags.html</id>
+    <link href="http://localhost/2020y07m10d_15h29m21s-metatags.html"/>
+    <published>2020-07-10T15:29:21-04:00</published>
+    <updated>2020-07-10T15:29:31-04:00</updated>
+    <id>http://localhost/2020y07m10d_15h29m21s-metatags.html</id>
     <content type="html"><![CDATA[<p>This file sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
 ]]></content>
   </entry>
 
   <entry>
     <title type="html"><![CDATA[Metatags with image]]></title>
-    <link href="http://localhost/2020y07m07d_22h02m44s-metatags-with-image.html"/>
-    <published>2020-07-07T22:02:44-04:00</published>
-    <updated>2020-07-07T22:02:55-04:00</updated>
-    <id>http://localhost/2020y07m07d_22h02m44s-metatags-with-image.html</id>
+    <link href="http://localhost/2020y07m10d_15h29m20s-metatags-with-image.html"/>
+    <published>2020-07-10T15:29:20-04:00</published>
+    <updated>2020-07-10T15:29:31-04:00</updated>
+    <id>http://localhost/2020y07m10d_15h29m20s-metatags-with-image.html</id>
     <content type="html"><![CDATA[<p><a href="https://en.wikipedia.org/wiki/Coconut#/media/File:Cocos_nucifera_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-187.jpg">This file</a> sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
 
 <p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description! It does have a hyperlink in the first paragraph, though.</p>

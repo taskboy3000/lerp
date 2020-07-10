@@ -66,6 +66,11 @@ image_alt: [% config.image_alt %]
 # the number of items in the RSS and JSON feeds
 show_max_posts: [% config.show_max_posts %]
 
+# Interested in indieweb's Web Mentions? https://www.w3.org/TR/webmention/
+# Setup a web mention listener like whim (https://github.com/jmacdotorg/whim)
+# Then add the URL below.
+webmention_endpoint: [% config.webmention_endpoint %]
+
 ######################
 # Split-location setup
 ######################

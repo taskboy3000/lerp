@@ -8,45 +8,45 @@
    "items" : [
       {
          "content_html" : "<p>This is a perfectly good and typical source file.</p>\n",
-         "date_published" : "2020-07-07T22:02:49-04:00",
-         "id" : "http://localhost/2020y07m07d_22h02m49s-two-tags.html",
+         "date_published" : "2020-07-10T15:29:25-04:00",
+         "id" : "http://localhost/2020y07m10d_15h29m25s-two-tags.html",
          "title" : "Two tags",
-         "url" : "http://localhost/2020y07m07d_22h02m49s-two-tags.html"
+         "url" : "http://localhost/2020y07m10d_15h29m25s-two-tags.html"
       },
       {
          "content_html" : "<p>This is a perfectly good and typical source file.</p>\n",
-         "date_published" : "2020-07-07T22:02:48-04:00",
-         "id" : "http://localhost/2020y07m07d_22h02m48s-one-tag.html",
+         "date_published" : "2020-07-10T15:29:24-04:00",
+         "id" : "http://localhost/2020y07m10d_15h29m24s-one-tag.html",
          "title" : "One tag",
-         "url" : "http://localhost/2020y07m07d_22h02m48s-one-tag.html"
+         "url" : "http://localhost/2020y07m10d_15h29m24s-one-tag.html"
       },
       {
          "content_html" : "<p>This is a test to see if we might accept tags with # but silently drop them from the tag list.</p>\n\n<p>When we reserialize this source file, the octothorpes will be removed.</p>\n\n<p>I’m OK with this (re: iOS Bear app).</p>\n",
-         "date_published" : "2020-07-07T22:02:47-04:00",
-         "id" : "http://localhost/2020y07m07d_22h02m47s-has-hashtags.html",
+         "date_published" : "2020-07-10T15:29:23-04:00",
+         "id" : "http://localhost/2020y07m10d_15h29m23s-has-hashtags.html",
          "title" : "Has hashtags",
-         "url" : "http://localhost/2020y07m07d_22h02m47s-has-hashtags.html"
+         "url" : "http://localhost/2020y07m10d_15h29m23s-has-hashtags.html"
       },
       {
          "content_html" : "<p>Uh oh, this file doesn’t have a title!</p>\n",
-         "date_published" : "2020-07-07T22:02:46-04:00",
-         "id" : "http://localhost/2020y07m07d_22h02m46s-no-title.html",
+         "date_published" : "2020-07-10T15:29:22-04:00",
+         "id" : "http://localhost/2020y07m10d_15h29m22s-no-title.html",
          "title" : "no-title",
-         "url" : "http://localhost/2020y07m07d_22h02m46s-no-title.html"
+         "url" : "http://localhost/2020y07m10d_15h29m22s-no-title.html"
       },
       {
          "content_html" : "<p>This file sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n",
-         "date_published" : "2020-07-07T22:02:45-04:00",
-         "id" : "http://localhost/2020y07m07d_22h02m45s-metatags.html",
+         "date_published" : "2020-07-10T15:29:21-04:00",
+         "id" : "http://localhost/2020y07m10d_15h29m21s-metatags.html",
          "title" : "Metatags",
-         "url" : "http://localhost/2020y07m07d_22h02m45s-metatags.html"
+         "url" : "http://localhost/2020y07m10d_15h29m21s-metatags.html"
       },
       {
          "content_html" : "<p><a href=\"https://en.wikipedia.org/wiki/Coconut#/media/File:Cocos_nucifera_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-187.jpg\">This file</a> sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>\n\n<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description! It does have a hyperlink in the first paragraph, though.</p>\n",
-         "date_published" : "2020-07-07T22:02:44-04:00",
-         "id" : "http://localhost/2020y07m07d_22h02m44s-metatags-with-image.html",
+         "date_published" : "2020-07-10T15:29:20-04:00",
+         "id" : "http://localhost/2020y07m10d_15h29m20s-metatags-with-image.html",
          "title" : "Metatags with image",
-         "url" : "http://localhost/2020y07m07d_22h02m44s-metatags-with-image.html"
+         "url" : "http://localhost/2020y07m10d_15h29m20s-metatags-with-image.html"
       }
    ],
    "title" : "Another Plerd Blog",

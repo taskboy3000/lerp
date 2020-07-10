@@ -236,6 +236,11 @@ sub _build_template_directory {
 has 'title' => (is => 'rw', default => sub { "Another Plerd Blog" });
 has twitter_id => (is => 'rw', predicate => 1);
 
+has 'webmention_endpoint' => (
+    is => 'rw',
+    coerce => \&_coerce_uri
+);
+
 #------------
 # Coersions
 #-------------

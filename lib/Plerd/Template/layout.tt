@@ -12,6 +12,10 @@
         [% post.social_meta_tags %]
     [% END %]
 
+    [% IF config.webmention_endpoint %]
+    <link rel="webmention" href="[% config.webmention_endpoint %]">
+    [% END %]
+
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="[% rssFeed.uri %]" rel="alternate" title="Atom feed" type="application/atom+xml">
     <link href="[% jsonFeed.uri %]" rel="alternate" title="JSON feed" type="application/json">
