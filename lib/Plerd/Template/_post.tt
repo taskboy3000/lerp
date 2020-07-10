@@ -8,6 +8,14 @@
         </a>
     </h2>
 
+    [% IF include_reading_time %]
+    <p class="text-right">
+        <em>
+            <small>The estimated reading time for this article is about [% post.reading_time %] minute[% post.reading_time == 1 ? "" : "s" %].</small>
+        </em>
+    </p>
+    [% END %]
+
     <div class="post-content pl-3 pr-3">
 
         <div class="body e-content">[%- post.body %]</div>

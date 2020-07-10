@@ -4,12 +4,8 @@
 <ul class="latest-posts list-unstyled">
 [% FOREACH post = posts %]
     <li>
-        [% INCLUDE "_post.tt" title_hightlight = 1%]
-        <p class="text-right">
-            <em>
-                <small>The estimated reading time for this article is about [% post.reading_time %] minute[% post.reading_time == 1 ? "" : "s" %].</small>
-            </em>
-        </p>    
+        [% INCLUDE "_post.tt" title_hightlight = 1 include_reading_time = 1 %]
+  
     </li>
 [% END %]
 </ul>
