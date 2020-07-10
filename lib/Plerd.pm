@@ -742,76 +742,84 @@ sub publish_all {
     my (%opts) = (
         'force' => 0,
         'verbose' => 0,
+        'only_notes' => 0,
+        'only_posts' => 0,
         @_
     );
 
-    if ($opts{verbose}) {
-        say "Looking for new post files in " . $self->config->source_directory;
-    }
 
     my ($did_publish_posts, $did_publish_notes) = (0, 0);
- 
-    if (-e $self->config->source_directory) {
-        for (my $source_file = $self->first_source_file;
-            defined($source_file);
-            $source_file = $self->next_source_file)
-        {
-            my $post;
-            eval {
-                $post = Plerd::Model::Post->new(
-                    config => $self->config,
-                    source_file => $source_file
-                );
-                1;
-            } or do {
-                say $@;
-                next;
-            };
 
-            if ($self->should_publish_post($post) || $opts{force}) {
+    if (!$opts{only_notes}) {
+        if ($opts{verbose}) {
+            say "Looking for new post files in " . $self->config->source_directory;
+        }
+
+        if (-e $self->config->source_directory) {
+            for (my $source_file = $self->first_source_file;
+                defined($source_file);
+                $source_file = $self->next_source_file)
+            {
+                my $post;
                 eval {
-                    $self->publish_post($post, %opts);
-                    $did_publish_posts = 1;
+                    $post = Plerd::Model::Post->new(
+                        config => $self->config,
+                        source_file => $source_file
+                    );
                     1;
                 } or do {
                     say $@;
+                    next;
                 };
 
-            } else {
-                if ($opts{verbose}) {
-                    say "Declining to reprocess old source: " . $source_file->basename;
+                if ($self->should_publish_post($post) || $opts{force}) {
+                    eval {
+                        $self->publish_post($post, %opts);
+                        $did_publish_posts = 1;
+                        1;
+                    } or do {
+                        say $@;
+                    };
+
+                } else {
+                    if ($opts{verbose}) {
+                        say "Declining to reprocess old source: " . $source_file->basename;
+                    }
                 }
             }
         }
     }
 
-    if ($opts{verbose}) {
-        say "Looking for new notes files in " . $self->config->source_notes_directory;
-    }
 
-    if (-d $self->config->source_notes_directory) {        
-        # @todo: sort source by mtime
-        while (my $file = $self->config->source_notes_directory->next) {
-            next if -d $file;
-            my $note = Plerd::Model::Note->new(
-                config => $self->config,
-                source_file => $file,
-            );
+    if (!$opts{only_posts}) {
+        if ($opts{verbose}) {
+            say "Looking for new notes files in " . $self->config->source_notes_directory;
+        }
 
-            if ($self->should_publish_note($note) || $opts{force}) {
-                eval {
-                    $self->publish_note($note, %opts);
-                    $did_publish_notes = 1;
-                    1;
-                } or do {
-                    say $@;
-                };
-            } else {
-                if ($opts{verbose}) {
-                    say "Declining to reprocess old note: " . $file->basename;
+        if (-d $self->config->source_notes_directory) {        
+            # @todo: sort source by mtime
+            while (my $file = $self->config->source_notes_directory->next) {
+                next if -d $file;
+                my $note = Plerd::Model::Note->new(
+                    config => $self->config,
+                    source_file => $file,
+                );
+
+                if ($self->should_publish_note($note) || $opts{force}) {
+                    eval {
+                        $self->publish_note($note, %opts);
+                        $did_publish_notes = 1;
+                        1;
+                    } or do {
+                        say $@;
+                    };
+                } else {
+                    if ($opts{verbose}) {
+                        say "Declining to reprocess old note: " . $file->basename;
+                    }
+                    next;                    
+
                 }
-                next;                    
-
             }
         }
     }

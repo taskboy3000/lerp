@@ -30,6 +30,8 @@ sub Main {
         # commands
         'init' => \$opts{initialize},
         'P|publish-all' => \$opts{publish_all},
+        'N|publish-only-notes' => \$opts{publish_only_notes},
+        'O|publish-only-posts' => \$opts{publish_only_posts},
         'list-recent-posts' => \$opts{list_recent_posts},
 
         # options
@@ -51,6 +53,10 @@ sub Main {
         publish_all($opts{config}, $opts{verbose}, $opts{force});
     } elsif ($opts{list_recent_posts}) {
         list_recent_posts($opts{config});
+    } elsif ($opts{publish_only_notes}) {
+        publish_only_notes($opts{config}, $opts{verbose}, $opts{force});
+    } elsif ($opts{publish_only_posts}) {
+        publish_only_posts($opts{config}, $opts{verbose}, $opts{force});
     } else {
         usage();
     }
@@ -70,6 +76,8 @@ COMMAND:
 
 --init                   Create a new plerd site
 --P|publish-all          Republish all known source files
+--O|publish-only-posts   Publish only new posts; ignore new notes
+--N|publish-only-notes   Publish only new notes; ignore new posts
 
 OPTIONS:
 
@@ -169,6 +177,78 @@ sub publish_all {
     if ($verbose) {
         printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
     }
+}
+
+sub publish_only_notes {
+    my ($conf_file, $verbose, $force) = @_;
+
+    my $start = time();
+
+    my $config = get_config($conf_file);
+
+    if (!-e $config->config_file) {
+        die("Cannot find plerd config file: " . $config->config_file);
+    }
+
+    if ($verbose) {
+        say "Using config file: " . $config->config_file;
+    }
+
+    $config->unserialize;
+
+    my $plerd = Plerd->new(config => $config);
+    if ($verbose) {
+        say "Trying to obtain lock";
+    }
+
+    my $lock_fh = get_lock($config);
+    if ($verbose) {
+        say "Publishing articles to " . $config->publication_directory;
+    }
+
+    $plerd->publish_all(verbose => $verbose, force => $force, only_notes => 1);
+    free_lock($lock_fh);
+
+    if ($verbose) {
+        printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
+    }
+
+}
+
+sub publish_only_posts {
+    my ($conf_file, $verbose, $force) = @_;
+
+    my $start = time();
+
+    my $config = get_config($conf_file);
+
+    if (!-e $config->config_file) {
+        die("Cannot find plerd config file: " . $config->config_file);
+    }
+
+    if ($verbose) {
+        say "Using config file: " . $config->config_file;
+    }
+
+    $config->unserialize;
+
+    my $plerd = Plerd->new(config => $config);
+    if ($verbose) {
+        say "Trying to obtain lock";
+    }
+
+    my $lock_fh = get_lock($config);
+    if ($verbose) {
+        say "Publishing articles to " . $config->publication_directory;
+    }
+
+    $plerd->publish_all(verbose => $verbose, force => $force, only_posts => 1);
+    free_lock($lock_fh);
+
+    if ($verbose) {
+        printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
+    }
+
 }
 
 sub list_recent_posts {
