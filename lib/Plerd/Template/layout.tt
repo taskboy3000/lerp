@@ -40,7 +40,7 @@
                     <a class="nav-link" title="The latest published articles" href="[% frontPage.uri %]">Latest Articles</a>
                 </li>
                 <li class="nav-item [% activeSection == "notes_roll" ? "active" : "" %]">
-                    <a class="nav-link" title="The latest notes in reverse chronological order" href="[% noteRoll.uri %]">Notes</a>
+                    <a class="nav-link" title="The latest notes in reverse chronological order" href="[% notesRoll.uri %]">Notes</a>
                 </li>
                 <li class="nav-item [% activeSection == "tags" ? "active" : "" %]">
                     <a class="nav-link" title="All published articles grouped by tags" href="[% tagsIndex.uri %]">Tags</a>
