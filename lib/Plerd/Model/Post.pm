@@ -343,28 +343,34 @@ has 'socialmeta' => (
 sub _build_socialmeta {
     my $self = shift;
 
-    unless ( $self->image ) {
-        # Neither this post nor this whole blog defines an image URL.
-        # So, no social meta-tags for this post.
-        return;
-    }
-
     my %args = (
         site_name   => $self->config->title,
         title       => $self->title,
         description => $self->description,
-        image       => $self->image->as_string,
         url         => $self->uri->as_string,
-        image_alt   => $self->image_alt,
     );
 
-    if ($self->config->has_facebook_id) {
-        $args{ fb_app_id } = $self->config->facebook_id;
+    if ($self->image) {
+        $args{image} = $self->image->as_string;
+        if ($args{image_alt}) {
+            $args{image_alt} = $self->image_alt->as_string;
+        }
+    } else {
+        return;
     }
 
-    if ($self->config->has_twitter_id) {
-        $args{ site } = '@' . $self->config->twitter_id;
+    my $has_silo = 0;
+    if ($self->config->has_facebook_id) {
+        $args{ fb_app_id } = $self->config->facebook_id;
+        $has_silo = 1;
     }
+
+    if ($self->config->twitter_id) {
+        $args{ site } = '@' . $self->config->twitter_id;
+        $has_silo = 1;
+    }
+
+    return if !$has_silo;
 
     my $socialmeta;
     eval {
