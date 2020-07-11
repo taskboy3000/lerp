@@ -182,13 +182,13 @@ sub parse {
         my %citations = (
             qq[^->\\s*($urlPat)\$] => sub {
                 my ($url) = @_;
-                sprintf(q[<p class="h-cite reply-to">In reply to: <a rel="noopener noreferrer" class="u-in-reply-to" href="%s">%s</a></p>],
+                sprintf(q[<div class="h-cite u-in-reply-to reply-to">In reply to: <a rel="noopener noreferrer" href="%s">%s</a></div>],
                     $url, $url
                 );
             },
             qq[^\\^\\s*($urlPat)\$] => sub {
                 my ($url) = @_;
-                sprintf(q[<p class="h-cite like"><abbr title="I like the following post">👍</abbr>: <a rel="noopener noreferrer" class="u-like-of" href="%s">%s</a></p>],
+                sprintf(q[<div class="h-cite u-like-of like"><abbr title="I like the following post">👍</abbr>: <a rel="noopener noreferrer" class="" href="%s">%s</a></div>],
                     $url, $url
                 );
 

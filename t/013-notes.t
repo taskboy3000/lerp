@@ -67,13 +67,13 @@ No.],
             [
 q[->  http://facebook.com/
 This garbage site is garbage.],
-q[<p class="h-cite reply-to">In reply to: <a rel="noopener noreferrer" class="u-in-reply-to" href="http://facebook.com/">http://facebook.com/</a></p>
+q[<div class="h-cite u-in-reply-to reply-to">In reply to: <a rel="noopener noreferrer" href="http://facebook.com/">http://facebook.com/</a></div>
 This garbage site is garbage.]
             ],
             [
 q[^https://twitter.com/
 Although it too is a garbage site, I rather prefer it to others.],
-q[<p class="h-cite like"><abbr title="I like the following post">👍</abbr>: <a rel="noopener noreferrer" class="u-like-of" href="https://twitter.com/">https://twitter.com/</a></p>
+q[<div class="h-cite u-like-of like"><abbr title="I like the following post">👍</abbr>: <a rel="noopener noreferrer" class="" href="https://twitter.com/">https://twitter.com/</a></div>
 Although it too is a garbage site, I rather prefer it to others.]                
             ],
         );
