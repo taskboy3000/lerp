@@ -1,10 +1,7 @@
 use Modern::Perl '2018';
 
 use FindBin;
-BEGIN {
-    $::gLIBDIR="/Users/jjohn/src/plerd_taskboy3000/t/../lib";
-}
-use lib $::gLIBDIR;
+use lib "$FindBin::Bin/../lib";
 
 use Test::More;
 
