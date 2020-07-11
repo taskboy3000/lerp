@@ -1,9 +1,12 @@
 [% WRAPPER 'layout.tt' section_title = "Notes Roll" %]
 
-
 <div class="notes-roll">
-[% FOREACH note = notes %]  
-    [% INCLUDE "_note.tt" note = note %]
+[% IF notes.size > 0 %]
+    [% FOREACH note = notes %]  
+        [% INCLUDE "_note.tt" note = note %]
+    [% END %]
+[% ELSE %]
+    <em>No notes posted yet.  Check back later.</em>
 [% END %]
 </div>
 

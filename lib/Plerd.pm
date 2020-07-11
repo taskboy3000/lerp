@@ -312,7 +312,7 @@ sub publish_note {
     if ($self->_publish(
             $note->template_file,
             $note->publication_file,
-            { note => $note, thisURI => $note->uri })
+            { note => $note, thisURI => $note->uri, activeSection => "notes_roll" })
     ) {
         if ($opts{verbose}) {
             say "Published " . $note->publication_file->basename;
@@ -378,7 +378,7 @@ sub publish_notes_roll {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { notes => \@notes, thisURI => $feed->uri }
+        { notes => \@notes, thisURI => $feed->uri, activeSection => "notes_roll" }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;
@@ -431,7 +431,7 @@ sub publish_notes_json_feed {
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { feed => $json, thisURI => $feed->uri }
+        { feed => $json, thisURI => $feed->uri, activeSection => "notes_roll" }
     )) {
         if ($opts{verbose}) {
             say "Published " . $feed->publication_file->basename;
