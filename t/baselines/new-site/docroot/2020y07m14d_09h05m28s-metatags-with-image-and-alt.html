@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Another Plerd Blog :: Metatags</title>
+    <title>Another Plerd Blog :: Metatags with image and alt</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -32,6 +32,9 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
                     <a class="nav-link" title="The latest published articles" href="http://localhost/blog.html">Latest Articles</a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" title="The latest notes in reverse chronological order" href="http://localhost/notes_roll.html">Notes</a>
                 </li>
                 <li class="nav-item ">
                     <a class="nav-link" title="All published articles grouped by tags" href="http://localhost/tags.html">Tags</a>
@@ -88,7 +91,7 @@
                     <br>
                     <section class="pr-1">
                         <h3>HTML Validation</h3>
-                        <a target="_blank" rel="noreferrer noopener" href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2020y07m10d_15h29m21s-metatags.html">Validate now</a>
+                        <a target="_blank" rel="noreferrer noopener" href="https://validator.w3.org/nu/?doc=http%3A%2F%2Flocalhost%2F2020y07m14d_09h05m28s-metatags-with-image-and-alt.html">Validate now</a>
                     </section>
                 </div>
             </div>
@@ -96,8 +99,8 @@
     
 <article class="post h-entry">
     <h2 class="text-center pt-2">
-        <a class="text-info u-url u-uid" href="http://localhost/2020y07m10d_15h29m21s-metatags.html">
-           <span class="p-name">Metatags</span>
+        <a class="text-info u-url u-uid" href="http://localhost/2020y07m14d_09h05m28s-metatags-with-image-and-alt.html">
+           <span class="p-name">Metatags with image and alt</span>
         </a>
     </h2>
 
@@ -105,13 +108,21 @@
 
     <div class="post-content pl-3 pr-3">
 
-        <div class="body e-content"><p>This file sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
+        <div class="body e-content"><p><img src="image: http://blog.example.com/example.png" alt="A lovely bunch of coconuts." /></p>
+
+<p>This file, which is <strong>awesome</strong>, sets up some attributes that should cause some social media tags to get created in the resulting HTML, under the right circumstances.</p>
+
+<p>Furthermore, it refers to a post-specific image. But it doesn’t specify a description!</p>
+
+<p>It also leads with an image tag hanging out all by itself, which Plerd ought not to consider a paragraph of body text.</p>
 </div>
 
         <div class="footer">
             <p>
                 Published by <a class="p-author h-card" href="http://localhost/">Sam Handwich</a>
-                on <time class="dt-published" datetime="2020-07-10T19:29:21+00:00">July 10, 2020</time>
+                on <time class="dt-published" datetime="2020-07-14T13:05:28+00:00">July 14, 2020</time>
+                
+                .
             </p>
         </div>
 

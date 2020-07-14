@@ -163,6 +163,21 @@ sub _build_image_alt {
     $self->config->image_alt;
 }
 
+# @todo: document supported attributes
+has indieweb_sub => (
+    is => 'rw',
+    lazy => 1,
+    builder => '_build_indieweb_sub',
+);
+
+sub _build_indieweb_sub {
+    my ($self) = @_;
+    if (exists $self->attributes->{indieweb_sub}) {
+        return $self->attributes->{indieweb_sub};
+    }
+    return;
+}
+
 # @todo:
 #   If next/previous articles are desirable, then a feed of publication order of articles
 #   needs to be generated and made amenable to getting this answer.
