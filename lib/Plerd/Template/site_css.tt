@@ -113,8 +113,9 @@ article pre {
 .h-entry.note {
     padding-bottom: 20px;
 }
+
 .h-entry.note .e-content {
-    white-space: pre;
+    white-space: break-spaces;
     margin-right: 20px;
     padding-bottom: 20px;
     border-bottom: 1px solid #ddd;
