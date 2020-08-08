@@ -61,9 +61,32 @@ async function getRecentNotes () {
     populateLatestNotes(json);
 }
 
+function inititalizeWebMentions () {
+    const wm_summaries = document.querySelectorAll('.webmentions .summary');
+    for (let wb_summary of wm_summaries) {
+        let url = wb_summary.getAttribute("data-summary-uri");
+        if (url) {
+            Fetch(url).then((content) => {
+                wb_summary.innerHTML = content;            
+            });
+        }
+    }
+    const wm_displays = document.querySelectorAll('.webmentions .display');
+    for (let wb_display of wm_displays) {
+        let url = wb_display.getAttribute("data-display-uri");
+        if (url) {
+            Fetch(url).then((content) => {
+                wb_display.innerHTML = content;
+            });
+        }
+
+    }
+}
+
 function initialize () {
     getRecentPosts();
     getRecentNotes();
+    initializeWebMentions();
 }
 
 window.addEventListener('DOMContentLoaded', initialize, false);

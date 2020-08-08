@@ -41,6 +41,13 @@
                 [% END %]
             </ul>
         [% END %]
+
+        [% IF post.webmentions_summary_uri %]
+        <div class="webmentions">
+            <div class="summary" data-summary-uri="[% post.webmentions_summary_uri %]"><small>loading...<small></div>
+            <div class="display" data-display-uri="[% post.webmentions_display_uri %]" class="collapse"><small>loading...</small></div>
+        </div>
+        [% END %]
     </div>
 
 </article>
