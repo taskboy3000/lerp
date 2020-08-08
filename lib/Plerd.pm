@@ -736,6 +736,27 @@ sub publish_site_js_page {
     die("assert - Publishing failed for site css page");
 }
 
+sub publish_support_files {
+    my ($self) = shift;
+    my (%opts) = (
+        'force' => 0,
+        'verbose' => 0,
+        @_
+    );
+
+    $self->publish_front_page(%opts);
+    $self->publish_archive_page(%opts);
+    $self->publish_rss_feed(%opts);
+    $self->publish_json_feed(%opts);
+    $self->publish_notes_json_feed(%opts);
+    $self->publish_notes_roll(%opts);
+    $self->publish_tags_index_page(%opts);
+    $self->publish_site_css_page(%opts);
+    $self->publish_site_js_page(%opts);
+
+    return 1;
+}
+
 
 sub publish_all {
     my ($self) = shift;
@@ -829,6 +850,7 @@ sub publish_all {
         return;
     }
 
+    # @todo: make this a call to publish_support_files
     if ($did_publish_posts) {
         $self->publish_front_page(%opts);
         $self->publish_archive_page(%opts);

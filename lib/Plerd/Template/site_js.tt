@@ -61,7 +61,7 @@ async function getRecentNotes () {
     populateLatestNotes(json);
 }
 
-function inititalizeWebMentions () {
+function initializeWebMentions () {
     const wm_summaries = document.querySelectorAll('.webmentions .summary');
     for (let wb_summary of wm_summaries) {
         let url = wb_summary.getAttribute("data-summary-uri");
