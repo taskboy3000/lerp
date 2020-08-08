@@ -69,7 +69,7 @@ function initializeWebMentions () {
             fetch(url).then((response) => {
                 return response.body.text();
             }).then((html) => {
-                wb_summary.innerHTML = html.
+                wb_summary.innerHTML = html;
             });
         }
     }
