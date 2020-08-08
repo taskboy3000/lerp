@@ -66,7 +66,7 @@ function initializeWebMentions () {
     for (let wb_summary of wm_summaries) {
         let url = wb_summary.getAttribute("data-summary-uri");
         if (url) {
-            Fetch(url).then((content) => {
+            fetch(url).then((content) => {
                 wb_summary.innerHTML = content;            
             });
         }
@@ -75,7 +75,7 @@ function initializeWebMentions () {
     for (let wb_display of wm_displays) {
         let url = wb_display.getAttribute("data-display-uri");
         if (url) {
-            Fetch(url).then((content) => {
+            fetch(url).then((content) => {
                 wb_display.innerHTML = content;
             });
         }
