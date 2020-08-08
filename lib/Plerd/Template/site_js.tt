@@ -72,7 +72,7 @@ function initializeWebMentions () {
                 if (html) {
                     wb_summary.innerHTML = html;
                 } else {
-                    wb_summary.parentNode.querySelect(".display").remove();
+                    wb_summary.parentNode.querySelect(".display").classList.add("d-none");
                 }
             });
         }
