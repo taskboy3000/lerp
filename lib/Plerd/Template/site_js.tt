@@ -67,7 +67,7 @@ function initializeWebMentions () {
         let url = wb_summary.getAttribute("data-summary-uri");
         if (url) {
             fetch(url).then((response) => {
-                return response.body.text();
+                return response.text();
             }).then((html) => {
                 wb_summary.innerHTML = html;
             });
@@ -78,7 +78,7 @@ function initializeWebMentions () {
         let url = wb_display.getAttribute("data-display-uri");
         if (url) {
             fetch(url).then((response) => {
-                return response.body.text();
+                return response.text();
             }).then((html) => {
                 wb_display.innerHTML = html;
             });
