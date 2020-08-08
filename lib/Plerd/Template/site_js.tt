@@ -70,9 +70,20 @@ function initializeWebMentions () {
                 return response.text();
             }).then((html) => {
                 if (html) {
-                    wb_summary.innerHTML = html;
+                    let a = document.createElement("a");
+                    let d_node = wb_summary.parentNode.querySelector(".display");
+                    a.setAttribute("href", "#");
+                    a.setAttribute("data-toggle", "collapse");
+                    a.setAttribute("data-target", "div.display[data-display-uri='"
+                       + d_node.getAttribute('data-display-uri')
+                       + "']");
+                    a.innerHTML=html;
+                    wb_summary.innerHTML = "";
+                    wb_summary.append(a);
                 } else {
-                    wb_summary.parentNode.querySelect(".display").classList.add("d-none");
+                    wb_summary.classList.add("d-none");
+                    wb_summary.parentNode.querySelector(".display").classList.add("d-none");
+                    wb_summary.parentNode.querySelector(".display").classList.add("d-none");
                 }
             });
         }

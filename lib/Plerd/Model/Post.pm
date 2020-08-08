@@ -559,7 +559,7 @@ sub _build_webmentions_display_uri {
     # WARNING: This assumes web mentions use whim
     #   https://github.com/jmacdotorg/whim
     my $clone = $self->config->webmention_endpoint->clone;
-    $clone->path($clone->path . '/display_wms');
+    $clone->path($clone->path . 'display_wms');
     $clone->query_form('url' => $self->uri);
 
     return $clone;
@@ -579,7 +579,7 @@ sub _build_webmentions_summary_uri {
     # WARNING: This assumes web mentions use whim
     #   https://github.com/jmacdotorg/whim
     my $clone = $self->config->webmention_endpoint->clone;
-    $clone->path($clone->path . '/summarize_wms');
+    $clone->path($clone->path . 'summarize_wms');
     $clone->query_form('url' => $self->uri);
 
     return $clone;
