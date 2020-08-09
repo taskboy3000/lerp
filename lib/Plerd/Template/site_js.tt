@@ -11,6 +11,7 @@ function populateFeedList (feed, listNode, emptyMsg) {
             let a = document.createElement("a");
             a.innerHTML = item.title;
             a.setAttribute("href", item.url);
+            a.classList.add("reply_stats");
             li.append(a);
             listNode.append(li);
         }

@@ -98,13 +98,45 @@ article pre {
 .tags-grouped-by-letter-list h4 {
     font-size: 1.3rem;
 }
-
+xo
 .archived-articles-list h2 {
     padding: 5px 10px;
 }
 
 .single-note nav {
     margin-left: -15px;
+}
+
+article.post.h-entry .webmentions {
+    padding-top: 20px;
+    margin-left: 10px;
+}
+
+
+article.post.h-entry .webmentions .summary {
+    padding-bottom: 10px;
+}
+
+article.post.h-entry .webmentions .summary a.reply_stats {
+    letter-spacing: 0.5em;
+}
+
+article.post.h-entry .webmentions .display h3 {
+    font-size: 1.5 rem;
+    padding-bottom: 10px;
+}
+
+article.post.h-entry .webmentions .display div.row {
+    margin:0;
+    padding-bottom: 10px;
+}
+
+article.post.h-entry .webmentions .display .media .media-left {
+    padding-right: 10px;
+}
+
+article.post.h-entry .webmentions .display .media .media-left img {
+    box-shadow: 2px 2px 2px #999;
 }
 
 .notes-roll {
