@@ -71,7 +71,7 @@ sub _build_config_tt {
         ABSOLUTE => 1,
         RELATIVE => 1,
     );
-    Template->new(%params);    
+    Template->new(%params);
 }
 
 has 'custom_nav_items' => (
@@ -85,7 +85,7 @@ sub _build_custom_nav_items {
 
 has 'database_directory' => (
     is => 'rw',
-    lazy => 1, 
+    lazy => 1,
     builder => '_build_database_directory',
     coerce => \&_coerce_directory,
 );
@@ -100,13 +100,14 @@ has 'engine_name' => (is => 'ro', default => sub { "Taskboy Plerd"});
 has 'engine_uri' => (is => 'ro', default => sub { URI->new('https://github.com/taskboy3000/plerd') });
 has 'engine_version' => (is => 'ro', default => sub { $VERSION });
 
+has 'jumbotron_image' => (is => 'rw', predicate => 1, coerce => \&_coerce_image);
 has 'image' => (is => 'rw', predicate => 1, coerce => \&_coerce_image);
 has 'image_alt' => (is => 'rw', default => sub { "[image]" });
 
 has facebook_id => (is => 'rw', predicate => 1);
 
 has log_directory => (
-    is => 'rw', 
+    is => 'rw',
     lazy => 1,
     builder => '_build_log_directory',
     coerce => \&_coerce_directory
@@ -131,15 +132,15 @@ has 'notes_publication_directory' => (
     is => 'rw',
     lazy => 1,
     builder => '_build_notes_publication_directory',
-    coerce => \&_coerce_directory        
+    coerce => \&_coerce_directory
 );
 sub _build_notes_publication_directory {
     my ($self) = @_;
-    return Path::Class::Dir->new($self->publication_directory, "notes");    
+    return Path::Class::Dir->new($self->publication_directory, "notes");
 }
 
 has path => (
-    is => 'rw', 
+    is => 'rw',
     lazy => 1,
     builder => '_build_path',
     coerce => \&_coerce_directory
@@ -175,7 +176,7 @@ has 'run_directory' => (
     is => 'rw',
     lazy => 1,
     builder => '_build_run_directory',
-    coerce => \&_coerce_directory    
+    coerce => \&_coerce_directory
 );
 sub _build_run_directory {
     my $self = shift;
@@ -226,7 +227,7 @@ has 'template_directory' => (
     is => 'rw',
     lazy => 1,
     builder => '_build_template_directory',
-    coerce => \&_coerce_directory    
+    coerce => \&_coerce_directory
 );
 sub _build_template_directory {
     my $self = shift;
@@ -252,13 +253,13 @@ sub _coerce_directory {
         return $path->absolute;
     }
 
-    my $dir = Path::Class::Dir->new($path); 
+    my $dir = Path::Class::Dir->new($path);
     if (!$dir) {
         die("assert - could not convert '$path' to Path. exists? "
         . (-d $path ? "yes" : "no")
         );
     }
-    return $dir->absolute;    
+    return $dir->absolute;
 }
 
 sub _coerce_file {
@@ -308,11 +309,11 @@ sub initialize {
     ]) {
         if (!-d $self->$dir_method) {
             push @messages, "Creating " . $self->$dir_method();
-            $self->$dir_method->mkpath; 
+            $self->$dir_method->mkpath;
         }
     }
 
-    # add default templates 
+    # add default templates
     my $src_template_dir = Path::Class::Dir->new($ENV{PLERD_HOME}, "lib", "Plerd", "Template");
     while (my $src_file = $src_template_dir->next) {
         next if substr($src_file, -3, 3) ne '.tt';
@@ -347,8 +348,8 @@ sub unserialize {
         die("Cannot read or parse: " . $self->source_file);
     };
 
-    # In the config file, there are *_path values that need to 
-    # get mapped to *_directory properties here. 
+    # In the config file, there are *_path values that need to
+    # get mapped to *_directory properties here.
     for my $property (keys %$config_ref) {
         my $method = $property;
         if ((my $base_prop = $property) =~ /^(\w+)_path$/) {

@@ -36,6 +36,10 @@ author_name:  [% config.author_name %]
 # author_email: The email address of this blog's author.
 author_email: [% config.author_email %]
 
+# Set the background image URL for the "jumbotron" header that
+# the section title of appears in
+jumbotron_image: [% config.jumbotron_image %]
+
 ######################
 # Social-media setup
 ######################

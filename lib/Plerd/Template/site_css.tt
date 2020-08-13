@@ -1,6 +1,11 @@
 /* reset global tags */
 html {
     font-size: 16px;
+    font-family: Nunito, Helvetica, Ariel, san-serif;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: Roboto, Helvetica, Ariel, san-serif;
 }
 
 h1 {
@@ -36,6 +41,26 @@ a, a:visited, a:hover, a:active {
 .jumbotron {
     margin-bottom: 0;
 }
+
+[% IF config.jumbotron_image %]
+.jumbotron {
+    background-image: url('[% config.jumbotron_image %]');
+    padding:0;
+    background-size: 100%;
+    width:100%;
+    border-radius:0;
+}
+.jumbotron .heading-wrapper {
+    background-color: rgba(128,128,128,0.8);
+    color: white;
+    padding: 20px;
+    text-shadow: 2px 2px 5px #222;
+    width: 80%;
+    margin-left:auto;
+    margin-right:auto;
+    
+}
+[% END %]
 
 .sidebar {
     overflow: hidden;

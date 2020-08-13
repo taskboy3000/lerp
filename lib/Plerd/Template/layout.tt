@@ -17,12 +17,16 @@
     [% END %]
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    [% IF activeSection == "notes_roll" %]
+    <link href="[% notesJSONFeed.uri %]" rel="alternate" title="JSON feed" type="application/json">
+    [% ELSE %]
     <link href="[% rssFeed.uri %]" rel="alternate" title="Atom feed" type="application/atom+xml">
     <link href="[% jsonFeed.uri %]" rel="alternate" title="JSON feed" type="application/json">
-
+    [% END %]
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
     <link rel="stylesheet" href="[% siteCSS.uri %]">
-
-
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-info">
@@ -49,7 +53,7 @@
                     <a class="nav-link" title="A chronologic grouping of all published articles" href="[% archive.uri %]">Archive</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" title="An Atom feed of the latest articles" href="[% rssFeed.uri %]">Feed</a>
+                    <a class="nav-link" title="An Atom feed of the latest articles" href="[% rssFeed.uri %]">Blog Feed</a>
                 </li>
 
                 [% FOREACH customNavItem = config.custom_nav_items %]
@@ -63,10 +67,12 @@
 
     [% IF jumbotron > 0 %]
     <div class="jumbotron text-center">
-        <h1 class="display-3">[% section_title || config.title %]</h1>
-        [% IF section_description %]
-        <p class="lead">[% section_description %]</p>
-        [% END %]
+        <div class="heading-wrapper">  
+          <h1 class="display-3">[% section_title || config.title %]</h1>
+          [% IF section_description %]
+          <p class="lead">[% section_description %]</p>
+          [% END %]
+        </div>
     </div>
     [% END %]
 
