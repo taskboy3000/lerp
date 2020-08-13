@@ -13,6 +13,10 @@
     border-color: var(--info) !important;
 }
 
+.text-info {
+    color: var(--info) !important;
+}
+
 html {
     font-size: 16px;
 }

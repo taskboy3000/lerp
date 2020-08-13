@@ -25,7 +25,7 @@
                 Published by <a class="p-author h-card" href="[% config.base_uri %]">[% config.author_name%]</a>
                 on <time class="dt-published" datetime="[% post.utc_date.ymd %]T[% post.utc_date.hms %]+00:00">[% post.month_name %] [% post.day %], [% post.year %]</time>
                 [% IF post.indieweb_sub %]
-                and posted to <a class="u-syndication" href="[% post.indieweb_sub %]">[% post.indieweb_sub %]</a>
+                and posted to <a class="u-syndication" href="[% post.indieweb_sub %]">[% post.indieweb_sub.path %]</a>
                 [% END %]
                 .
             </p>
