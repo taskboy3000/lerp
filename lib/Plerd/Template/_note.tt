@@ -1,14 +1,17 @@
+[% USE format;
+     zero_padded = format("%02d");
+%]
 <div class="h-entry note">
     <div class="masthead">
         Published on
-        <time class="dt-published" datetime="[% note.utc_date.ymd %]T[% note.utc_date.hms %]+00:00">[% note.date.month_name %] [% note.date.day %], [% note.date.year %]</time>
+        <time class="dt-published" datetime="[% note.utc_date.ymd %]T[% note.utc_date.hms %]+00:00">[% note.date.month_name %] [% note.date.day %], [% note.date.year %] at [% zero_padded(note.date.hour) %]:[% zero_padded(note.date.minute) %]</time>
         by 
         <a class="p-author h-card text-light" href="[% config.base_uri %]">[% config.author_name %]</a>
 
-        :: 
+        · 
 
-        <a class="u-url u-uid text-light" href="[% note.uri %]">
-           <span class="">Permalink <sup>&Lscr;</sup></span>
+        <a class="u-url u-uid text-light" href="[% note.uri %]" title="Permalink for bookmarking and webmentions">
+           &Lscr;
         </a>
 
     </div>

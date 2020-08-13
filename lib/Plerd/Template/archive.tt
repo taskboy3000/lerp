@@ -1,10 +1,7 @@
-[%- # Joe Johnston <jjohn@taskboy.com> %]
-[% WRAPPER layout.tt section_title = 'Archives' %]
-<br>
-<h2>Posts grouped chronologically</h2>
-
-<hr>
-
+[% WRAPPER layout.tt
+     section_title = 'Archives'
+     section_description = 'Blog posts sorted in reverse chronological order'
+%]
 <div class="archived-articles-list">
 [% current_month = 0 %]
 [% FOREACH post IN posts %]

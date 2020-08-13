@@ -1,11 +1,30 @@
 /* reset global tags */
+:root {
+    --info: #1d3172;
+    --header-spacing: 0.05em;
+}
+
+.bg-info {
+    background-color: var(--info) !important;
+}
+
+.btn-info {
+    background-color: var(--info) !important;
+    border-color: var(--info) !important;
+}
+
 html {
     font-size: 16px;
+}
+
+body {
     font-family: Nunito, Helvetica, Ariel, san-serif;
 }
 
 h1, h2, h3, h4, h5 {
     font-family: Roboto, Helvetica, Ariel, san-serif;
+    letter-spacing: var(--header-spacing);
+    font-variant: small-caps;
 }
 
 h1 {
@@ -22,7 +41,6 @@ h3 {
 
 h4 {
     font-size: 1.6 rem;
-    font-variant: small-caps;
 }
 
 img {
@@ -31,6 +49,13 @@ img {
 
 a, a:visited, a:hover, a:active {
     color: var(--info);
+}
+
+nav.navbar {
+    font-variant: small-caps;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 2px 2px 5px black;
 }
 
 /* common page-layout styling */
@@ -46,10 +71,11 @@ a, a:visited, a:hover, a:active {
 .jumbotron {
     background-image: url('[% config.jumbotron_image %]');
     padding:0;
-    background-size: 100%;
+    background-size: cover;
     width:100%;
     border-radius:0;
 }
+    
 .jumbotron .heading-wrapper {
     background-color: rgba(128,128,128,0.8);
     color: white;
@@ -58,8 +84,8 @@ a, a:visited, a:hover, a:active {
     width: 80%;
     margin-left:auto;
     margin-right:auto;
-    
 }
+
 [% END %]
 
 .sidebar {
@@ -74,8 +100,11 @@ a, a:visited, a:hover, a:active {
 }
 .sidebar h2 {
     font-size: 1.7rem;
-    padding: 10px;
+    padding: 20px 0 6px 0;
     margin: -10px 0 0 -15px;
+    letter-spacing: var(--header-spacing);
+    font-variant: small-caps;
+    text-shadow: 2px 2px 5px black;
 }
 
 .sidebar h3 {
@@ -123,10 +152,16 @@ article pre {
 .tags-grouped-by-letter-list h4 {
     font-size: 1.3rem;
 }
-xo
+
+.archived-articles-list {
+    margin-top: 10px;
+}
+
 .archived-articles-list h2 {
     padding: 5px 10px;
+    text-shadow: 2px 2px 5px black;
 }
+
 
 .single-note nav {
     margin-left: -15px;
@@ -180,7 +215,6 @@ article.post.h-entry .webmentions .display .media .media-left img {
 }
 
 .h-entry.note .masthead {
-    font-style: italic;
     background-color: var(--info);
     color: var(--light);
     padding: 10px 0 10px 10px;
@@ -193,4 +227,13 @@ article.post.h-entry .webmentions .display .media .media-left img {
 .h-entry.note .masthead a:visted,
 .h-entry.note .masthead a:focus {
     color: var(--light);
+}
+
+.h-entry.note .e-content {
+    margin:0;
+    padding: 20px;
+    box-shadow: 2px 2px 5px #ddd;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }

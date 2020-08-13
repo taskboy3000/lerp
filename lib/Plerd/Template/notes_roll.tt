@@ -1,4 +1,7 @@
-[% WRAPPER 'layout.tt' section_title = "Notes Roll" %]
+[% WRAPPER 'layout.tt'
+      section_title = "Notes Roll"
+      section_description = 'Reverse chronological list of notes'
+%]
 
 <div class="notes-roll">
 [% IF notes.size > 0 %]

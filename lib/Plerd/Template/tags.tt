@@ -1,5 +1,8 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
-[% WRAPPER layout.tt section_title = 'Tags' %]
+[% WRAPPER layout.tt
+      section_title = 'Tags'
+      section_description = 'Blog posts and notes grouped by tags'
+%]
 <br>
 <h2>Index</h2>
 
