@@ -83,9 +83,7 @@
                 <div class="sidebar-inner">
                     <section class="about pr-1">
                         <h3>About this site</h3>
-                        <p>
-                            This is a blog by <a href="mailto:[% config.author_email %]">[% config.author_name %]</a>.
-                        </p>
+                        [% siteDescription %]
                     </section>
                     <br>
                     <section class="search pr-1">

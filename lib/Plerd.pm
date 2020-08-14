@@ -7,6 +7,7 @@ use JSON;
 use Moo;
 use Template;
 use Template::Stash;
+use Text::MultiMarkdown qw( markdown );
 
 use Plerd::Config;
 use Plerd::Model::Archive;
@@ -20,6 +21,7 @@ use Plerd::Model::RSSFeed;
 use Plerd::Model::SiteCSS;
 use Plerd::Model::SiteJavaScript;
 use Plerd::Model::TagIndex;
+use Plerd::SmartyPants;
 use Plerd::Remembrancer;
 
 #-------------------------------
@@ -107,6 +109,7 @@ sub _build_publisher {
             rssFeed => $self->rss_feed,
             siteCSS => $self->site_css,
             siteJS => $self->site_js,
+            siteDescription => $self->site_description,
             tagsIndex => $self->tags_index,
             w3validatorURI => URI->new("https://validator.w3.org/nu/"),
         }
@@ -143,6 +146,30 @@ has 'site_css' => (
 sub _build_site_css {
     my ($self) = @_;
     Plerd::Model::SiteCSS->new(config => $self->config);
+}
+
+has 'site_description' => (
+    is => 'ro', 
+    lazy => 1,
+    builder => '_build_site_description',
+    predicate => 1,
+);
+sub _build_site_description {
+    my ($self) = @_;
+
+    my $site_description = $self->config->site_description;
+    if ($site_description) {
+        return Plerd::SmartyPants::process(markdown($site_description));
+    }
+
+    my $author = $self->config->author_name;
+    my $email = $self->config->author_email;
+
+    my $default_description = <<"EOT";
+This is a blog by [$author](mailto:$email).
+EOT
+
+    return markdown($default_description);
 }
 
 has 'site_js' => (
@@ -617,15 +644,10 @@ sub publish_front_page {
         push @posts, $post;
     }
 
-    my $desc = "";
-    if ($self->config->has_site_description) {
-        $desc = $self->config->site_description;
-    }
-
     if ($self->_publish(
         $feed->template_file,
         $feed->publication_file,
-        { posts => \@posts, thisURI => $feed->uri, section_description => $desc },
+        { posts => \@posts, thisURI => $feed->uri },
         "blog"
     )) {
         if ($opts{verbose}) {

@@ -40,6 +40,12 @@ author_email: [% config.author_email %]
 # the section title of appears in
 jumbotron_image: [% config.jumbotron_image %]
 
+# This is a blob of markdown text that will appear 
+# in the sidebar under "About this site"
+# Here is a URL to help you with block scalars in YAML
+#   https://yaml-multiline.info/
+site_description: [% config.site_description %]
+
 ######################
 # Social-media setup
 ######################
