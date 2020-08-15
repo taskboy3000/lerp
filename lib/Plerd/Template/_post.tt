@@ -8,29 +8,31 @@
         </a>
     </h2>
 
-    [% IF include_reading_time %]
-    <p class="text-right">
-        <em>
-            <small>The estimated reading time for this article is about [% post.reading_time %] minute[% post.reading_time == 1 ? "" : "s" %].</small>
-        </em>
-    </p>
-    [% END %]
-
-    <div class="post-content pl-3 pr-3">
-
-        <div class="body e-content">[%- post.body %]</div>
-
-        <div class="footer">
-            <p>
-                Published by <a class="p-author h-card" href="[% config.base_uri %]">[% config.author_name%]</a>
-                on <time class="dt-published" datetime="[% post.utc_date.ymd %]T[% post.utc_date.hms %]+00:00">[% post.month_name %] [% post.day %], [% post.year %]</time>
-                [% IF post.indieweb_sub %]
-                and posted to <a class="u-syndication" href="[% post.indieweb_sub %]">[% post.indieweb_sub.path %]</a>
-                [% END %]
-                .
+    <div class="content-wrapper">
+        [% IF include_reading_time %]
+            <p class="text-right">
+                <em>
+                    <small>The estimated reading time for this article is about [% post.reading_time %] minute[% post.reading_time == 1 ? "" : "s" %].</small>
+                </em>
             </p>
-        </div>
+        [% END %]
 
+        <div class="post-content pl-3 pr-3">
+
+            <div class="body e-content">[%- post.body %]</div>
+
+            <div class="footer">
+                <p>
+                    Published by <a class="p-author h-card" href="[% config.base_uri %]">[% config.author_name%]</a>
+                    on <time class="dt-published" datetime="[% post.utc_date.ymd %]T[% post.utc_date.hms %]+00:00">[% post.month_name %] [% post.day %], [% post.year %]</time>
+                    [% IF post.indieweb_sub %]
+                        and posted to <a class="u-syndication" href="[% post.indieweb_sub %]">[% post.indieweb_sub.path %]</a>
+                    [% END %]
+                    .
+                </p>
+            </div>
+        </div>
+    
         [% IF post.tags.size > 0 %]
             <ul class="list-inline tag-list">
                 <li class="list-inline-item">Tags:</li>

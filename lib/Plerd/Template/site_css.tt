@@ -128,21 +128,37 @@ footer.engine-attribution {
 
 
 /* component-specific styling */
-.post {
+article.post {
+    margin-top: 10px;
+    margin-bottom: 20px;
     margin-top: 10px;
     padding-bottom: 10px;
 }
 
-.post.h-entry h2.bg-info {
+article.post.h-entry h2.bg-info {
     padding: 5px 0 5px 10px; 
 }
 
+article.post div.content-wrapper {
+    margin-left: 20px;
+    margin-right: 20px;
+}
 
-article pre {
+
+article.post pre {
     background-color: #e9ecef;
     padding: 10px;
     font-family: monospace;
     box-shadow: 2px 2px 4px #ddd;
+}
+
+
+article.post  figure {
+    max-height: 600px;
+    max-width: 600px;
+    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #all-tags-list h3 {
