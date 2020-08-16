@@ -16,6 +16,17 @@ sub _build_config {
     Plerd::Config->new();    
 }
 
+#has 'feed_template_file' => (
+#    is => 'ro',
+#    lazy => 1,
+#    builder => '_build_feed_template_file'
+#);
+#sub _build_template_file {
+#    my ($self) = @_;
+#    Path::Class::File->new($self->config->template_directory, "feed.tt");
+#}
+
+
 has 'publication_file' => (
     is => 'ro',
     lazy => 1, 

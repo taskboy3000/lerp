@@ -151,6 +151,48 @@ sub _build_uri {
     URI->new($base_uri . "notes/" . $self->publication_file->basename);
 }
 
+
+has 'webmentions_display_uri' => (
+    is => 'rw',
+    lazy => 1,
+    builder => '_build_webmentions_display_uri',
+);
+sub _build_webmentions_display_uri {
+    my $self = shift;
+    if (!$self->config->webmention_endpoint) {
+        return;
+    }
+
+    # WARNING: This assumes web mentions use whim
+    #   https://github.com/jmacdotorg/whim
+    my $clone = $self->config->webmention_endpoint->clone;
+    $clone->path($clone->path . 'display_wms');
+    $clone->query_form('url' => $self->uri);
+
+    return $clone;
+}
+
+has 'webmentions_summary_uri' => (
+    is => 'rw',
+    lazy => 1,
+    builder => '_build_webmentions_summary_uri',
+);
+sub _build_webmentions_summary_uri {
+    my $self = shift;
+    if (!$self->config->webmention_endpoint) {
+        return;
+    }
+
+    # WARNING: This assumes web mentions use whim
+    #   https://github.com/jmacdotorg/whim
+    my $clone = $self->config->webmention_endpoint->clone;
+    $clone->path($clone->path . 'summarize_wms');
+    $clone->query_form('url' => $self->uri);
+
+    return $clone;
+}
+
+
 #-------------------
 # Public Methods
 #-------------------

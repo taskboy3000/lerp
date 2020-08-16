@@ -92,28 +92,6 @@ nav.navbar {
 
 [% END %]
 
-.sidebar {
-    overflow: hidden;
-}
-.sidebar-inner {
-    box-shadow: 5px 5px 10px #ddd;
-    padding-bottom: 20px;
-    padding-top: 10px;
-    overflow-x: scroll;    
-
-}
-.sidebar h2 {
-    font-size: 1.7rem;
-    padding: 20px 0 6px 0;
-    margin: -10px 0 0 -15px;
-    letter-spacing: var(--header-spacing);
-    font-variant: small-caps;
-    text-shadow: 2px 2px 5px black;
-}
-
-.sidebar h3 {
-    font-size: 1.5rem;
-}
 
 .content {
     padding-right: 0;
@@ -127,7 +105,61 @@ footer.engine-attribution {
 }
 
 
+/* Sidebar Styling */
+.sidebar {
+    overflow: hidden;
+}
+
+.sidebar-inner {
+    box-shadow: 5px 5px 10px #ddd;
+    padding-bottom: 20px;
+    padding-top: 10px;
+    overflow-x: scroll;    
+
+}
+
+.sidebar h2 {
+    font-size: 1.7rem;
+    padding: 20px 0 6px 0;
+    margin: -10px 0 0 -15px;
+    letter-spacing: var(--header-spacing);
+    font-variant: small-caps;
+    text-shadow: 2px 2px 5px black;
+}
+
+.sidebar h3 {
+    font-size: 1.5rem;
+}
+
+
 /* component-specific styling */
+
+/* Tag Index Styling */
+#all-tags-list h3 {
+    padding-left: 10px;
+}
+
+.tagged-articles-list {
+    padding-bottom: 10px;
+}
+
+.tags-grouped-by-letter-list h4 {
+    font-size: 1.3rem;
+}
+
+
+/* Archive Page Styling */
+.archived-articles-list {
+    margin-top: 10px;
+}
+
+.archived-articles-list h2 {
+    padding: 5px 10px;
+    text-shadow: 2px 2px 5px black;
+}
+
+
+/* Post Styling */
 article.post {
     margin-top: 10px;
     margin-bottom: 20px;
@@ -161,62 +193,19 @@ article.post  figure {
     margin-right: auto;
 }
 
-#all-tags-list h3 {
-    padding-left: 10px;
-}
 
-.tagged-articles-list {
-    padding-bottom: 10px;
-}
-
-.tags-grouped-by-letter-list h4 {
-    font-size: 1.3rem;
-}
-
-.archived-articles-list {
-    margin-top: 10px;
-}
-
-.archived-articles-list h2 {
-    padding: 5px 10px;
-    text-shadow: 2px 2px 5px black;
-}
-
-
+/* Notes Styling */
 .single-note nav {
     margin-left: -15px;
 }
 
-article.post.h-entry .webmentions {
-    padding-top: 20px;
-    margin-left: 10px;
-}
-
-
-article.post.h-entry .webmentions .summary {
-    padding-bottom: 10px;
-}
-
-article.post.h-entry .webmentions .summary a.reply_stats {
-    letter-spacing: 0.5em;
-}
-
-article.post.h-entry .webmentions .display h3 {
-    font-size: 1.5 rem;
-    padding-bottom: 10px;
-}
-
-article.post.h-entry .webmentions .display div.row {
+.h-entry.note .e-content {
     margin:0;
-    padding-bottom: 10px;
-}
-
-article.post.h-entry .webmentions .display .media .media-left {
-    padding-right: 10px;
-}
-
-article.post.h-entry .webmentions .display .media .media-left img {
-    box-shadow: 2px 2px 2px #999;
+    padding: 20px;
+    box-shadow: 2px 2px 5px #ddd;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .notes-roll {
@@ -249,11 +238,39 @@ article.post.h-entry .webmentions .display .media .media-left img {
     color: var(--light);
 }
 
-.h-entry.note .e-content {
+/* Webmentions Styling */
+.h-entry .webmentions {
+    margin-top: 20px;
+    margin-left: 10px;
+}
+
+.h-entry .webmentions {
+    padding-top: 20px;
+    margin-left: 10px;
+}
+
+.h-entry .webmentions .summary {
+    padding-bottom: 10px;
+}
+
+.h-entry .webmentions .summary a.reply_stats {
+    letter-spacing: 0.5em;
+}
+
+.h-entry .webmentions .display h3 {
+    font-size: 1.5 rem;
+    padding-bottom: 10px;
+}
+
+.h-entry .webmentions .display div.row {
     margin:0;
-    padding: 20px;
-    box-shadow: 2px 2px 5px #ddd;
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
+    padding-bottom: 10px;
+}
+
+.h-entry .webmentions .display .media .media-left {
+    padding-right: 10px;
+}
+
+.h-entry .webmentions .display .media .media-left img {
+    box-shadow: 2px 2px 2px #999;
 }

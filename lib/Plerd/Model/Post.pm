@@ -168,6 +168,7 @@ has indieweb_sub => (
     is => 'rw',
     lazy => 1,
     builder => '_build_indieweb_sub',
+    coerce => \&_coerce_uri,
 );
 
 sub _build_indieweb_sub {
@@ -684,6 +685,15 @@ sub _coerce_title {
     $string =~ s{</?p>\s*}{}g;
 
     return $string;
+}
+
+sub _coerce_uri {
+    my ($string) = @_;
+    return unless $string;
+    if (ref $string eq 'URI') {
+        return $string;
+    }
+    return URI->new($string);
 }
 
 sub _strip_html {

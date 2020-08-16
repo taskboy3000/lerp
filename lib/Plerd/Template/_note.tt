@@ -16,4 +16,13 @@
 
     </div>
     <div class="e-content">[% note.body %]</div>
+
+    [% IF note.webmentions_summary_uri %]
+    <div class="webmentions">
+        <div class="summary" data-summary-uri="[% note.webmentions_summary_uri %]"><small>loading...</small></div>
+        <div class="display collapse" data-display-uri="[% note.webmentions_display_uri %]"><small>loading...</small></div>
+    </div>
+    [% END %]
+    
 </div>
+
