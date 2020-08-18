@@ -98,12 +98,22 @@ nav.navbar {
     margin-top: -10px;
 }
 
+.content blockquote {
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-left: 2px solid #ddd;
+}
+
 footer.engine-attribution {
     margin-top: 40px;
     font-style: italic;
     font-size: 90%;
 }
 
+
+/* component-specific styling */
 
 /* Sidebar Styling */
 .sidebar {
@@ -130,9 +140,6 @@ footer.engine-attribution {
 .sidebar h3 {
     font-size: 1.5rem;
 }
-
-
-/* component-specific styling */
 
 /* Tag Index Styling */
 #all-tags-list h3 {
