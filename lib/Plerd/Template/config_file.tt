@@ -30,6 +30,14 @@ title:        [% config.title %]
 # description: An optional blurb that will appear on the recent posts view
 site_description:  [% config.site_description %]
 
+latest_articles_description: 
+
+notes_description: 
+
+tags_description: 
+
+archive_description: 
+
 # author_name: The name of this blog's author.
 author_name:  [% config.author_name %]
 

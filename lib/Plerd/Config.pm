@@ -184,6 +184,10 @@ sub _build_run_directory {
 }
 
 has 'site_description' => (is => 'rw', predicate => 1);
+has 'archive_description' => (is => 'rw', predicate => 1);
+has 'latest_articles_description' => (is => 'rw', predicate => 1);
+has 'notes_description' => (is => 'rw', predicate => 1);
+has 'tags_description' => (is => 'rw', predicate => 1);
 
 has 'show_max_posts' => (is => 'rw', default => sub { 5 });
 
@@ -297,16 +301,16 @@ sub initialize {
 
     my @messages;
     for my $dir_method (qw[
-        path
         database_directory
-        publication_directory
         log_directory
         notes_publication_directory
-        template_directory
+        path
+        publication_directory
+        run_directory
         source_directory
         source_notes_directory
-        run_directory
-    ]) {
+        template_directory
+                        ]) {
         if (!-d $self->$dir_method) {
             push @messages, "Creating " . $self->$dir_method();
             $self->$dir_method->mkpath;

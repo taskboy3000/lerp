@@ -3,6 +3,7 @@ package Plerd::Model::Note;
 use Modern::Perl '2018';
 
 use DateTime;
+use DateTime::Format::MySQL;
 use DateTime::Format::W3CDTF;
 use HTML::Strip;
 use Path::Class::File;
@@ -39,6 +40,15 @@ sub _build_date {
 
     my $mtime = $self->source_file->stat->mtime;
     DateTime->from_epoch(epoch => $mtime, time_zone => 'local');
+}
+
+has 'date_as_mysql' => (
+    is => 'rw',
+    lazy => 1,
+    builder => '_build_date_as_mysql',
+);
+sub _build_date_as_mysql {
+    DateTime::Format::MySQL->format_datetime(shift->date);
 }
 
 has 'publication_file' => (

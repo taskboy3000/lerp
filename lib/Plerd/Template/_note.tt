@@ -4,7 +4,9 @@
 <div class="h-entry note">
     <div class="masthead">
         Published on
-        <time class="dt-published" datetime="[% note.utc_date.ymd %]T[% note.utc_date.hms %]+00:00">[% note.date.month_name %] [% note.date.day %], [% note.date.year %] at [% zero_padded(note.date.hour) %]:[% zero_padded(note.date.minute) %]</time>
+        <time class="dt-published" datetime="[% note.utc_date.ymd %]T[% note.utc_date.hms %]+00:00">
+            [% note.date_as_mysql %] UTC            
+        </time>
         by 
         <a class="p-author h-card text-light" href="[% config.base_uri %]">[% config.author_name %]</a>
 

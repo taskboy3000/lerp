@@ -1,5 +1,6 @@
 requires 'Data::GUID';
 requires 'DateTime';
+requires 'DateTime::Format::MySQL';
 requires 'DateTime::Format::W3CDTF';
 requires 'FindBin';
 requires 'HTML::SocialMeta' => '0.72';

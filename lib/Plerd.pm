@@ -39,6 +39,24 @@ sub _build_archive {
     Plerd::Model::Archive->new(config => $self->config);
 }
 
+has 'archive_description' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_archive_description',
+    predicate => 1,
+);
+sub _build_archive_description {
+    my ($self) = @_;
+
+    my $description = $self->config->archive_description;
+    if ($description) {
+        return Plerd::SmartyPants::process(markdown($description));
+    }
+
+    return "";
+}
+
+
 has 'config' => (
     is => 'ro',
     lazy => 1,
@@ -71,6 +89,42 @@ sub _build_json_feed {
     Plerd::Model::JSONFeed->new(config => $self->config);
 }
 
+has 'latest_articles_description' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_latest_articles_description',
+    predicate => 1,
+);
+sub _build_latest_articles_description {
+    my ($self) = @_;
+
+    my $description = $self->config->latest_articles_description;
+    if ($description) {
+        return Plerd::SmartyPants::process(markdown($description));
+    }
+
+    return "";
+}
+
+
+has 'notes_description' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_notes_description',
+    predicate => 1,
+);
+sub _build_notes_description {
+    my ($self) = @_;
+
+    my $description = $self->config->notes_description;
+    if ($description) {
+        return Plerd::SmartyPants::process(markdown($description));
+    }
+
+    return "";
+}
+
+
 has 'notes_json_feed' => (
     is => 'ro',
     builder => '_build_notes_json_feed'
@@ -101,9 +155,12 @@ sub _build_publisher {
         ABSOLUTE => 1,
         PRE_DEFINE => {
             archive => $self->archive,
+            archiveDescription => $self->archive_description,
             config => $self->config,
             frontPage => $self->front_page,
             jsonFeed => $self->json_feed,
+            latestArchiveDescription => $self->latest_articles_description,
+            notesDescription => $self->notes_description,
             notesJSONFeed => $self->notes_json_feed,
             notesRoll => $self->notes_roll,
             rssFeed => $self->rss_feed,
@@ -149,7 +206,7 @@ sub _build_site_css {
 }
 
 has 'site_description' => (
-    is => 'ro', 
+    is => 'ro',
     lazy => 1,
     builder => '_build_site_description',
     predicate => 1,
@@ -172,6 +229,7 @@ EOT
     return markdown($default_description);
 }
 
+
 has 'site_js' => (
     is => 'ro',
     lazy => 1,
@@ -187,6 +245,24 @@ has 'sorted_source_files' => (
     clearer => 1,
     predicate => 1,
 );
+
+
+has 'tags_description' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_tags_description',
+    predicate => 1,
+);
+sub _build_tags_description {
+    my ($self) = @_;
+
+    my $description = $self->config->tags_description;
+    if ($description) {
+        return Plerd::SmartyPants::process(markdown($description));
+    }
+
+    return "";
+}
 
 has 'tags_index' => (
     is => 'ro',
@@ -313,7 +389,7 @@ sub publish_note {
     my $must_republish = ($opts{force} || !$published_file_exists);
     if (!$must_republish) {
         # ought I to republish?
-        if ($published_file_exists 
+        if ($published_file_exists
             && ($note->publication_file->stat->mtime >= $note->source_file->stat->mtime)
         ) {
             if ($opts{verbose}) {
@@ -570,7 +646,7 @@ sub publish_rss_feed {
     my $feed = $self->rss_feed;
     my $post_memory = $self->config->post_memory;
 
-    # @fixme - need to regen?                                                              
+    # @fixme - need to regen?
     my @posts;
 
     my $max_posts = $self->config->show_max_posts;
@@ -832,7 +908,7 @@ sub publish_all {
             say "Looking for new notes files in " . $self->config->source_notes_directory;
         }
 
-        if (-d $self->config->source_notes_directory) {        
+        if (-d $self->config->source_notes_directory) {
             # @todo: sort source by mtime
             while (my $file = $self->config->source_notes_directory->next) {
                 next if -d $file;
@@ -853,7 +929,7 @@ sub publish_all {
                     if ($opts{verbose}) {
                         say "Declining to reprocess old note: " . $file->basename;
                     }
-                    next;                    
+                    next;
 
                 }
             }
