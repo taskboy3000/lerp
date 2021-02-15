@@ -3,8 +3,9 @@
 # See https://github.com/jmacdotorg/plerd for more details.
 use Modern::Perl '2018';
 use FindBin;
+
 BEGIN {
-    $::gLIBDIR="$FindBin::Bin/../lib";
+    $::gLIBDIR = "$FindBin::Bin/../lib";
 }
 use lib $::gLIBDIR;
 
@@ -21,14 +22,15 @@ exit;
 #-----------
 sub TestDefault {
     my %baselines = (
-        "-- Russia, with love" => q[— Russia, with love],
-        q[My "smartquotes"] => q[My “smartquotes”],
-        q[I can't believe it's not butter!] => q[I can’t believe it’s not butter!],
-     );
+        "-- Russia, with love"              => q[— Russia, with love],
+        q[My "smartquotes"]                 => q[My “smartquotes”],
+        q[I can't believe it's not butter!] =>
+            q[I can’t believe it’s not butter!],
+    );
 
-    for my $test (sort keys %baselines) {
-        my $got = Plerd::SmartyPants->process($test);
-        ok($got eq $baselines{$test}, $test);
+    for my $test ( sort keys %baselines ) {
+        my $got = Plerd::SmartyPants->process( $test );
+        ok( $got eq $baselines{ $test }, $test );
     }
 
 }
@@ -37,6 +39,7 @@ sub TestDefault {
 # Helpers
 #------------
 sub Main {
+
     # Initialize globals as needed
     setup();
 

@@ -13,48 +13,50 @@ use Plerd::Remembrancer;
 # Attributes and Builders
 #-------------------------
 has 'config' => (
-    is => 'ro', 
-    lazy => 1, 
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_config'
 );
+
 sub _build_config {
-    Plerd::Config->new();    
+    Plerd::Config->new();
 }
 
 has 'publication_file' => (
-    is => 'ro', 
-    lazy => 1, 
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_publication_file'
 );
-sub _build_publication_file {
-    my ($self) = @_;
 
-    Path::Class::File->new(
-        $self->config->publication_directory,
-        "notes_roll.html"
-    );
+sub _build_publication_file {
+    my ( $self ) = @_;
+
+    Path::Class::File->new( $self->config->publication_directory,
+        "notes_roll.html" );
 }
 
 has 'template_file' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_template_file'
 );
+
 sub _build_template_file {
-    my ($self) = @_;
-    Path::Class::File->new($self->config->template_directory, "notes_roll.tt");
+    my ( $self ) = @_;
+    Path::Class::File->new( $self->config->template_directory,
+        "notes_roll.tt" );
 }
 
 has 'uri' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_uri'
-); 
-sub _build_uri {
-    my ($self) = @_;
-    my $base_uri = $self->config->base_uri;
-    return URI->new($base_uri . $self->publication_file->basename);
-}
+);
 
+sub _build_uri {
+    my ( $self ) = @_;
+    my $base_uri = $self->config->base_uri;
+    return URI->new( $base_uri . $self->publication_file->basename );
+}
 
 1;

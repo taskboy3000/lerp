@@ -10,61 +10,65 @@ use Plerd::Config;
 #-------------------------
 # Attributes and Builders
 #-------------------------
-has config => ('is' => 'rw', lazy => 1, builder => '_build_config');
+has config => ( 'is' => 'rw', lazy => 1, builder => '_build_config' );
+
 sub _build_config {
-    Plerd::Config->new();    
+    Plerd::Config->new();
 }
 
 has 'name' => (
-    is => 'rw',
+    is     => 'rw',
     coerce => \&_canonicalize_tag
 );
 
 has 'source_file' => (
-    is => 'ro',
+    is        => 'ro',
     predicate => 1,
-    coerce => \&_coerce_source_file,
+    coerce    => \&_coerce_source_file,
 );
+
 sub _coerce_source_file {
-    my ($file) = @_;
-    if (ref $file eq 'Path::Class::File') {
+    my ( $file ) = @_;
+    if ( ref $file eq 'Path::Class::File' ) {
         return $file;
-    } 
-    return Path::Class::File->new($file);
+    }
+    return Path::Class::File->new( $file );
 }
 
 has 'template_file' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_template_file'
 );
+
 sub _build_template_file {
-    my ($self) = @_;
-    Path::Class::File->new($self->config->template_directory, "tags.tt");
+    my ( $self ) = @_;
+    Path::Class::File->new( $self->config->template_directory, "tags.tt" );
 }
 
 has 'uri' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_uri'
 );
+
 sub _build_uri {
     my $self = shift;
 
     # @todo: ensure name is URL safe
-    return URI->new('tags.html#tag-' . $self->name . '-list');
+    return URI->new( 'tags.html#tag-' . $self->name . '-list' );
 }
 
 #-----------
 # Coersions
 #-----------
 sub _canonicalize_tag {
-    my ($tag) = @_;
+    my ( $tag ) = @_;
 
-    chomp($tag);
+    chomp( $tag );
 
     # no html
-    if ($tag =~ /[<>]/) {
+    if ( $tag =~ /[<>]/ ) {
         $tag =~ s{(</?[^>]+>)}{}g;
     }
 
@@ -74,7 +78,7 @@ sub _canonicalize_tag {
     # remove octothorpes
     $tag =~ s/#//g;
 
-    return lc($tag);
+    return lc( $tag );
 }
 
 1;

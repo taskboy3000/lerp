@@ -1,4 +1,4 @@
-# This class is a primative hash on disk.
+# This class is a primitive hash on disk.
 #
 # keys are files relative to some base dir.
 # values are the contents of those files.
@@ -18,17 +18,18 @@ use YAML;
 
 # Needs to be set by the caller
 has database_directory => (
-    is => 'ro', 
-    required => 1, 
-    coerce => \&_coerce_directory
+    is       => 'ro',
+    required => 1,
+    coerce   => \&_coerce_directory
 );
+
 sub _coerce_directory {
-    my ($path) = @_;
-    if (ref $path eq 'Path::Class::Dir') {
+    my ( $path ) = @_;
+    if ( ref $path eq 'Path::Class::Dir' ) {
         return $path->absolute;
     }
 
-    return Path::Class::Dir->new($path)->absolute;    
+    return Path::Class::Dir->new( $path )->absolute;
 }
 
 #----------------------
@@ -39,23 +40,23 @@ sub _coerce_directory {
 #   DB_DIR/foo/bar/
 #      with a key file called 'baz'
 sub save {
-    my ($self, $key, $payload) = @_;
+    my ( $self, $key, $payload ) = @_;
 
-    my $entry = $self->_key_to_entry($key);
-    if (!-d $entry->parent) {
-        if (-e $entry->parent) {
-            die("Declining to overwrite existing key: " . $entry->parent);
+    my $entry = $self->_key_to_entry( $key );
+    if ( !-d $entry->parent ) {
+        if ( -e $entry->parent ) {
+            die( "Declining to overwrite existing key: " . $entry->parent );
         } else {
             $entry->parent->mkpath;
-        }   
+        }
     }
 
-    if (!-e $entry && ref $payload eq ref {}) {
-        $payload->{created_at} = Time::HiRes::time();
+    if ( !-e $entry && ref $payload eq ref {} ) {
+        $payload->{ created_at } = Time::HiRes::time();
     }
 
-    if (ref $payload) {
-        $entry->spew(Dump($payload));
+    if ( ref $payload ) {
+        $entry->spew( Dump( $payload ) );
     } else {
         $entry->touch;
     }
@@ -64,15 +65,15 @@ sub save {
 }
 
 sub exists {
-    my ($self, $key) = @_;
-    my $entry = $self->_key_to_entry($key);
+    my ( $self, $key ) = @_;
+    my $entry = $self->_key_to_entry( $key );
     return -e $entry;
 }
 
 sub updated_at {
-    my ($self, $key) = @_;
-    my $entry = $self->_key_to_entry($key);
-    if (-e $entry) { 
+    my ( $self, $key ) = @_;
+    my $entry = $self->_key_to_entry( $key );
+    if ( -e $entry ) {
         my $stat = $entry->stat();
         return $stat->mtime;
     }
@@ -81,13 +82,13 @@ sub updated_at {
 }
 
 sub load {
-    my ($self, $key) = @_;
-    my $entry = $self->_key_to_entry($key);
+    my ( $self, $key ) = @_;
+    my $entry = $self->_key_to_entry( $key );
 
-    if (-e $entry) {
-        if (-s $entry) {
+    if ( -e $entry ) {
+        if ( -s $entry ) {
             my $yaml = $entry->slurp();
-            return Load($yaml);
+            return Load( $yaml );
         } else {
             return 1;
         }
@@ -98,65 +99,62 @@ sub load {
 
 # Alpha sorted keys;
 sub keys {
-    my ($self) = @_;
+    my ( $self ) = @_;
 
     my $filter = sub {
-        my ($files) = @_;
+        my ( $files ) = @_;
 
         return sort { $a->stringify cmp $b->stringify } @$files;
     };
 
-    my @files = _dir_walk($self->database_directory, $filter);
+    my @files = _dir_walk( $self->database_directory, $filter );
 
-    return [ map { $self->_entry_to_key($_) } @files ];
+    return [ map { $self->_entry_to_key( $_ ) } @files ];
 }
 
 # Reverse chrono keys
 sub earliest_keys {
-    my ($self) = @_;
+    my ( $self ) = @_;
 
     my $filter = sub {
-        my ($files) = @_;
+        my ( $files ) = @_;
 
         return sort { $a->stat->mtime <=> $b->stat->mtime } @$files;
     };
-    my @files = _dir_walk($self->database_directory, $filter);
+    my @files = _dir_walk( $self->database_directory, $filter );
 
-    return [ map { $self->_entry_to_key($_) } @files ];
+    return [ map { $self->_entry_to_key( $_ ) } @files ];
 }
 
 # Chrono keys
 sub latest_keys {
-    my ($self) = shift;
+    my ( $self ) = shift;
 
     my $filter = sub {
-        my ($files) = @_;
+        my ( $files ) = @_;
 
         return sort { $b->stat->mtime <=> $a->stat->mtime } @$files;
     };
-    my @files = _dir_walk($self->database_directory, $filter);
+    my @files = _dir_walk( $self->database_directory, $filter );
 
-    return [ map { $self->_entry_to_key($_) } @files ];
+    return [ map { $self->_entry_to_key( $_ ) } @files ];
 }
 
 sub keys_in_created_order {
     my $self = shift;
     my $keys = $self->keys;
 
-    my @keys = map {
-            $_->[0]
-        } sort {
-            $a->[-1]->{created_at} <=> $b->[1]->{created_at} 
-        } map {
-            [ $_, $self->load($_) ]
-        } @$keys;
+    my @keys =
+        map  { $_->[ 0 ] }
+        sort { $a->[ -1 ]->{ created_at } <=> $b->[ 1 ]->{ created_at } }
+        map  { [ $_, $self->load( $_ ) ] } @$keys;
 
     return \@keys;
 }
 
 sub remove {
-    my ($self, $key) = @_;
-    my $entry = $self->_key_to_entry($key);
+    my ( $self, $key ) = @_;
+    my $entry = $self->_key_to_entry( $key );
 
     return if !-e $entry;
 
@@ -168,29 +166,29 @@ sub remove {
 # Private keys
 #-----------------------
 sub _key_to_entry {
-    my ($self, $key) = @_;
+    my ( $self, $key ) = @_;
 
     # Make a copy of $key array so as not to maul the caller
     my @copy;
-    if (ref $key eq ref []) {
+    if ( ref $key eq ref [] ) {
         @copy = @$key;
     } else {
-        @copy = ($key);
+        @copy = ( $key );
     }
 
-    my $entry = Path::Class::File->new($self->database_directory, @copy);
+    my $entry = Path::Class::File->new( $self->database_directory, @copy );
 
     return $entry;
 }
 
 sub _entry_to_key {
-    my ($self, $entry) = @_;
+    my ( $self, $entry ) = @_;
     return if !$entry;
 
-    my $rel = $entry->relative($self->database_directory);
+    my $rel   = $entry->relative( $self->database_directory );
     my @parts = $rel->components;
 
-    if ($parts[0] eq ".") {
+    if ( $parts[ 0 ] eq "." ) {
         shift @parts;
     }
 
@@ -199,33 +197,34 @@ sub _entry_to_key {
 
 # not a method
 sub _dir_walk {
-    my ($dir, $filter_coderef) = @_;
- 
-    if (!-d $dir) {
+    my ( $dir, $filter_coderef ) = @_;
+
+    if ( !-d $dir ) {
         return;
     }
 
     my @found;
-    while (my $thing = $dir->next) {
+    while ( my $thing = $dir->next ) {
+
         # No dot files allowed
-        if (substr($thing->basename, 0, 1) eq '.') {
+        if ( substr( $thing->basename, 0, 1 ) eq '.' ) {
             next;
         }
 
         # no temp file from editors
-        if (substr($thing->basename, -1, 1) eq '~') {
+        if ( substr( $thing->basename, -1, 1 ) eq '~' ) {
             next;
         }
 
-        if ($thing->is_dir) {
-            push @found, _dir_walk($thing); # pass along filter? 
+        if ( $thing->is_dir ) {
+            push @found, _dir_walk( $thing );    # pass along filter?
         } else {
             push @found, $thing;
         }
     }
 
-    if (defined $filter_coderef) {
-        return $filter_coderef->(\@found);        
+    if ( defined $filter_coderef ) {
+        return $filter_coderef->( \@found );
     }
 
     return @found;

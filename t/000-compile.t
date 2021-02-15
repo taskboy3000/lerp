@@ -1,9 +1,10 @@
 use Modern::Perl '2018';
 
 use FindBin;
+
 BEGIN {
-    $::gLIBDIR="$FindBin::Bin/../lib";
-    $::gBINDIR="$FindBin::Bin/../bin";
+    $::gLIBDIR = "$FindBin::Bin/../lib";
+    $::gBINDIR = "$FindBin::Bin/../bin";
 }
 use lib $::gLIBDIR;
 
@@ -16,47 +17,50 @@ exit;
 # Tests
 #-------
 sub TestCompileModules {
-    my @classFiles = sort glob("$::gLIBDIR/*.pm"), 
-    glob("$::gLIBDIR/*/*.pm"),
-    glob("$::gLIBDIR/*/*/*.pm");
+    my @classFiles = sort glob( "$::gLIBDIR/*.pm" ),
+        glob( "$::gLIBDIR/*/*.pm" ),
+        glob( "$::gLIBDIR/*/*/*.pm" );
 
-    for my $classFile (@classFiles) {
-        my @cmd = ($^X, "-I$::gLIBDIR", "-wc", $classFile, "2>/dev/null");
-        # diag(join(" ", @cmd)); 
+    for my $classFile ( @classFiles ) {
+        my @cmd = ( $^X, "-I$::gLIBDIR", "-wc", $classFile, "2>/dev/null" );
 
-        system(join(" ", @cmd));
+        # diag(join(" ", @cmd));
 
-        my $ok=0;
-        if ($? == -1) {
-            printf("Could not execute: %s\n", join(" ", @cmd));
-        } elsif ($? && 127) {
-            # Expected with bad compiles 
+        system( join( " ", @cmd ) );
+
+        my $ok = 0;
+        if ( $? == -1 ) {
+            printf( "Could not execute: %s\n", join( " ", @cmd ) );
+        } elsif ( $? && 127 ) {
+
+            # Expected with bad compiles
         } else {
-            $ok=1;
+            $ok = 1;
         }
 
-        ok($ok, "Compiling : $classFile");
+        ok( $ok, "Compiling : $classFile" );
     }
 }
 
 sub TestCompileExecuteables {
-    my @binFiles = sort glob("$::gBINDIR/*");
+    my @binFiles = sort glob( "$::gBINDIR/*" );
 
-    for my $binFile (@binFiles) {
-        my @cmd = ($^X, "-I$::gLIBDIR", "-wc", $binFile, "2>/dev/null");
-        
-        system(join(" ", @cmd));
+    for my $binFile ( @binFiles ) {
+        my @cmd = ( $^X, "-I$::gLIBDIR", "-wc", $binFile, "2>/dev/null" );
 
-        my $ok=0;
-        if ($? == -1) {
-            printf("Could not execute: %s\n", join(" ", @cmd));
-        } elsif ($? && 127) {
+        system( join( " ", @cmd ) );
+
+        my $ok = 0;
+        if ( $? == -1 ) {
+            printf( "Could not execute: %s\n", join( " ", @cmd ) );
+        } elsif ( $? && 127 ) {
+
             # Expected with bad compiles
         } else {
-            $ok=1;
+            $ok = 1;
         }
 
-        ok($ok, "Compiling : $binFile");
+        ok( $ok, "Compiling : $binFile" );
     }
 
 }

@@ -11,9 +11,10 @@ use Plerd::Config;
 #-------------------------
 # Attributes and Builders
 #-------------------------
-has config => ('is' => 'ro', lazy => 1, builder => '_build_config');
+has config => ( 'is' => 'ro', lazy => 1, builder => '_build_config' );
+
 sub _build_config {
-    Plerd::Config->new();    
+    Plerd::Config->new();
 }
 
 #has 'feed_template_file' => (
@@ -26,36 +27,36 @@ sub _build_config {
 #    Path::Class::File->new($self->config->template_directory, "feed.tt");
 #}
 
-
 has 'publication_file' => (
-    is => 'ro',
-    lazy => 1, 
-    predicate => 1, 
-    builder => '_build_publication_file'
+    is        => 'ro',
+    lazy      => 1,
+    predicate => 1,
+    builder   => '_build_publication_file'
 );
+
 sub _build_publication_file {
     my $self = shift;
-    Path::Class::File->new(
-        $self->config->publication_directory,
-        "archive.html",
-    );
+    Path::Class::File->new( $self->config->publication_directory,
+        "archive.html", );
 }
 
 has 'template_file' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_template_file'
 );
+
 sub _build_template_file {
-    my ($self) = @_;
-    Path::Class::File->new($self->config->template_directory, "archive.tt");
+    my ( $self ) = @_;
+    Path::Class::File->new( $self->config->template_directory, "archive.tt" );
 }
 
 has 'uri' => (
-    is => 'ro',
-    lazy => 1,
+    is      => 'ro',
+    lazy    => 1,
     builder => '_build_uri'
 );
+
 sub _build_uri {
     my $self = shift;
 
@@ -64,6 +65,5 @@ sub _build_uri {
         $self->config->base_uri,
     );
 }
-
 
 1;

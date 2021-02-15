@@ -19,21 +19,20 @@ exit;
 #--------------
 sub TestNameLogic {
     my %baselines = (
-        'cat' => 'cat',
-        'Dog' => 'dog',
-        'Foo BaR' => 'foo_bar',
+        'cat'                          => 'cat',
+        'Dog'                          => 'dog',
+        'Foo BaR'                      => 'foo_bar',
         'An <em>important</em> LESSON' => 'an_important_lesson',
-        '#octothorpe' => 'octothorpe',
+        '#octothorpe'                  => 'octothorpe',
     );
 
-    for my $tag (keys %baselines) {
-        my $t = Plerd::Model::Tag->new(name => $tag, config => $gCFG);
-        ok($t->name eq $baselines{$tag}, "Canonicalized '$tag' to '" . $t->name . "'");
-        diag("Tag URI: " . $t->uri);
-    } 
+    for my $tag ( keys %baselines ) {
+        my $t = Plerd::Model::Tag->new( name => $tag, config => $gCFG );
+        ok( $t->name eq $baselines{ $tag },
+            "Canonicalized '$tag' to '" . $t->name . "'" );
+        diag( "Tag URI: " . $t->uri );
+    }
 }
-
-
 
 #--------------
 # Helpers
@@ -49,7 +48,7 @@ sub Main {
 }
 
 sub setup {
-    $gCFG = Plerd::Config->new(path => "$FindBin::Bin/init/new-site");
+    $gCFG = Plerd::Config->new( path => "$FindBin::Bin/init/new-site" );
     $gCFG->initialize;
 }
 

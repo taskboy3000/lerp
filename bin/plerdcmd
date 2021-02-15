@@ -3,10 +3,11 @@
 use Modern::Perl '2018';
 
 use FindBin;
+
 BEGIN {
-    if (!exists $ENV{PLERD_HOME}) {
-        $ENV{PLERD_HOME}="$FindBin::Bin/..";
-    }   
+    if ( !exists $ENV{ PLERD_HOME } ) {
+        $ENV{ PLERD_HOME } = "$FindBin::Bin/..";
+    }
 }
 use lib "$ENV{PLERD_HOME}/lib";
 
@@ -27,39 +28,52 @@ exit;
 sub Main {
     my %opts;
     GetOptions(
+
         # commands
-        'init' => \$opts{initialize},
-        'P|publish-all' => \$opts{publish_all},
-        'N|publish-only-notes' => \$opts{publish_only_notes},
-        'O|publish-only-posts' => \$opts{publish_only_posts},
-        'S|publish-only-support' => \$opts{publish_only_support},
-        'list-recent-posts' => \$opts{list_recent_posts},
+        'init'                   => \$opts{ initialize },
+        'P|publish-all'          => \$opts{ publish_all },
+        'N|publish-only-notes'   => \$opts{ publish_only_notes },
+        'O|publish-only-posts'   => \$opts{ publish_only_posts },
+        'S|publish-only-support' => \$opts{ publish_only_support },
+        'list-recent-posts'      => \$opts{ list_recent_posts },
 
         # options
-        'c|config=s' => \$opts{config},
-        'd|base-dir=s' => \$opts{base_dir},
-        'force'        => \$opts{force},
-        'h|help' => \$opts{usage},
-        'v|verbose' => \$opts{verbose},
-        'version'   => \$opts{version},
+        'c|config=s'   => \$opts{ config },
+        'd|base-dir=s' => \$opts{ base_dir },
+        'force'        => \$opts{ force },
+        'h|help'       => \$opts{ usage },
+        'v|verbose'    => \$opts{ verbose },
+        'version'      => \$opts{ version },
     );
 
-    if ($opts{help}) {
+    if ( $opts{ help } ) {
         usage();
-    } elsif ($opts{version}){
+    } elsif ( $opts{ version } ) {
         version();
-    } elsif ($opts{initialize}) {
-        initialize($opts{config}, $opts{base_dir}, $opts{verbose});
-    } elsif ($opts{publish_all}) {
-        publish_all($opts{config}, $opts{verbose}, $opts{force});
-    } elsif ($opts{list_recent_posts}) {
-        list_recent_posts($opts{config});
-    } elsif ($opts{publish_only_notes}) {
-        publish_only_notes($opts{config}, $opts{verbose}, $opts{force});
-    } elsif ($opts{publish_only_posts}) {
-        publish_only_posts($opts{config}, $opts{verbose}, $opts{force});
-    } elsif ($opts{publish_only_support}) {
-        publish_only_support($opts{config}, $opts{verbose}, $opts{force});        
+    } elsif ( $opts{ initialize } ) {
+        initialize( $opts{ config }, $opts{ base_dir }, $opts{ verbose } );
+    } elsif ( $opts{ publish_all } ) {
+        publish_all( $opts{ config }, $opts{ verbose }, $opts{ force } );
+    } elsif ( $opts{ list_recent_posts } ) {
+        list_recent_posts( $opts{ config } );
+    } elsif ( $opts{ publish_only_notes } ) {
+        publish_only_notes(
+            $opts{ config },
+            $opts{ verbose },
+            $opts{ force }
+        );
+    } elsif ( $opts{ publish_only_posts } ) {
+        publish_only_posts(
+            $opts{ config },
+            $opts{ verbose },
+            $opts{ force }
+        );
+    } elsif ( $opts{ publish_only_support } ) {
+        publish_only_support(
+            $opts{ config },
+            $opts{ verbose },
+            $opts{ force }
+        );
     } else {
         usage();
     }
@@ -97,221 +111,234 @@ EOT
 
 sub version {
     my $cfg = Plerd::Config->new;
-    printf("%s / %s\nCode available at: %s\nThis is free software under the MIT License.\n",
-        $cfg->engine_name,
-        $cfg->engine_version,
-        $cfg->engine_uri
-    );
+    printf(
+        "%s / %s\nCode available at: %s\nThis is free software under the MIT License.\n",
+        $cfg->engine_name, $cfg->engine_version, $cfg->engine_uri );
 }
 
 sub get_config {
-    my ($conf_file, $base_dir) = @_;
+    my ( $conf_file, $base_dir ) = @_;
 
     my $config;
-    if (defined $conf_file && -e $conf_file) {
-        $config = Plerd::Config->new(config_file => $conf_file);
+    if ( defined $conf_file && -e $conf_file ) {
+        $config = Plerd::Config->new( config_file => $conf_file );
         $config->unserialize;
     } else {
         my %params;
-        if (defined $base_dir) {
-            $params{path} = $base_dir;
+        if ( defined $base_dir ) {
+            $params{ path } = $base_dir;
         }
-        if (defined $conf_file) {
-            $params{config_file} = $conf_file;
+        if ( defined $conf_file ) {
+            $params{ config_file } = $conf_file;
         }
-        $config = Plerd::Config->new(%params);
+        $config = Plerd::Config->new( %params );
     }
     return $config;
 }
 
 sub initialize {
-    my ($conf_file, $base_dir, $verbose) = @_;
+    my ( $conf_file, $base_dir, $verbose ) = @_;
 
-    my $config = get_config($conf_file, $base_dir);
+    my $config = get_config( $conf_file, $base_dir );
 
-    if ($verbose) {
-        printf("Using conf: %s\n", $config->config_file);
+    if ( $verbose ) {
+        printf( "Using conf: %s\n", $config->config_file );
     }
 
-    if ($verbose) {
+    if ( $verbose ) {
         say "Trying to obtain lock";
     }
 
-    my ($lock_fh) = get_lock($config);
+    my ( $lock_fh ) = get_lock( $config );
     my @messages = $config->initialize;
-    free_lock($lock_fh);
+    free_lock( $lock_fh );
 
-    if ($verbose) {
-        for my $line (@messages) {
+    if ( $verbose ) {
+        for my $line ( @messages ) {
             say $line;
         }
     }
 }
 
 sub publish_all {
-    my ($conf_file, $verbose, $force) = @_;
+    my ( $conf_file, $verbose, $force ) = @_;
 
     my $start = time();
 
-    my $config = get_config($conf_file);
+    my $config = get_config( $conf_file );
 
-    if (!-e $config->config_file) {
-        die("Cannot find plerd config file: " . $config->config_file);
+    if ( !-e $config->config_file ) {
+        die( "Cannot find plerd config file: " . $config->config_file );
     }
 
-    if ($verbose) {
+    if ( $verbose ) {
         say "Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
-    my $plerd = Plerd->new(config => $config);
-    if ($verbose) {
+    my $plerd = Plerd->new( config => $config );
+    if ( $verbose ) {
         say "Trying to obtain lock";
     }
 
-    my $lock_fh = get_lock($config);
-    if ($verbose) {
+    my $lock_fh = get_lock( $config );
+    if ( $verbose ) {
         say "Publishing articles to " . $config->publication_directory;
     }
 
-    $plerd->publish_all(verbose => $verbose, force => $force);
-    free_lock($lock_fh);
+    $plerd->publish_all( verbose => $verbose, force => $force );
+    free_lock( $lock_fh );
 
-    if ($verbose) {
-        printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
+    if ( $verbose ) {
+        printf( "Site generated in %0.02f minutes\n",
+            ( time() - $start ) / 60 );
     }
 }
 
 sub publish_only_notes {
-    my ($conf_file, $verbose, $force) = @_;
+    my ( $conf_file, $verbose, $force ) = @_;
 
     my $start = time();
 
-    my $config = get_config($conf_file);
+    my $config = get_config( $conf_file );
 
-    if (!-e $config->config_file) {
-        die("Cannot find plerd config file: " . $config->config_file);
+    if ( !-e $config->config_file ) {
+        die( "Cannot find plerd config file: " . $config->config_file );
     }
 
-    if ($verbose) {
+    if ( $verbose ) {
         say "Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
-    my $plerd = Plerd->new(config => $config);
-    if ($verbose) {
+    my $plerd = Plerd->new( config => $config );
+    if ( $verbose ) {
         say "Trying to obtain lock";
     }
 
-    my $lock_fh = get_lock($config);
-    if ($verbose) {
+    my $lock_fh = get_lock( $config );
+    if ( $verbose ) {
         say "Publishing articles to " . $config->publication_directory;
     }
 
-    $plerd->publish_all(verbose => $verbose, force => $force, only_notes => 1);
-    free_lock($lock_fh);
+    $plerd->publish_all(
+        verbose    => $verbose,
+        force      => $force,
+        only_notes => 1
+    );
+    free_lock( $lock_fh );
 
-    if ($verbose) {
-        printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
+    if ( $verbose ) {
+        printf( "Site generated in %0.02f minutes\n",
+            ( time() - $start ) / 60 );
     }
 
 }
 
 sub publish_only_posts {
-    my ($conf_file, $verbose, $force) = @_;
+    my ( $conf_file, $verbose, $force ) = @_;
 
     my $start = time();
 
-    my $config = get_config($conf_file);
+    my $config = get_config( $conf_file );
 
-    if (!-e $config->config_file) {
-        die("Cannot find plerd config file: " . $config->config_file);
+    if ( !-e $config->config_file ) {
+        die( "Cannot find plerd config file: " . $config->config_file );
     }
 
-    if ($verbose) {
+    if ( $verbose ) {
         say "Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
-    my $plerd = Plerd->new(config => $config);
-    if ($verbose) {
+    my $plerd = Plerd->new( config => $config );
+    if ( $verbose ) {
         say "Trying to obtain lock";
     }
 
-    my $lock_fh = get_lock($config);
-    if ($verbose) {
+    my $lock_fh = get_lock( $config );
+    if ( $verbose ) {
         say "Publishing articles to " . $config->publication_directory;
     }
 
-    $plerd->publish_all(verbose => $verbose, force => $force, only_posts => 1);
-    free_lock($lock_fh);
+    $plerd->publish_all(
+        verbose    => $verbose,
+        force      => $force,
+        only_posts => 1
+    );
+    free_lock( $lock_fh );
 
-    if ($verbose) {
-        printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
+    if ( $verbose ) {
+        printf( "Site generated in %0.02f minutes\n",
+            ( time() - $start ) / 60 );
     }
 
 }
 
 sub publish_only_support {
-    my ($conf_file, $verbose, $force) = @_;
+    my ( $conf_file, $verbose, $force ) = @_;
 
     my $start = time();
 
-    my $config = get_config($conf_file);
+    my $config = get_config( $conf_file );
 
-    if (!-e $config->config_file) {
-        die("Cannot find plerd config file: " . $config->config_file);
+    if ( !-e $config->config_file ) {
+        die( "Cannot find plerd config file: " . $config->config_file );
     }
 
-    if ($verbose) {
+    if ( $verbose ) {
         say "Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
-    my $plerd = Plerd->new(config => $config);
-    if ($verbose) {
+    my $plerd = Plerd->new( config => $config );
+    if ( $verbose ) {
         say "Trying to obtain lock";
     }
 
-    my $lock_fh = get_lock($config);
-    if ($verbose) {
+    my $lock_fh = get_lock( $config );
+    if ( $verbose ) {
         say "Publishing support files to " . $config->publication_directory;
     }
 
-    $plerd->publish_support_files(verbose => $verbose, force => $force, only_posts => 1);
-    free_lock($lock_fh);
+    $plerd->publish_support_files(
+        verbose    => $verbose,
+        force      => $force,
+        only_posts => 1
+    );
+    free_lock( $lock_fh );
 
-    if ($verbose) {
-        printf("Site generated in %0.02f minutes\n", (time()-$start)/60);
+    if ( $verbose ) {
+        printf( "Site generated in %0.02f minutes\n",
+            ( time() - $start ) / 60 );
     }
 }
 
-
-
 sub list_recent_posts {
-    my ($conf_file) = @_;
+    my ( $conf_file ) = @_;
 
-    my $config = get_config($conf_file);
-    if (!-e $config->config_file) {
-        die("Cannot find plerd config file: " . $config->config_file);
+    my $config = get_config( $conf_file );
+    if ( !-e $config->config_file ) {
+        die( "Cannot find plerd config file: " . $config->config_file );
     }
 
     $config->unserialize;
 
-    my $plerd = Plerd->new(config => $config);
+    my $plerd  = Plerd->new( config => $config );
     my $recent = $plerd->get_recent_posts;
-    if (@$recent == 0) {
+    if ( @$recent == 0 ) {
         say "No post published yet.";
         return;
     }
 
-    for my $post (@$recent) {
-        printf("[%s] %s published to %s\n",
-            scalar(localtime($post->source_file->stat->mtime)),
+    for my $post ( @$recent ) {
+        printf(
+            "[%s] %s published to %s\n",
+            scalar( localtime( $post->source_file->stat->mtime ) ),
             $post->source_file->basename,
             $post->publication_file->basename,
         );
@@ -320,20 +347,21 @@ sub list_recent_posts {
 }
 
 sub get_lock {
-    my ($config) = @_;
+    my ( $config ) = @_;
 
-    my $lock_file = Path::Class::File->new($ENV{TMPDIR} || "/tmp", "running.lock");
-    if (!-e $lock_file) {
+    my $lock_file =
+        Path::Class::File->new( $ENV{ TMPDIR } || "/tmp", "running.lock" );
+    if ( !-e $lock_file ) {
         $lock_file->touch;
     }
 
-    open my $fh, '<', $lock_file or die("assert");
-    flock($fh, LOCK_EX) or die "Cannot lock mailbox - $!\n";
+    open my $fh, '<', $lock_file or die( "assert" );
+    flock( $fh, LOCK_EX ) or die "Cannot lock mailbox - $!\n";
     return $fh;
 }
 
 sub free_lock {
-    my ($fh) = @_;
-    flock($fh, LOCK_UN);
-    close($fh);
+    my ( $fh ) = @_;
+    flock( $fh, LOCK_UN );
+    close( $fh );
 }

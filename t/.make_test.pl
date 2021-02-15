@@ -2,9 +2,10 @@
 use Modern::Perl '2018';
 
 use FindBin;
+
 BEGIN {
-    if (!exists $ENV{PLERD_HOME}) {
-        $ENV{PLERD_HOME} = "$FindBin::Bin/..";
+    if ( !exists $ENV{ PLERD_HOME } ) {
+        $ENV{ PLERD_HOME } = "$FindBin::Bin/..";
     }
 }
 
@@ -18,20 +19,20 @@ exit;
 #-------------------
 sub Main {
 
-    if (!$ARGV[0]) {
-        say("Usage: $0 [TEST_FILE]");
+    if ( !$ARGV[ 0 ] ) {
+        say( "Usage: $0 [TEST_FILE]" );
         exit;
     }
 
-    my $file = Path::Class::File->new($FindBin::Bin, $ARGV[0]);
-    
-    if (-e $file) {
-        die("Declining to overwrite:  " . $file);
+    my $file = Path::Class::File->new( $FindBin::Bin, $ARGV[ 0 ] );
+
+    if ( -e $file ) {
+        die( "Declining to overwrite:  " . $file );
     }
 
-    $file->spew(iomode => '>:encoding(UTF-8)', test_tmpl());
+    $file->spew( iomode => '>:encoding(UTF-8)', test_tmpl() );
 
-    say("Created " . $file);
+    say( "Created " . $file );
 }
 
 sub test_tmpl {
