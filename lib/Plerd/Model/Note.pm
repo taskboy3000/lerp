@@ -125,21 +125,34 @@ has 'title' => (
 
 sub _build_title {
     my ( $self ) = @_;
+
+    # 1. Use the source file name
+    if ( $self->source_file_loaded ) {
+        if ( my $basename = $self->source_file->basename ) {
+            $basename =~ s/\.txt$//i;
+            $basename =~ s/[_-]/ /g;
+            if ( $basename ) {
+                return $basename;
+            }
+        }
+    }
+
+    # 2. OK, try the content
     my $raw = $self->body;
     $raw = _strip_html( $raw );
 
-    my @words = split /\s+/, $raw;
-    if ( @words ) {
+    if ( my @words = split /\s+/, $raw ) {
         my $size = @words - 1;
         my $max  = $size > 6 ? 6 : $size;
         return join( " ", @words[ 0 .. $max ] );
-    } else {
-        my $basename = $self->publication_file->basename;
-        $basename =~ s/\.html$//;
-        return $basename;
     }
 
+    # 3. very sorry state of affairs if we get to this point
+    my $basename = $self->publication_file->basename;
+    $basename =~ s/\.html$//;
+    return $basename;
 }
+
 has 'utc_date' => (
     is      => 'rw',
     lazy    => 1,
@@ -293,7 +306,7 @@ sub load {
 
     my $new = $self->new(
         config      => $self->config,
-        source_file => $self->source_file,
+        source_file => $file,
     );
 
     my $raw_body = $file->slurp();
@@ -302,17 +315,6 @@ sub load {
     $new->source_file_loaded( 1 );
 
     return $new;
-}
-
-sub _strip_html {
-    my ( $raw_text ) = @_;
-    return unless $raw_text;
-    my $stripped = HTML::Strip->new->parse( $raw_text );
-
-    # Clean up apparently orphaned punctuation
-    $stripped =~ s{ ([;.,\?\!])}{$1}g;
-
-    return $stripped;
 }
 
 sub _coerce_file {
@@ -324,4 +326,18 @@ sub _coerce_file {
 
     return Path::Class::File->new( $thing );
 }
+
+sub _strip_html {
+    my ( $raw_text ) = @_;
+    return unless $raw_text;
+
+    my $stripped = HTML::Strip->new->parse( $raw_text );
+
+    # Clean up apparently orphaned punctuation
+    my $pat = q| ([;.,\?!])|;
+    $stripped =~ s($pat)($1)g;
+
+    return $stripped;
+}
+
 1;
