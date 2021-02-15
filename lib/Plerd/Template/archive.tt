@@ -4,7 +4,7 @@
 %]
 <div class="archived-articles-list">
 [% current_month = 0 %]
-[% FOREACH post IN posts %]
+[% FOREACH post IN posts.reverse %]
     [% post_month = post.year _ post.month %]
     [% IF !current_month || current_month != post_month %]
         [% IF current_month %]
