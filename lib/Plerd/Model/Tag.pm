@@ -5,6 +5,8 @@ use Modern::Perl '2018';
 use Moo;
 use URI;
 
+use overload '""' => 'to_string';
+
 use Plerd::Config;
 
 #-------------------------
@@ -57,6 +59,11 @@ sub _build_uri {
 
     # @todo: ensure name is URL safe
     return URI->new( 'tags.html#tag-' . $self->name . '-list' );
+}
+
+sub to_string {
+    my ( $self ) = @_;
+    return $self->name;
 }
 
 #-----------

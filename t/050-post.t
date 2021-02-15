@@ -43,7 +43,15 @@ sub TestPostWithFormatedTitle {
     ok( $post->has_title,   "Post has title: " . $post->title );
     ok( $post->has_body,    "Post does have a body" );
     ok( $post->can_publish, "Post can be published" );
+
+    my $raw = $post->raw_body;
     diag( "Published filename would be: " . $post->published_filename );
+    my $rewrite = $post->get_updated_source;
+    if ( $raw ne $rewrite ) {
+        diag(
+            "Rewritten source changed: \n---Original:---\n$raw\n---New:---\n$rewrite"
+        );
+    }
 }
 
 #--------------

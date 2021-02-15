@@ -119,7 +119,8 @@ sub _build_description {
     $description || '';
 }
 
-has 'guid' => ( is => 'rw', lazy => 1, builder => '_build_guid' );
+has 'guid' =>
+    ( is => 'rw', lazy => 1, builder => '_build_guid', predicate => 1 );
 
 sub _build_guid {
     my ( $self ) = @_;
@@ -644,8 +645,7 @@ sub load_source {
                 $self->$key( $value );
             }
 
-            unless ( grep { $_ eq $key } @{ $self->ordered_attribute_names } )
-            {
+            if ( !grep { $_ eq $key } @{ $self->ordered_attribute_names } ) {
                 push @{ $self->ordered_attribute_names }, $key;
             }
         } else {
@@ -653,11 +653,18 @@ sub load_source {
         }
     }
 
+    if ( !$self->has_guid ) {
+        $self->guid;    # force one to be generated
+        $self->attributes_have_changed( 1 );
+    }
+
     my $body;
-    $body = "$line\n" if defined $line;
+
+    $body = "$line\n" if length( $line ) > 0;
     while ( <$fh> ) {
         $body .= $_;
     }
+
     close $fh;
     $self->raw_body( $body );    # @thinkie: raw_title?
     $self->body( $body );        # this converts MD to HTML
@@ -665,19 +672,54 @@ sub load_source {
     return 1;
 }
 
-sub serialize_source {
+sub get_updated_source {
     my ( $self ) = @_;
 
     # if $self->attributes_have_changed...
     my $new_content = '';
+
     for my $attribute_name ( @{ $self->ordered_attribute_names } ) {
-        if ( defined $self->attributes->{ $attribute_name } ) {
-            $new_content .= sprintf( "%s: %s\n",
-                $attribute_name, $self->attributes->{ $attribute_name } );
+        if ( $self->can( $attribute_name ) ) {
+            my $val = $self->$attribute_name();
+
+            if ( ref $val eq 'ARRAY' ) {
+                $val = join( ', ', @$val );
+            } elsif ( ref $val eq 'HASH' ) {
+                my @tmp;
+                for my $k ( sort keys %$val ) {
+                    push @tmp, sprintf( "(%s=%s)", $k, $val->{ $k } );
+                }
+                $val = join( ', ', @tmp );
+            } elsif ( ref $val eq 'Path::Class::File' ) {
+                $val = "$val";
+            } elsif ( ref $val eq 'Data::GUID' ) {
+                $val = "$val";
+            } elsif ( ref $val && $val->isa( 'URI' ) ) {
+                $val = "$val";
+            } elsif ( ref $val ) {
+                die("cannot serialize ref type '@{[ref $val]}' for attribute '$attribute_name'\n"
+                );
+            }
+
+            if ( length( $val ) > 0 ) {
+                $new_content .= sprintf( "%s: %s\n", $attribute_name, $val );
+            }
         }
     }
-    $new_content .= "\n" . $self->raw_body . "\n";
-    $self->source_file->spew( $new_content );
+
+    if ( $new_content ) {
+
+# Have added back new attributes; ensure there is a space between headers and content
+        $new_content .= "\n";
+    }
+
+    return $new_content . $self->raw_body;
+}
+
+sub serialize_source {
+    my ( $self ) = @_;
+
+    $self->source_file->spew( $self->get_updated_source );
 }
 
 sub can_publish {
