@@ -78,7 +78,7 @@
 
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-3 sidebar d-none d-sm-block">
+            <div class="col-md-3 sidebar d-none d-md-block">
                 <h2 class="bg-info text-light text-center">Utilities</h2>
                 <div class="sidebar-inner">
                     <section class="about pr-1">
@@ -115,7 +115,7 @@
                     </section>
                 </div>
             </div>
-            <div class="col-sm-9 content pl-0">[%- content %]</div>
+            <div class="col-md-9 col-sm-12 content pl-0">[%- content %]</div>
             
         </div>
         <footer class="engine-attribution text-center">

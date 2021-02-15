@@ -8,6 +8,7 @@ use DateTime::Format::W3CDTF;
 use HTML::Strip;
 use Path::Class::File;
 use Moo;
+use MIME::Base64;
 use URI;
 
 use Plerd::Config;
@@ -52,6 +53,16 @@ has 'date_as_mysql' => (
 
 sub _build_date_as_mysql {
     DateTime::Format::MySQL->format_datetime( shift->date );
+}
+
+has 'id' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_id',
+);
+sub _build_id {
+    my  ($self) = @_;
+    return encode_base64($self->uri);
 }
 
 has 'publication_file' => (

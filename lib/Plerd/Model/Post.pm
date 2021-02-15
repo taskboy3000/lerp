@@ -9,6 +9,7 @@ use DateTime::Format::W3CDTF;
 use File::Basename;
 use HTML::SocialMeta;
 use HTML::Strip;
+use Digest::SHA qw(sha1_hex);
 use Moo;
 use Path::Class::File;
 use Text::MultiMarkdown qw( markdown );
@@ -131,6 +132,17 @@ sub _build_guid {
     $self->attributes_have_changed( 1 );
     return Data::GUID->new;
 }
+
+has 'id' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_id',
+);
+sub _build_id {
+    my  ($self) = @_;
+    return sha1_hex($self->uri);
+}
+
 
 # Inherit from the config
 has 'image' => (
