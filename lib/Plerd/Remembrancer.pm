@@ -88,7 +88,14 @@ sub load {
     if ( -e $entry ) {
         if ( -s $entry ) {
             my $yaml = $entry->slurp();
-            return Load( $yaml );
+            my $data;
+            eval {
+                $data = Load( $yaml );
+                1;
+            } or do {
+                die("$entry is invalid:\n$@");
+            };
+            return $data;
         } else {
             return 1;
         }
