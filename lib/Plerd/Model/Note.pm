@@ -220,6 +220,7 @@ sub parse {
     my ($self, $raw) = @_;
 
     $raw //= $self->raw_body;
+    my $urlPat = q[http(?:s)?://(?:\S+)];
 
     my @lines;
     LINE:
@@ -230,7 +231,6 @@ sub parse {
         #
         # If a line contains a "command string" followed by a URL,
         # mark it up in a specific way
-        my $urlPat = q[http(?:s)?://(?:\S+)];
         my %citations = (
             qq[^->\\s*($urlPat)\$] => sub {
                 my ($url) = @_;
@@ -255,7 +255,7 @@ sub parse {
         }
 
         for my $word (split(/ /, $line)) {
-            if ($word =~ m!^http(?:s)://(?:(\w+)\.){2,}!) {
+            if ($word =~ m!$urlPat!o) {
                 $word = sprintf(q[<a rel="noopener noreferrer" href="%s">%s</a>],
                                 $word,
                                 $word,

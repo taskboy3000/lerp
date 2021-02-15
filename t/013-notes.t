@@ -23,7 +23,7 @@ qq[I hate Mondays. ☹️
 #mondays #rainydays],
 q[I hate Mondays. ☹️
 <a href="tags.html#tag-mondays-list">#mondays</a> <a href="tags.html#tag-rainydays-list">#rainydays</a>],
-            ],      
+            ],
             [
 q[ Acrostics
  Simply
@@ -71,8 +71,32 @@ This garbage site is garbage.]
 q[^https://twitter.com/
 Although it too is a garbage site, I rather prefer it to others.],
 q[<div class="h-cite u-like-of like"><abbr title="I like the following post">👍</abbr>: <a rel="noopener noreferrer" class="" href="https://twitter.com/">https://twitter.com/</a></div>
-Although it too is a garbage site, I rather prefer it to others.]                
+Although it too is a garbage site, I rather prefer it to others.]
             ],
+        [
+        q[^ https://twitter.com/emilyst/status/1361086453556518912?s=20
+
+This tweetstorm gets it right.  Cyptocurrencies are all comp sci projects that escaped the lab.
+
+I see few of the promises of this “currencies” coming true.  It does not scale. It consumes hideous amounts of power.
+
+Your crypto wallets will, trust me, be used against you.
+
+h/t to Aaron Parecki via https://aaronparecki.com/2021/02/14/24/bitcoin
+
+#bitcoin],
+        q[<div class="h-cite u-like-of like"><abbr title="I like the following post">👍</abbr>: <a rel="noopener noreferrer" class="" href="https://twitter.com/emilyst/status/1361086453556518912?s=20">https://twitter.com/emilyst/status/1361086453556518912?s=20</a></div>
+
+This tweetstorm gets it right.  Cyptocurrencies are all comp sci projects that escaped the lab.
+
+I see few of the promises of this “currencies” coming true.  It does not scale. It consumes hideous amounts of power.
+
+Your crypto wallets will, trust me, be used against you.
+
+h/t to Aaron Parecki via <a rel="noopener noreferrer" href="https://aaronparecki.com/2021/02/14/24/bitcoin">https://aaronparecki.com/2021/02/14/24/bitcoin</a>
+
+<a href="tags.html#tag-bitcoin-list">#bitcoin</a>],
+        ]
         );
 
     my $N = Plerd::Model::Note->new;
@@ -82,12 +106,12 @@ Although it too is a garbage site, I rather prefer it to others.]
         ok($got eq $expected, "parse test");
         if ($got ne $expected) {
             say "RAW RESPONSE:\n$got|";
-            $expected =~ s/ /./g;
-            $got =~ s/ /./g;
+            # $expected =~ s/ /./g;
+            # $got =~ s/ /./g;
             say "Expected (@{[length($expected)]}):\n$expected|";
             say "---\nGot (@{[length($got)]}):\n$got|";
         }
-    }       
+    }
 }
 
 sub TestNotesModel {
@@ -108,7 +132,7 @@ sub TestNotesModel {
         diag($note->body);
         diag("--------------------");
         diag("="x75);
-    }    
+    }
 }
 
 #------------
