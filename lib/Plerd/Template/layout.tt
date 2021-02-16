@@ -25,7 +25,7 @@
     [% END %]
     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="preload" href="[% siteCSS.uri %]" as="style">
     <link rel="stylesheet" href="[% siteCSS.uri %]">
 </head>
 <body>
@@ -80,7 +80,7 @@
         <div class="row">
             <div class="col-md-3 sidebar d-none d-md-block">
                 <h2 class="bg-info text-light text-center">Utilities</h2>
-                <div class="sidebar-inner">
+                <div class="sidebar-inner small">
                     <section class="about pr-1">
                         <h3>About this site</h3>
                         [% siteDescription %]
