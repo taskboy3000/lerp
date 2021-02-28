@@ -16,44 +16,56 @@
     <link rel="webmention" href="[% config.webmention_endpoint %]">
     [% END %]
 
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/vs2015.min.css">
+
     [% IF activeSection == "notes_roll" %]
     <link href="[% notesJSONFeed.uri %]" rel="alternate" title="JSON feed" type="application/feed+json">
     [% ELSE %]
     <link href="[% rssFeed.uri %]" rel="alternate" title="Atom feed" type="application/atom+xml">
     <link href="[% jsonFeed.uri %]" rel="alternate" title="JSON feed" type="application/json">
     [% END %]
-    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito">
+
     <link rel="preload" href="[% siteCSS.uri %]" as="style">
     <link rel="stylesheet" href="[% siteCSS.uri %]">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-info">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-info mx-auto">
         <div class="logo-container">
-            <a class="navbar-brand" href="[% config.base_uri %]">[% config.title %]</a>
+            <a class="navbar-brand ps-2" href="[% config.base_uri %]">[% config.title %]</a>
         </div>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav ps-sm-3 text-shadow">
                 <li class="nav-item [% activeSection == "blog" ? "active" : "" %]">
                     <a class="nav-link" title="The latest published articles" href="[% frontPage.uri %]">Latest Articles</a>
                 </li>
                 <li class="nav-item [% activeSection == "notes_roll" ? "active" : "" %]">
                     <a class="nav-link" title="The latest notes in reverse chronological order" href="[% notesRoll.uri %]">Notes</a>
                 </li>
-                <li class="nav-item [% activeSection == "tags" ? "active" : "" %]">
-                    <a class="nav-link" title="All published articles grouped by tags" href="[% tagsIndex.uri %]">Tags</a>
-                </li>
                 <li class="nav-item [% activeSection == "archive" ? "active" : "" %]">
                     <a class="nav-link" title="A chronologic grouping of all published articles" href="[% archive.uri %]">Archive</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" title="An Atom feed of the latest articles" href="[% rssFeed.uri %]">Blog Feed</a>
+                <li class="nav-item [% activeSection == "tags" ? "active" : "" %]">
+                    <a class="nav-link" title="All published articles grouped by tags" href="[% tagsIndex.uri %]">Tags</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href="#">
+                    Feeds
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a class="dropdown-item" title="An Atom feed of the latest articles" href="[% rssFeed.uri %]">Articles</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" title="JSON feed of latest notes" href="[% notesJSONFeed.uri %]">Notes</a>
+                    </li>
+                  </ul>
                 </li>
 
                 [% FOREACH customNavItem = config.custom_nav_items %]
@@ -67,10 +79,10 @@
 
     [% IF jumbotron > 0 %]
     <div class="jumbotron text-center">
-        <div class="heading-wrapper">  
-          <h1 class="display-3">[% section_title || config.title %]</h1>
+        <div class="heading-wrapper">
+          <h1 class="display-3 text-shadow">[% section_title || config.title %]</h1>
           [% IF section_description %]
-          <p class="lead">[% section_description %]</p>
+          <p class="lead text-gray text-shadow">[% section_description %]</p>
           [% END %]
         </div>
     </div>
@@ -79,14 +91,14 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 sidebar d-none d-md-block">
-                <h2 class="bg-info text-light text-center">Utilities</h2>
+                <h2 class="text-center text-gray text-shadow bg-primary pb-3">Utilities</h2>
                 <div class="sidebar-inner small">
-                    <section class="about pr-1">
+                    <section class="about pe-1">
                         <h3>About this site</h3>
                         [% siteDescription %]
                     </section>
                     <br>
-                    <section class="search pr-1">
+                    <section class="search pe-1">
                         <h3>Search</h3>
                         <form action="https://duckduckgo.com" method="get" class="form">
                             <input name="sites" type="hidden" value="[% config.base_uri %]">
@@ -99,24 +111,24 @@
                         </form>
                     </section>
                     <br>
-                    <section class="recent_posts pr-1">
+                    <section class="recent_posts pe-1">
                         <h3>Recent Posts</h3>
                         <ul id="recent-posts-list"></ul>
                     </section>
                     <br>
-                    <section class="recent_notes pr-1">
+                    <section class="recent_notes pe-1">
                         <h3>Latest Notes</h3>
                         <ul id="latest-notes-list"></ul>
                     </section>
                     <br>
-                    <section class="pr-1">
+                    <section class="pe-1">
                         <h3>HTML Validation</h3>
                         <a target="_blank" rel="noreferrer noopener" href="[% u = w3validatorURI.clone; u.query_form("doc", thisURI); u %]">Validate now</a>
                     </section>
                 </div>
             </div>
-            <div class="col-md-9 col-sm-12 content pl-0">[%- content %]</div>
-            
+            <div class="col-md-9 col-sm-12 content ps-0">[%- content %]</div>
+
         </div>
         <footer class="engine-attribution text-center">
             <p>
@@ -125,8 +137,8 @@
         </footer>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
     <script src="[% siteJS.uri %]"></script>
 </body>
 </html>

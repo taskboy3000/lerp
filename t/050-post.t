@@ -54,12 +54,25 @@ sub TestPostWithFormatedTitle {
     }
 }
 
+sub TestFencedCodeBlock {
+    my $source_file = Path::Class::File->new( "$FindBin::Bin", "source_model",
+        "fenced-code-block.md" );
+
+    my $post = Plerd::Model::Post->new( source_file => $source_file );
+    $post->load_source;
+    ok( $post->has_body, "Post has a body" );
+
+    diag( "Source file: " . $source_file );
+    diag( "Body:\n" . $post->body );
+}
+
 #--------------
 # Helpers
 #--------------
 sub Main {
     setup();
 
+    TestFencedCodeBlock();
     TestEmptyPost();
     TestPostWithEmptySource();
     TestPostWithFormatedTitle();

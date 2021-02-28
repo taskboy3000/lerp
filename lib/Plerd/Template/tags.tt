@@ -1,7 +1,7 @@
 [%- # Joe Johnston <jjohn@taskboy.com> %]
 [% WRAPPER layout.tt
       section_title = 'Tags'
-      section_description = 'Blog posts and notes grouped by tags'
+      section_description = 'Articles and notes grouped by tags'
 %]
 <br>
 <h2>Index</h2>
@@ -19,7 +19,7 @@
 <ul id="all-tags-list" class="list-unstyled">
   [% FOREACH letter = ['A'..'Z'] %]
     <li id="[% letter %]-tag-list">
-      <h3 class="bg-info text-light">[% letter %]</h3>
+      <h3 class="bg-info text-light bg-gradient-primary">[% letter %]</h3>
       [% IF tag_links.$letter %]
       <ul class="tags-grouped-by-letter-list list-unstyled">
       [%- FOREACH tag = tag_links.$letter.keys.sort %]

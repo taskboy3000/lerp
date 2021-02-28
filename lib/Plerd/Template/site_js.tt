@@ -107,6 +107,7 @@ function initialize () {
     getRecentPosts();
     getRecentNotes();
     initializeWebMentions();
+    hljs.initHighlighting();
 }
 
-window.addEventListener('DOMContentLoaded', initialize, false);
+window.addEventListener('load', initialize, false);

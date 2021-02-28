@@ -2,6 +2,8 @@
 package Plerd::Model::TagIndex;
 use Modern::Perl '2018';
 
+use Fcntl       ( ':flock' );
+use Digest::SHA ( 'sha1_hex' );
 use Path::Class::File;
 use Moo;
 use URI;
@@ -119,6 +121,7 @@ sub update_tag_for_post {
     return if !ref $tag && !ref $post;
 
     my $tm     = $self->config->tag_memory;
+    my $lock   = $self->get_lock( $tag );
     my $memory = $tm->load( $tag->name );
 
     my $changed = 0;
@@ -174,6 +177,7 @@ sub update_tag_for_post {
         $tm->save( $tag->name, $memory );
     }
 
+    $self->free_lock( $lock => $tag );
     return 1;
 }
 
@@ -192,6 +196,7 @@ sub remove_tag_from_post {
 
     my $tag_name = ref $tag ? $tag->name : $tag;
     my $tm       = $self->config->tag_memory;
+    my $lock     = $self->get_lock( $tag );
     my $memory   = $tm->load( $tag_name );
 
     my $changed = 0;
@@ -218,8 +223,32 @@ sub remove_tag_from_post {
             }
         }
     }
-
+    $self->free_lock( $lock => $tag );
     return 1;
+}
+
+sub get_lock_filename_for_tag {
+    my ( $self, $tag ) = @_;
+
+    my $sha = sha1_hex( $tag->name );
+
+    my $lockFileName = $self->config->run_directory . '/tag-$sha.lock';
+    return $lockFileName;
+}
+
+sub get_lock {
+    my ( $self, $tag ) = @_;
+    my $lockFileName = $self->get_lock_filename_for_tag( $tag );
+    open my $lockFH, '>', $lockFileName or die "lock file: $!";
+    flock $lockFH, LOCK_EX;
+    return $lockFH;
+}
+
+sub free_lock {
+    my ( $self, $lockFH, $tag ) = @_;
+    my $lockFileName = $self->get_lock_filename_for_tag( $tag );
+    flock( $lockFH, LOCK_UN );
+    unlink $lockFileName;
 }
 
 1;

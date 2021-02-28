@@ -1,6 +1,6 @@
 [% WRAPPER layout.tt
      section_title = 'Archives'
-     section_description = 'Blog posts sorted in reverse chronological order'
+     section_description = 'Articles sorted in reverse chronological order'
 %]
 <div class="archived-articles-list">
 [% current_month = 0 %]

@@ -2,19 +2,23 @@
      zero_padded = format("%02d");
 %]
 <div class="h-entry note">
-    <div class="masthead">
-        Published on
-        <time class="dt-published" datetime="[% note.utc_date.ymd %]T[% note.utc_date.hms %]+00:00">
-            [% note.date_as_mysql %] UTC            
-        </time>
-        by 
-        <a class="p-author h-card text-light" href="[% config.base_uri %]">[% config.author_name %]</a>
+    <div class="masthead text-gray text-shadow bg-primary pt-4">
+        <div class="row">
+           <div class="col-sm-7">
+                [% note.title %]
+           </div>
+           <div class="col-sm-4 text-right">
+                <time class="dt-published text-small" datetime="[% note.utc_date.ymd %]T[% note.utc_date.hms %]+00:00">
+                    Published on [% note.date_as_mysql %] UTC
+                </time>
+           </div>
+           <div class="col-sm-1 text-right">
+                <a class="u-url u-uid text-light" href="[% note.uri %]" title="Permalink for bookmarking and webmentions">
+                    &Lscr;
+                </a>
+           </div>
+        </div>
 
-        · 
-
-        <a class="u-url u-uid text-light" href="[% note.uri %]" title="Permalink for bookmarking and webmentions">
-           &Lscr;
-        </a>
 
     </div>
     <div class="e-content">[% note.body %]</div>

@@ -10,6 +10,7 @@ requires 'JSON';
 requires 'Modern::Perl';
 requires 'Moo';
 requires 'Path::Class';
+requires 'Parallel::ForkManager';
 requires 'Template';
 requires 'Test::More';
 requires 'Text::MultiMarkdown';

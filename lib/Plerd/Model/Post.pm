@@ -12,10 +12,11 @@ use HTML::Strip;
 use Digest::SHA qw(sha1_hex);
 use Moo;
 use Path::Class::File;
-use Text::MultiMarkdown qw( markdown );
+
 use URI;
 
 use Plerd::Config;
+use Plerd::Markdown;
 use Plerd::Model::Tag;
 use Plerd::SmartyPants;
 
@@ -749,7 +750,8 @@ sub can_publish {
 #-------------------
 sub _apply_markdown {
     my ( $string ) = @_;
-    return Plerd::SmartyPants::process( markdown( $string || '' ) );
+    my $md = Plerd::Markdown->new();
+    return Plerd::SmartyPants::process( $md->markdown( $string || '' ), 'qdeqw' );
 }
 
 sub _coerce_file {

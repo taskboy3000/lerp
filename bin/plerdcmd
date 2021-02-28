@@ -30,7 +30,6 @@ sub Main {
     GetOptions(
 
         # commands
-        'init'                   => \$opts{ initialize },
         'P|publish-all'          => \$opts{ publish_all },
         'N|publish-only-notes'   => \$opts{ publish_only_notes },
         'O|publish-only-posts'   => \$opts{ publish_only_posts },
@@ -44,16 +43,24 @@ sub Main {
         'h|help'       => \$opts{ usage },
         'v|verbose'    => \$opts{ verbose },
         'version'      => \$opts{ version },
+        'w|workers=i'  => \$opts{ workers },
     );
+
+    if ( !defined $opts{ workers } ) {
+        $opts{ workers } = 1;
+    }
 
     if ( $opts{ help } ) {
         usage();
     } elsif ( $opts{ version } ) {
         version();
-    } elsif ( $opts{ initialize } ) {
-        initialize( $opts{ config }, $opts{ base_dir }, $opts{ verbose } );
     } elsif ( $opts{ publish_all } ) {
-        publish_all( $opts{ config }, $opts{ verbose }, $opts{ force } );
+        publish_all(
+            $opts{ config },
+            $opts{ verbose },
+            $opts{ force },
+            $opts{ workers }
+        );
     } elsif ( $opts{ list_recent_posts } ) {
         list_recent_posts( $opts{ config } );
     } elsif ( $opts{ publish_only_notes } ) {
@@ -91,7 +98,6 @@ USAGE:
 
 COMMAND:
 
---init                   Create a new plerd site
 --P|publish-all          Republish all known source files
 --O|publish-only-posts   Publish only new posts; ignore new notes
 --N|publish-only-notes   Publish only new notes; ignore new posts
@@ -99,11 +105,12 @@ COMMAND:
 
 OPTIONS:
 
---c|config [FILE]        Name of plerd configuration file to use
---base-dir [DIR]         Directory into which plerd artifacts are copied
+--c|config [FILE]        Name of  configuration file to use
+--base-dir [DIR]         Directory into which artifacts are copied
 --force                  Force the publication of files, even if source has not changed
+--w|workers [INT]        Number of processes to spawn
 --v|verbose              Enable verbose messages
---version                Print plerd version number
+--version                Print version number
 --help                   This screen
 
 EOT
@@ -161,7 +168,7 @@ sub initialize {
 }
 
 sub publish_all {
-    my ( $conf_file, $verbose, $force ) = @_;
+    my ( $conf_file, $verbose, $force, $workers ) = @_;
 
     my $start = time();
 
@@ -184,10 +191,15 @@ sub publish_all {
 
     my $lock_fh = get_lock( $config );
     if ( $verbose ) {
+        printf( "Using %d worker(s) to generate posts\n", $workers );
         say "Publishing articles to " . $config->publication_directory;
     }
 
-    $plerd->publish_all( verbose => $verbose, force => $force );
+    $plerd->publish_all(
+        verbose => $verbose,
+        force   => $force,
+        workers => $workers
+    );
     free_lock( $lock_fh );
 
     if ( $verbose ) {

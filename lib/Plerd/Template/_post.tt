@@ -1,12 +1,15 @@
-[%# 
+[%#
    Posts use the h-entry microformat: http://microformats.org/wiki/h-entry
 %]
 <article class="post h-entry">
-    <h2 class="[% title_hightlight ? "bg-info" : "text-center pt-2" %]">
-        <a class="[% title_hightlight ? "text-light" : "text-info" %] u-url u-uid" href="[% post.uri %]">
-           <span class="p-name">[% post.title %]</span>
-        </a>
-    </h2>
+    <div class="text-center text-gray text-shadow bg-primary pt-2 pb-1 mb-4">
+        <h2>
+          <a class="text-gray u-url u-uid" href="[% post.uri   %]">
+            <span class="p-name">[% post.title %]</span>
+          </a>
+        </h2>
+
+    </div>
 
     <div class="content-wrapper">
         [% IF include_reading_time %]
@@ -17,7 +20,7 @@
             </p>
         [% END %]
 
-        <div class="post-content pl-3 pr-3">
+        <div class="post-content ps-3 pe-3">
 
             <div class="body e-content">[%- post.body %]</div>
 
@@ -32,7 +35,7 @@
                 </p>
             </div>
         </div>
-    
+
         [% IF post.tags.size > 0 %]
             <ul class="list-inline tag-list">
                 <li class="list-inline-item">Tags:</li>
@@ -49,7 +52,7 @@
 </article>
 
 <p class="small">
-    <a href="#" data-toggle="modal" data-target="#mdl-comment-referral-[% post.id %]">💬 Share a response to this post</a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#mdl-comment-referral-[% post.id %]">💬 Share a response to this post</a>
 </p>
 
 [% IF post.webmentions_summary_uri %]
@@ -67,24 +70,24 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Share a response</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <p>To share a response that links to this page from somewhere else on the web, paste its URL here.</p>
                     <p>
-                        <label for="tx-source">URL to the response</label>
-                        <input class="form-control" id="tx-source" name="source" type="text"  placeholder="https://www.example.com/your_post.html"/>
+                        <label>URL to the response</label>
+                        <input class="form-control" name="source" type="text"  placeholder="https://www.example.com/your_post.html"/>
                     </p>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </form>
-                
+
     </div>
 </div>

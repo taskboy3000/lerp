@@ -1,6 +1,6 @@
 [% WRAPPER 'layout.tt'
       section_title = "Notes Roll"
-      section_description = 'Reverse chronological list of notes'
+      section_description = 'Indieweb-style Microposts '
 %]
 
 [% IF notesDescription %]

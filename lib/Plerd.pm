@@ -3,8 +3,10 @@
 package Plerd;
 use Modern::Perl '2018';
 
+use Fcntl ( ':flock' );
 use JSON;
 use Moo;
+use Parallel::ForkManager;
 use Template;
 use Template::Stash;
 use Text::MultiMarkdown qw( markdown );
@@ -886,6 +888,7 @@ sub publish_all {
         'verbose'    => 0,
         'only_notes' => 0,
         'only_posts' => 0,
+        'workers'    => 0,
         @_
     );
 
@@ -897,6 +900,10 @@ sub publish_all {
                 . $self->config->source_directory;
         }
 
+        # @todo: think about how to tell parent that a post was published.
+        $did_publish_posts = ( $opts{ workers } > 1 );
+
+        my $pm = Parallel::ForkManager->new( $opts{ workers } );
         if ( -e $self->config->source_directory ) {
             for (
                 my $source_file = $self->first_source_file;
@@ -904,6 +911,7 @@ sub publish_all {
                 $source_file = $self->next_source_file
                 )
             {
+                $pm->start && next;
                 my $post;
                 eval {
                     $post = Plerd::Model::Post->new(
@@ -931,7 +939,9 @@ sub publish_all {
                             . $source_file->basename;
                     }
                 }
+                $pm->finish;
             }
+            $pm->wait_all_children;
         }
     }
 
@@ -1223,6 +1233,28 @@ sub _publish {
     }
 
     return 1;
+}
+
+sub get_lock_filename_for_post {
+    my ( $self, $post ) = @_;
+    my $guid         = $post->guid;
+    my $lockFileName = $self->config->run_directory . '/post-$guid.lock';
+    return $lockFileName;
+}
+
+sub get_lock {
+    my ( $self, $post ) = @_;
+    my $lockFileName = $self->get_lock_filename_for_post( $post );
+    open my $lockFH, '>', $lockFileName or die "lock file: $!";
+    flock $lockFH, LOCK_EX;
+    return $lockFH;
+}
+
+sub free_lock {
+    my ( $self, $lockFH, $post ) = @_;
+    my $lockFileName = $self->get_lock_filename_for_post( $post );
+    flock( $lockFH, LOCK_UN );
+    unlink $lockFileName;
 }
 
 1;
