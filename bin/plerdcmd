@@ -149,11 +149,11 @@ sub initialize {
     my $config = get_config( $conf_file, $base_dir );
 
     if ( $verbose ) {
-        printf( "Using conf: %s\n", $config->config_file );
+        printf( "[$$] Using conf: %s\n", $config->config_file );
     }
 
     if ( $verbose ) {
-        say "Trying to obtain lock";
+        say "[$$] Trying to obtain lock";
     }
 
     my ( $lock_fh ) = get_lock( $config );
@@ -175,24 +175,24 @@ sub publish_all {
     my $config = get_config( $conf_file );
 
     if ( !-e $config->config_file ) {
-        die( "Cannot find plerd config file: " . $config->config_file );
+        die( "[$$] Cannot find plerd config file: " . $config->config_file );
     }
 
     if ( $verbose ) {
-        say "Using config file: " . $config->config_file;
+        say "[$$] Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
     my $plerd = Plerd->new( config => $config );
     if ( $verbose ) {
-        say "Trying to obtain lock";
+        say "[$$] Trying to obtain lock";
     }
 
     my $lock_fh = get_lock( $config );
     if ( $verbose ) {
-        printf( "Using %d worker(s) to generate posts\n", $workers );
-        say "Publishing articles to " . $config->publication_directory;
+        printf( "[$$] Using %d worker(s) to generate posts\n", $workers );
+        say "[$$] Publishing articles to " . $config->publication_directory;
     }
 
     $plerd->publish_all(
@@ -203,7 +203,7 @@ sub publish_all {
     free_lock( $lock_fh );
 
     if ( $verbose ) {
-        printf( "Site generated in %0.02f minutes\n",
+        printf( "[$$] Site generated in %0.02f minutes\n",
             ( time() - $start ) / 60 );
     }
 }
@@ -220,19 +220,19 @@ sub publish_only_notes {
     }
 
     if ( $verbose ) {
-        say "Using config file: " . $config->config_file;
+        say "[$$] Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
     my $plerd = Plerd->new( config => $config );
     if ( $verbose ) {
-        say "Trying to obtain lock";
+        say "[$$] Trying to obtain lock";
     }
 
     my $lock_fh = get_lock( $config );
     if ( $verbose ) {
-        say "Publishing articles to " . $config->publication_directory;
+        say "[$$] Publishing articles to " . $config->publication_directory;
     }
 
     $plerd->publish_all(
@@ -243,7 +243,7 @@ sub publish_only_notes {
     free_lock( $lock_fh );
 
     if ( $verbose ) {
-        printf( "Site generated in %0.02f minutes\n",
+        printf( "[$$] Site generated in %0.02f minutes\n",
             ( time() - $start ) / 60 );
     }
 
@@ -257,23 +257,23 @@ sub publish_only_posts {
     my $config = get_config( $conf_file );
 
     if ( !-e $config->config_file ) {
-        die( "Cannot find plerd config file: " . $config->config_file );
+        die( "[$$] Cannot find plerd config file: " . $config->config_file );
     }
 
     if ( $verbose ) {
-        say "Using config file: " . $config->config_file;
+        say "[$$] Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
     my $plerd = Plerd->new( config => $config );
     if ( $verbose ) {
-        say "Trying to obtain lock";
+        say "[$$] Trying to obtain lock";
     }
 
     my $lock_fh = get_lock( $config );
     if ( $verbose ) {
-        say "Publishing articles to " . $config->publication_directory;
+        say "[$$] Publishing articles to " . $config->publication_directory;
     }
 
     $plerd->publish_all(
@@ -284,7 +284,7 @@ sub publish_only_posts {
     free_lock( $lock_fh );
 
     if ( $verbose ) {
-        printf( "Site generated in %0.02f minutes\n",
+        printf( "[$$] Site generated in %0.02f minutes\n",
             ( time() - $start ) / 60 );
     }
 
@@ -302,19 +302,19 @@ sub publish_only_support {
     }
 
     if ( $verbose ) {
-        say "Using config file: " . $config->config_file;
+        say "[$$] Using config file: " . $config->config_file;
     }
 
     $config->unserialize;
 
     my $plerd = Plerd->new( config => $config );
     if ( $verbose ) {
-        say "Trying to obtain lock";
+        say "[$$] Trying to obtain lock";
     }
 
     my $lock_fh = get_lock( $config );
     if ( $verbose ) {
-        say "Publishing support files to " . $config->publication_directory;
+        say "[$$] Publishing support files to " . $config->publication_directory;
     }
 
     $plerd->publish_support_files(
@@ -325,7 +325,7 @@ sub publish_only_support {
     free_lock( $lock_fh );
 
     if ( $verbose ) {
-        printf( "Site generated in %0.02f minutes\n",
+        printf( "[$$] Site generated in %0.02f minutes\n",
             ( time() - $start ) / 60 );
     }
 }
@@ -343,7 +343,7 @@ sub list_recent_posts {
     my $plerd  = Plerd->new( config => $config );
     my $recent = $plerd->get_recent_posts;
     if ( @$recent == 0 ) {
-        say "No post published yet.";
+        say "[$$] No post published yet.";
         return;
     }
 
@@ -368,7 +368,7 @@ sub get_lock {
     }
 
     open my $fh, '<', $lock_file or die( "assert" );
-    flock( $fh, LOCK_EX ) or die "Cannot lock mailbox - $!\n";
+    flock( $fh, LOCK_EX | LOCK_NB ) or die "Cannot obtain lock now. Try back later.\n";
     return $fh;
 }
 
