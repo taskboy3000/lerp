@@ -315,7 +315,7 @@ sub publish_post {
                 # the cache is newer than the source.
                 # decline to proceed.
                 if ( $opts{ verbose } ) {
-                    say "Declining to reprocess unchanged "
+                    say "[$$] Declining to reprocess unchanged "
                         . $post->source_file->basename;
                 }
                 return;
@@ -329,7 +329,7 @@ sub publish_post {
 
     if ( !$post->can_publish ) {
         if ( $opts{ verbose } ) {
-            say "Post cannot be published without both a title and body.";
+            say "[$$] Post cannot be published without both a title and body.";
         }
         return;
     }
@@ -352,7 +352,7 @@ sub publish_post {
         )
     {
         if ( $opts{ verbose } ) {
-            say "Published " . $post->publication_file->basename;
+            say "[$$] Published " . $post->publication_file->basename;
         }
 
       # @todo: fix orphan tag problem when a post is updated with tags removed

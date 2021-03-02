@@ -74,8 +74,8 @@ function initializeWebMentions () {
                     let a = document.createElement("a");
                     let d_node = wb_summary.parentNode.querySelector(".display");
                     a.setAttribute("href", "#");
-                    a.setAttribute("data-toggle", "collapse");
-                    a.setAttribute("data-target", "div.display[data-display-uri='"
+                    a.setAttribute("data-bs-toggle", "collapse");
+                    a.setAttribute("data-bs-target", "div.display[data-display-uri='"
                        + d_node.getAttribute('data-display-uri')
                        + "']");
                     a.innerHTML=html;
